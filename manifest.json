@@ -1,0 +1,10 @@
+{
+  "name": "Page Notes",
+  "version": "1.0",
+  "description": "Notes for a web page.",
+  "browser_action": {
+    "default_icon": "icon.png",
+    "popup": "popup.html"
+  },
+  "permissions": [ "tabs" ]
+}

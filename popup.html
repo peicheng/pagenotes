@@ -1,0 +1,32 @@
+<style>
+body {
+  margin: 0px;
+  padding: 0px;
+  font-family: tahoma, arial, sans-serif;
+  font-size: small;
+}
+#notes {
+  margin: 5px;
+  padding: 5px;
+  width: 256px;
+  height: 256px;
+}
+</style>
+
+<script>
+  function retrievePageNotes(tab) {
+	var notes = document.getElementById("notes");
+	if(localStorage[tab.url]) {
+    	notes.innerHTML = localStorage[tab.url];
+	}
+	else notes.innerHTML = "&nbsp;";
+    notes.addEventListener("blur", function () {
+    	localStorage[tab.url] = this.innerHTML;
+    });
+  }
+  chrome.tabs.getSelected(null, retrievePageNotes);
+</script>
+
+<div id="notes" contenteditable></div>
+<br/>
+<p></p>
