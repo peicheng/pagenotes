@@ -1,39 +1,48 @@
-<style type="text/css">
-  body {
-    margin: 3px;
-    padding: 3px;
-    width: 256px;
-    font-family: tahoma, arial, sans-serif;
-    font-size: small;
-  }
-</style>
-<script type="text/javascript">
-  function retrievePageNotes(tab) {
-    var notes = document.getElementById("notes");
-    if(localStorage[tab.url]) {
-      notes.innerHTML = localStorage[tab.url];
-    } else
-      notes.innerHTML = "&nbsp;";
-
-    var editbutton = document.getElementById("save-edit-button");
-    editbutton.addEventListener("click", function() {
-      if(this.innerHTML == "Edit") {
-        notes.contentEditable = true;
-        notes.focus();
-        this.innerHTML = "Save";
-      } else if(this.innerHTML == "Save") {
-        notes.contentEditable = false;
-        localStorage[tab.url] = notes.innerHTML;
-        this.innerHTML = "Edit"
+<!DOCTYPE html>
+<html>
+  <head>
+    <style type="text/css">
+      body {
+        margin: 3px;
+        padding: 3px;
+        width: 256px;
+        font-family: tahoma, arial, sans-serif;
+        font-size: small;
       }
-    });
-  }
+    </style>
+    <script type="text/javascript">
+      function retrievePageNotes(tab) {
+        var notes = document.getElementById("notes");
+        // Get notes for the current tab and display.
+        notes.innerHTML = "&nbsp;";
+        if(localStorage[tab.url]) {
+          notes.innerHTML = localStorage[tab.url];
+        }
+        // Add even listener to the Edit/Save button.
+        var editbutton = document.getElementById("save-edit-button");
+        editbutton.addEventListener("click", function() {
+          if(this.innerHTML == "Edit") {
+            notes.contentEditable = true;
+            notes.focus();
+            this.innerHTML = "Save";
+          } else if(this.innerHTML == "Save") {
+            notes.contentEditable = false;
+            localStorage[tab.url] = notes.innerHTML;
+            this.innerHTML = "Edit"
+          }
+        });
+      }
 
-  chrome.tabs.getSelected(null, retrievePageNotes);
-</script>
-<div id="notes">
-</div>
-<br/>
-<button id="save-edit-button">
-  Edit
-</button>
+      // Chrome extensions API call to get the current tab (URL).
+      chrome.tabs.getSelected(null, retrievePageNotes);
+    </script>
+  </head>
+  <body>
+    <div id="notes">
+    </div>
+    <br/>
+    <button id="save-edit-button">
+      Edit
+    </button>
+  </body>
+</html>
