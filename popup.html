@@ -1,32 +1,38 @@
-<style>
+<style type="text/css">
 body {
-  margin: 0px;
-  padding: 0px;
+  margin: 3px;
+  padding: 3px;
+  width: 256px;
   font-family: tahoma, arial, sans-serif;
   font-size: small;
 }
-#notes {
-  margin: 5px;
-  padding: 5px;
-  width: 256px;
-  height: 256px;
-}
 </style>
 
-<script>
+<script type="text/javascript">
   function retrievePageNotes(tab) {
     var notes = document.getElementById("notes");
     if(localStorage[tab.url]) {
       notes.innerHTML = localStorage[tab.url];
     }
     else notes.innerHTML = "&nbsp;";
-    notes.addEventListener("blur", function () {
-      localStorage[tab.url] = this.innerHTML;
+    
+    var editbutton = document.getElementById("save-edit-button");
+    editbutton.addEventListener("click", function() {
+    	if(this.innerHTML == "Edit") {
+  			notes.contentEditable = true;
+  			notes.focus();
+  			this.innerHTML = "Save";
+  	  }
+  	  else if(this.innerHTML == "Save") {
+  			notes.contentEditable = false;
+  			localStorage[tab.url] = notes.innerHTML;
+  			this.innerHTML = "Edit"
+  		}
     });
   }
   chrome.tabs.getSelected(null, retrievePageNotes);
 </script>
 
-<div id="notes" contenteditable></div>
+<div id="notes"></div>
 <br/>
-<p></p>
+<button id="save-edit-button">Edit</button>
