@@ -3,11 +3,12 @@
   <head>
     <style type="text/css">
       body {
-        margin: 3px;
-        padding: 3px;
         width: 256px;
-        font-family: tahoma, arial, sans-serif;
+        font-family: Helvetica, Arial, sans-serif;
         font-size: small;
+      }
+      #notes {
+        color: #222222;
       }
     </style>
     <script type="text/javascript">
@@ -27,37 +28,43 @@
           notes.innerHTML = localStorage[tabUrl];
         } else if(localStorage[tabHost]) {
           notes.innerHTML = localStorage[tabHost];
-          document.getElementById("site_level").checked = true;
+          document.getElementById("site-level").checked = true;
+        } else {
+          document.getElementById("save-edit-button").value = "Edit";
+          document.getElementById("save-edit-button").innerHTML = "Add";
+          document.getElementById("site-level-div").style.display = "none";
         }
         // Add event listener to the Edit/Save button.
         document.getElementById("save-edit-button").addEventListener("click", function() {
           if(this.value == "Edit") {
             notes.contentEditable = true;
             notes.focus();
+            document.getElementById("site-level-div").style.display = "block";
             this.innerHTML = "Save";
             this.value = "Save";
           } else if(this.value == "Save") {
             notes.contentEditable = false;
-            if (document.getElementById("site_level").checked == false) {
+            if (document.getElementById("site-level").checked == false) {
               localStorage[tabUrl] = notes.innerHTML;
             } else {
               localStorage[tabHost] = notes.innerHTML;
             }
             this.innerHTML = "Edit";
-            this.value = "Edit"
+            this.value = "Edit";
+            window.close();
           }
         });
         // Add event listener to the Delete button.
         document.getElementById("delete-button").addEventListener("click", function() {
           key = tabUrl;
-          if (document.getElementById("site_level").checked) {
+          if (document.getElementById("site-level").checked) {
             key = tabHost;
           }
           localStorage.removeItem(key);
-          location.reload();
+          window.close();
         });
-        // Add event listner to the site_level checkbox
-        document.getElementById("site_level").addEventListener("change", function() {
+        // Add event listner to the site-level checkbox
+        document.getElementById("site-level").addEventListener("change", function() {
           document.getElementById("save-edit-button").value = "Save";
           document.getElementById("save-edit-button").innerHTML = "Save";
         });
@@ -70,11 +77,10 @@
   <body>
     <div id="notes">
     </div>
-    <br/>
-    <input type="checkbox" name="site_level" id="site_level"/>
-    Site Level Notes
-    <br/>
-    <br/>
+    <div id="site-level-div" style="display:block; margin-bottom:5px; margin-top:10px;">
+      <input type="checkbox" name="site-level" id="site-level"/>
+      Site Level Notes
+    </div>
     <button id="save-edit-button" value="Edit">
       Edit
     </button>
