@@ -12,6 +12,8 @@
       }
     </style>
     <script type="text/javascript">
+      var bgPage = chrome.extension.getBackgroundPage();
+      
       function getHostFromUrl(url) {
         var a_element = document.createElement("a");
         a_element.href = url;
@@ -24,10 +26,10 @@
         notes.innerHTML = "&nbsp;";
         tabUrl = tab.url;
         tabHost = getHostFromUrl(tabUrl);
-        if(localStorage[tabUrl]) {
-          notes.innerHTML = localStorage[tabUrl];
-        } else if(localStorage[tabHost]) {
-          notes.innerHTML = localStorage[tabHost];
+        if(bgPage.getPageNotes(tabUrl)) {
+          notes.innerHTML = bgPage.getPageNotes(tabUrl);
+        } else if(bgPage.getPageNotes(tabHost)) {
+          notes.innerHTML = bgPage.getPageNotes(tabHost);
           document.getElementById("site-level").checked = true;
         } else {
           document.getElementById("save-edit-button").value = "Edit";
@@ -45,10 +47,11 @@
           } else if(this.value == "Save") {
             notes.contentEditable = false;
             if (document.getElementById("site-level").checked == false) {
-              localStorage[tabUrl] = notes.innerHTML;
+              bgPage.setPageNotes(tabUrl, notes.innerHTML);
             } else {
-              localStorage[tabHost] = notes.innerHTML;
+              bgPage.setPageNotes(tabHost, notes.innerHTML);
             }
+            localStorage[last_mod_time] = new Date.getTime();
             this.innerHTML = "Edit";
             this.value = "Edit";
             window.close();
@@ -60,7 +63,8 @@
           if (document.getElementById("site-level").checked) {
             key = tabHost;
           }
-          localStorage.removeItem(key);
+          bgPage.removePageNotes(key);
+          localStorage[last_mod_time] = new Date.getTime();
           window.close();
         });
         // Add event listner to the site-level checkbox
@@ -69,10 +73,10 @@
           document.getElementById("save-edit-button").innerHTML = "Save";
         });
       }
-
       // Chrome extensions API call to get the current tab (URL).
       chrome.tabs.getSelected(null, retrievePageNotes);
     </script>
+    <title>Page Notes</title>
   </head>
   <body>
     <div id="notes">

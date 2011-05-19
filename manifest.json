@@ -2,9 +2,17 @@
   "name": "Page Notes",
   "version": "1.0",
   "description": "Notes for a web page.",
+  "background_page": "background.html",
+  "options_page": "options.html",
   "browser_action": {
     "default_icon": "icon.png",
     "popup": "popup.html"
   },
-  "permissions": [ "tabs" ]
+  "permissions": [ 
+    "tabs",
+    "https://docs.google.com/feeds/*",
+    "https://www.google.com/accounts/OAuthGetRequestToken",
+    "https://www.google.com/accounts/OAuthAuthorizeToken",
+    "https://www.google.com/accounts/OAuthGetAccessToken"
+   ]
 }

@@ -1,0 +1,81 @@
+<!--
+* Copyright (c) 2010 The Chromium Authors. All rights reserved.  Use of this
+* source code is governed by a BSD-style license that can be found in the
+* LICENSE file.
+*
+* Author: Eric Bidelman <ericbidelman@chromium.org>
+-->
+<html>
+  <head>
+    <title>Options</title>
+    <style>
+      body {
+        font-family: Helvetica, Arial, sans-serif;
+        font-size: small;
+      }
+    </style>
+    <script type="text/javascript">
+      var bgPage = chrome.extension.getBackgroundPage();
+
+      function logout() {
+        bgPage.logout();
+        location.reload();
+      }
+
+      function setupSync() {
+        if(!bgPage.oauth.hasToken()) {
+          alert('Set up authentication first.');
+          return;
+        }
+        if(!localStorage['remoteDocEntry']) {
+          // alert('no exisiting entry');
+          docentry = new bgPage.GdocsEntry();
+          docentry.getRemoteDataFile();
+          // alert(docentry);
+          if(!localStorage['remoteDocEntry']) {
+            docentry.createRemoteDataFile();
+          }
+        }
+        // alert(localStorage['remoteDocEntry']);
+        location.reload();
+      }
+
+      function clearSync() {
+        localStorage.removeItem('remoteDocEntry');
+        location.reload();
+      }
+
+      function initUI() {
+        if (!bgPage.oauth.hasToken()) {
+          document.getElementById('revoke').disabled = true;
+        } else {
+          document.getElementById('auth').disabled = true;
+        }
+        if (localStorage['remoteDocEntry']) {
+          document.getElementById('setup_sync').disabled = true;
+        } else {
+          document.getElementById('clear_sync').disabled = true;
+        }
+      }
+    </script>
+  </head>
+  <body onload="initUI();">
+    <button id="setup_sync" onclick="setupSync();">
+      Setup Sync
+    </button>
+    <button id="clear_sync" onclick="clearSync();">
+      Clear Sync
+    </button>
+    <p>
+      Authentication Settings:
+    </p>
+    <p style="margin-left:10px; margin-top:10px">
+      <button id="auth" onclick="bgPage.do_oauth(location.reload())">
+        Get Google Docs OAuth Token
+      </button>
+      <button id="revoke" onclick="logout();">
+        Revoke Google Docs OAuth Token
+      </button>
+    </p>
+  </body>
+</html>
