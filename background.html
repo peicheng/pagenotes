@@ -47,28 +47,22 @@
       };
 
       function getRemoteLastModTime() {
-        remoteDocEntry = new GdocsEntry(localStorage['remoteDocEntry']);
-//        alert(JSON.stringify(remoteDocEntry));
-        remoteDocEntry.refresh();   
+        var remoteDocEntry = new GdocsEntry(localStorage.getItem('remoteDocEntry'));
+        //        alert(JSON.stringify(remoteDocEntry));
+        remoteDocEntry.refresh();
         return remoteDocEntry.getLastUpdateTime();
       };
 
-      function setRemoteData(data) {
-        alert('Setting remote data to' + data);
-      };
-
-      function getRemoteData() {
-        alert('Getting remote data');
-      };
-
       function syncToRemote() {
-        local_data_string = getAllPageNotes();
-        setRemoteData(local_data_string);
+        var remoteDocEntry = new GdocsEntry(localStorage.getItem('remoteDocEntry'));
+        remoteDocEntry.setData(getAllPageNotes());
+        localStorage.setItem('last_mod_time', remoteDocEntry.getLastUpdateTime());
       }
 
       function syncToLocal() {
-        remote_data_string = getRemoteData();
-        setAllPageNotes(remote_data_string);
+        var remoteDocEntry = new GdocsEntry(localStorage.getItem('remoteDocEntry'));
+        setAllPageNotes(remoteDocEntry.getData());
+        localStorage.setItem('last_mod_time', remoteDocEntry.getLastUpdateTime());
       }
 
       function sync() {
@@ -80,8 +74,8 @@
           local_last_mod_time = localStorage['last_mod_time']
         }
         remote_last_mod_time = getRemoteLastModTime();
-       alert(local_last_mod_time);
-       alert(remote_last_mod_time);
+        //       alert(local_last_mod_time);
+        //       alert(remote_last_mod_time);
         if (remote_last_mod_time == local_last_mod_time)
           return;
         if (remote_last_mod_time > local_last_mod_time) {
@@ -90,10 +84,10 @@
           syncToRemote();
         }
       }
-      
-//      function sync() {}
 
-//      window.setInterval(sync, SYNC_INTERVAL);
+      //      function sync() {}
+
+      //      window.setInterval(sync, SYNC_INTERVAL);
     </script>
     <title>Page Notes</title>
   </head>

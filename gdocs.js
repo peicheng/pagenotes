@@ -1,13 +1,13 @@
 var bgPage = chrome.extension.getBackgroundPage();
 
-function sendRequest(request, url){
+function sendRequest(request, url, body) {
   var xhr = new XMLHttpRequest();
   xhr.open(request.method, url + '?' + bgPage.stringify(request.parameters), false);
   for (var header in request.headers) {
     xhr.setRequestHeader(header, request.headers[header]);
   }
   xhr.setRequestHeader('Authorization', bgPage.oauth.getAuthorizationHeader(url, request.method, request.parameters));
-  xhr.send();
+  xhr.send(body);
   return xhr;
 }
 
@@ -49,6 +49,10 @@ GdocsEntry.prototype.getId = function() {
   return this.entry.id.$t;
 };
 //
+GdocsEntry.prototype.getResourceId = function() {
+  return this.entry.gd$resourceId.$t.split(':')[1];
+};
+//
 GdocsEntry.prototype.getEditMediaLink = function() {
   var edit_media_link;
   for (var e in this.entry.link) {
@@ -69,6 +73,10 @@ GdocsEntry.prototype.getSelfLink = function() {
     }
   }
   return self_link;
+};
+//
+GdocsEntry.prototype.getExportLink = function() {
+  return this.entry.content.src;
 };
 //
 GdocsEntry.prototype.getLastUpdateTime = function() {
@@ -151,6 +159,51 @@ GdocsEntry.prototype.getRemoteDataFile= function() {
   // alert(xhr.responseText);
   this.parseFeed(xhr.responseText);
   // alert(this.entry);
+  if (this.entry)
+    this.persist();
+};
+GdocsEntry.prototype.getData = function() {
+  var url = 'https://docs.google.com/feeds/download/documents/Export';
+  var request = {
+    'method': 'GET',
+    'headers': {
+      'GData-Version': '3.0',
+    },
+    'parameters': {
+      'docId': this.getResourceId(),
+      'exportFormat': 'txt'
+     }
+  };
+  var xhr = sendRequest(request, url);
+  if(xhr.status != 200) {
+    alert('There was a problem downloading the doc.');
+    alert(xhr.status);
+    return;
+  }
+  alert(xhr.status);
+  alert(xhr.responseText);
+  return xhr.responseText;
+};
+GdocsEntry.prototype.setData = function(data) {
+  var url = this.getEditMediaLink();
+  var request = {
+    'method': 'PUT',
+    'headers': {
+      'GData-Version': '3.0',
+      'If-Match': '*',
+      'Content-Type': 'text/plain'
+    },
+    'parameters': {
+      'alt': 'json'
+    }
+  };
+  var xhr = sendRequest(request, url, data);
+  if(xhr.status != 200) {
+    alert('There was a problem in updating the doc.');
+    alert(xhr.status);
+    return;
+  }
+  this.parseFeed(xhr.responseText);
   if (this.entry)
     this.persist();
 };
