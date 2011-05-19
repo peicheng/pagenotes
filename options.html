@@ -44,6 +44,11 @@
         localStorage.removeItem('remoteDocEntry');
         location.reload();
       }
+      
+      function clearLocalData() {
+        localStorage.removeItem('pagenotes');
+        location.reload();
+      }
 
       function initUI() {
         if (!bgPage.oauth.hasToken()) {
@@ -56,16 +61,24 @@
         } else {
           document.getElementById('clear_sync').disabled = true;
         }
+        if (!localStorage.getItem('pagenotes')) {
+          document.getElementById('clear_local').disabled = true; 
+        }
       }
     </script>
   </head>
   <body onload="initUI();">
-    <button id="setup_sync" onclick="setupSync();">
-      Setup Sync
+    <button id="clear_local" onclick="clearLocalData();">
+      Clear Local Data
     </button>
-    <button id="clear_sync" onclick="clearSync();">
-      Clear Sync
-    </button>
+    <p>
+      <button id="setup_sync" onclick="setupSync();">
+        Setup Sync
+      </button>
+      <button id="clear_sync" onclick="clearSync();">
+        Clear Sync
+      </button>
+    </p>
     <p>
       Authentication Settings:
     </p>
