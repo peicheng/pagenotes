@@ -2,9 +2,12 @@ var bgPage = chrome.extension.getBackgroundPage();
 
 function sendRequest(request, url, body) {
   var xhr = new XMLHttpRequest();
+  var header;
   xhr.open(request.method, url + '?' + bgPage.stringify(request.parameters), false);
   for (var header in request.headers) {
-    xhr.setRequestHeader(header, request.headers[header]);
+    if (request.headers.hasOwnProperty(header)) {
+      xhr.setRequestHeader(header, request.headers[header]);
+    }
   }
   xhr.setRequestHeader('Authorization', bgPage.oauth.getAuthorizationHeader(url, request.method, request.parameters));
   xhr.send(body);
@@ -17,15 +20,15 @@ function GoogleDoc(entrystring) {
   }
 }
 
-GoogleDoc.prototype.parseFeed = function(feed_response) {
-  var feed_response = JSON.parse(feed_response)
-  if('entry' in feed_response) {
-    this.entry = feed_response.entry;
+GoogleDoc.prototype.parseFeed = function(feedResponseString) {
+  var feedResponse = JSON.parse(feedResponseString);
+  if (feedResponse.entry) {
+    this.entry = feedResponse.entry;
     return;
   }
-  feed = feed_response.feed;
+  feed = feedResponse.feed;
   //alert(JSON.stringify(feed));
-  if ('entry' in feed) {
+  if (feed.entry) {
     // alert(feed.entry);
     if (feed.entry instanceof Array) {
       delete this.entry;
@@ -38,7 +41,7 @@ GoogleDoc.prototype.parseFeed = function(feed_response) {
 };
 //
 GoogleDoc.prototype.persist = function() {
-  localStorage['gDoc'] = JSON.stringify(this.entry);
+  localStorage.gDoc = JSON.stringify(this.entry);
 };
 //
 GoogleDoc.prototype.getEtag = function() {
@@ -55,9 +58,9 @@ GoogleDoc.prototype.getResourceId = function() {
 //
 GoogleDoc.prototype.getEditMediaLink = function() {
   var editMediaLink;
-  for (var e in this.entry.link) {
-    if (this.entry.link[e].rel == 'edit-media') {
-      editMediaLink = this.entry.link[e].href;
+  for (var i=0; i < this.entry.link.length; i++) {
+    if (this.entry.link[i].rel == 'edit-media') {
+      editMediaLink = this.entry.link[i].href;
       break;
     }
   }
@@ -65,14 +68,14 @@ GoogleDoc.prototype.getEditMediaLink = function() {
 };
 //
 GoogleDoc.prototype.getSelfLink = function() {
-  var self_link;
+  var selfLink;
   for (var i=0; i < this.entry.link.length; i++) {
     if (this.entry.link[i].rel == 'self') {
-      self_link = this.entry.link[i].href;
+      selfLink = this.entry.link[i].href;
       break;
     }
   }
-  return self_link;
+  return selfLink;
 };
 //
 GoogleDoc.prototype.getExportLink = function() {
@@ -101,8 +104,8 @@ GoogleDoc.prototype.refresh = function(callback) {
   var f = function(gdocEntry) {
     return function (resp, xhr) {
       if (xhr.status !== 200 && xhr.status !== 304 && xhr.status !== 412) {
-        alert('There was a problem in refreshing the doc entry.');
-        alert(xhr.status);
+        throw 'There was a problem in refreshing the doc entry. ' +
+            'Last request status: ' + xhr.status + '\n' + xhr.responseText;
         return;
       }
       if (xhr.status !== 304 && xhr.status !== 412) {
@@ -133,8 +136,8 @@ GoogleDoc.prototype.createRemoteDataFile = function () {
   };
   var xhr = sendRequest(request, url);
   if(xhr.status != 201) {
-    alert('There was a problem in setting up the sync.');
-    alert(xhr.reponseText);
+    throw 'There was a problem in setting up the sync. ' + 
+        'Last request status: ' + xhr.status + '\n' + xhr.responseText;
     return;
   }
   //  alert(xhr.responseText);
@@ -158,8 +161,8 @@ GoogleDoc.prototype.getRemoteDataFile= function() {
   };
   var xhr = sendRequest(request, url);
   if(xhr.status != 200) {
-    alert('There was a problem in searching for the existing doc.');
-    alert(xhr.reponseText);
+    throw 'There was a problem in searching for the existing doc.' +
+        'Last request status: ' + xhr.status + '\n' + xhr.responseText;
     return;
   }
   // alert(xhr.responseText);
@@ -168,6 +171,7 @@ GoogleDoc.prototype.getRemoteDataFile= function() {
   if (this.entry)
     this.persist();
 };
+//
 GoogleDoc.prototype.getData = function() {
   var url = 'https://docs.google.com/feeds/download/documents/Export';
   var request = {
@@ -182,14 +186,15 @@ GoogleDoc.prototype.getData = function() {
   };
   var xhr = sendRequest(request, url);
   if(xhr.status != 200) {
-    alert('There was a problem downloading the doc.');
-    alert(xhr.status);
+    throw 'There was a problem downloading the doc. ' + 
+        'Last request status: ' + xhr.status + '\n' + xhr.responseText;
     return;
   }
   // alert(xhr.status);
   // alert(xhr.responseText);
   return xhr.responseText;
 };
+//
 GoogleDoc.prototype.setData = function(data) {
   var url = this.getEditMediaLink();
   var request = {
@@ -205,8 +210,8 @@ GoogleDoc.prototype.setData = function(data) {
   };
   var xhr = sendRequest(request, url, data);
   if(xhr.status != 200) {
-    alert('There was a problem in updating the doc.');
-    alert(xhr.status);
+    throw 'There was a problem in updating the doc. ' +
+        'Last request status: ' + xhr.status + '\n' + xhr.responseText;
     return;
   }
   this.parseFeed(xhr.responseText);

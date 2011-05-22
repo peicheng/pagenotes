@@ -38,20 +38,20 @@
         }
         // Add event listener to the Edit/Save button.
         document.getElementById("save-edit-button").addEventListener("click", function() {
-          if(this.value == "Edit") {
+          if (this.value == "Edit") {
             notes.contentEditable = true;
             notes.focus();
             document.getElementById("site-level-div").style.display = "block";
             this.innerHTML = "Save";
             this.value = "Save";
-          } else if(this.value == "Save") {
+          } else if (this.value == "Save") {
             notes.contentEditable = false;
             if (document.getElementById("site-level").checked == false) {
               bgPage.setPageNotes(tabUrl, notes.innerHTML);
             } else {
               bgPage.setPageNotes(tabHost, notes.innerHTML);
             }
-            localStorage.setItem('lastModTime', new Date().getTime());
+            localStorage.lastModTime = new Date().getTime();
             window.close();
           }
         });
@@ -62,7 +62,7 @@
             key = tabHost;
           }
           bgPage.removePageNotes(key);
-          localStorage.setItem('lastModTime', new Date().getTime());
+          localStorage.lastModTime = new Date().getTime();
           window.close();
         });
         // Add event listner to the site-level checkbox

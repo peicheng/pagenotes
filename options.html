@@ -23,18 +23,22 @@
       }
 
       function setupSync() {
-        if(!bgPage.oauth.hasToken()) {
-          alert('Set up authentication first.');
-          return;
-        }
-        if(!localStorage['gDoc']) {
-          // alert('no exisiting entry');
-          docentry = new bgPage.GoogleDoc();
-          docentry.getRemoteDataFile();
-          // alert(docentry);
-          if(!localStorage['gDoc']) {
-            docentry.createRemoteDataFile();
+        try {
+          if(!bgPage.oauth.hasToken()) {
+            alert('Set up authentication first.');
+            return;
           }
+          if(!localStorage['gDoc']) {
+            // alert('no exisiting entry');
+            docentry = new bgPage.GoogleDoc();
+            docentry.getRemoteDataFile();
+            // alert(docentry);
+            if(!localStorage['gDoc']) {
+              docentry.createRemoteDataFile();
+            }
+          }
+        } catch (e) {
+          alert(e);
         }
         // alert(localStorage['gDoc']);
         location.reload();
@@ -44,7 +48,7 @@
         localStorage.removeItem('gDoc');
         location.reload();
       }
-      
+
       function clearLocalData() {
         localStorage.removeItem('pagenotes');
         location.reload();
@@ -56,21 +60,28 @@
         } else {
           document.getElementById('get_auth_token').disabled = true;
         }
-        if (localStorage['gDoc']) {
+        if (localStorage.gDoc) {
           document.getElementById('setup_sync').disabled = true;
         } else {
           document.getElementById('clear_sync').disabled = true;
         }
-        if (!localStorage.getItem('pagenotes')) {
-          document.getElementById('clear_local').disabled = true; 
+        if (!localStorage.pagenotes) {
+          document.getElementById('clear_local').disabled = true;
+        }
+        if (localStorage.lastSyncStatus) {
+          document.getElementById('sync_status').innerHTML = localStorage.lastSyncStatus;
         }
       }
     </script>
   </head>
   <body onload="initUI();">
-    <button id="clear_local" onclick="clearLocalData();">
-      Clear Local Data
-    </button>
+    <div id="sync_status">
+    </div>
+    <p>
+      <button id="clear_local" onclick="clearLocalData();">
+        Clear Local Data
+      </button>
+    </p>
     <p>
       <button id="setup_sync" onclick="setupSync();">
         Setup Sync

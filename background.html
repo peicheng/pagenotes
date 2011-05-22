@@ -43,48 +43,53 @@
       };
 
       function getRemoteLastModTime() {
-        var gDoc = new GoogleDoc(localStorage.getItem('gDoc'));
+        var gDoc = new GoogleDoc(localStorage.gDoc);
         return gDoc.getLastUpdateTime();
       };
 
       function syncToRemote() {
-        var gDoc = new GoogleDoc(localStorage.getItem('gDoc'));
+        var gDoc = new GoogleDoc(localStorage.gDoc);
         gDoc.setData(getAllPageNotes());
-        localStorage.setItem('lastModTime', gDoc.getLastUpdateTime());
+        localStorage.lastModTime = gDoc.getLastUpdateTime();
       }
 
       function syncToLocal() {
-        var gDoc = new GoogleDoc(localStorage.getItem('gDoc'));
+        var gDoc = new GoogleDoc(localStorage.gDoc);
         setAllPageNotes(gDoc.getData());
-        localStorage.setItem('lastModTime', gDoc.getLastUpdateTime());
+        localStorage.lastModTime = gDoc.getLastUpdateTime();
       }
 
       function sync() {
         if(!oauth.hasToken()) {
           return;
         }
-        if(!localStorage.getItem('gDoc')) {
+        if(!localStorage['gDoc']) {
           return;
         }
-        
-        var gDoc = new GoogleDoc(localStorage.getItem('gDoc'));
+
+        var gDoc = new GoogleDoc(localStorage.gDoc);
         //        alert(JSON.stringify(gDoc));
-        gDoc.refresh(function() {
-          localLastModTime = 0;
-          if(localStorage['lastModTime']) {
-            localLastModTime = localStorage['lastModTime']
-          }
-          remoteLastModTime = getRemoteLastModTime();
-        //        alert(localLastModTime);
-        //        alert(remoteLastModTime);
-          if (remoteLastModTime === localLastModTime)
-            return;
-          if (remoteLastModTime > localLastModTime) {
-            syncToLocal();
-          } else {
-            syncToRemote();
-          }
-        });
+        try {
+          gDoc.refresh( function() {
+            localLastModTime = 0;
+            if(localStorage.lastModTime) {
+              localLastModTime = localStorage.lastModTime
+            }
+            remoteLastModTime = getRemoteLastModTime();
+            //        alert(localLastModTime);
+            //        alert(remoteLastModTime);
+            if (remoteLastModTime === localLastModTime)
+              return;
+            if (remoteLastModTime > localLastModTime) {
+              syncToLocal();
+            } else {
+              syncToRemote();
+            }
+          });
+        } catch (e) {
+          localStorage.lastSyncStatus = e;
+        }
+        localStorage.lastSyncStatus = 'Last synced at: ' + new Date();
       };
 
       window.setInterval(sync, SYNC_INTERVAL);
