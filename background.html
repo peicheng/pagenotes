@@ -5,7 +5,7 @@
     <script type="text/javascript" src="gdocs.js"></script>
     <script type="text/javascript" src="pagenotes.js"></script>
     <script type="text/javascript">
-      var SYNC_INTERVAL = 1000; // In ms. Equivalent to 5 min.
+      var SYNC_INTERVAL = 5 * 60 * 1000; // In ms. Equivalent to 5 min.
       var DOCLIST_SCOPE = 'https://docs.google.com/feeds';
       var DOCLIST_FEED = DOCLIST_SCOPE + '/default/private/full/';
       var docs = [];
@@ -42,52 +42,52 @@
         clearPendingRequests();
       };
 
-      function do_oauth(onAuthorized) {
-        oauth.authorize(onAuthorized);
-      };
-
       function getRemoteLastModTime() {
-        var remoteDocEntry = new GdocsEntry(localStorage.getItem('remoteDocEntry'));
-        //        alert(JSON.stringify(remoteDocEntry));
-        remoteDocEntry.refresh();
-        return remoteDocEntry.getLastUpdateTime();
+        var gDoc = new GoogleDoc(localStorage.getItem('gDoc'));
+        return gDoc.getLastUpdateTime();
       };
 
       function syncToRemote() {
-        var remoteDocEntry = new GdocsEntry(localStorage.getItem('remoteDocEntry'));
-        remoteDocEntry.setData(getAllPageNotes());
-        localStorage.setItem('last_mod_time', remoteDocEntry.getLastUpdateTime());
+        var gDoc = new GoogleDoc(localStorage.getItem('gDoc'));
+        gDoc.setData(getAllPageNotes());
+        localStorage.setItem('lastModTime', gDoc.getLastUpdateTime());
       }
 
       function syncToLocal() {
-        var remoteDocEntry = new GdocsEntry(localStorage.getItem('remoteDocEntry'));
-        setAllPageNotes(remoteDocEntry.getData());
-        localStorage.setItem('last_mod_time', remoteDocEntry.getLastUpdateTime());
+        var gDoc = new GoogleDoc(localStorage.getItem('gDoc'));
+        setAllPageNotes(gDoc.getData());
+        localStorage.setItem('lastModTime', gDoc.getLastUpdateTime());
       }
 
       function sync() {
-        if(!oauth.hasToken())
+        if(!oauth.hasToken()) {
           return;
-
-        local_last_mod_time = 0;
-        if(localStorage['last_mod_time']) {
-          local_last_mod_time = localStorage['last_mod_time']
         }
-        remote_last_mod_time = getRemoteLastModTime();
-        //       alert(local_last_mod_time);
-        //       alert(remote_last_mod_time);
-        if (remote_last_mod_time == local_last_mod_time)
+        if(!localStorage.getItem('gDoc')) {
           return;
-        if (remote_last_mod_time > local_last_mod_time) {
-          syncToLocal();
-        } else {
-          syncToRemote();
         }
-      }
+        
+        var gDoc = new GoogleDoc(localStorage.getItem('gDoc'));
+        //        alert(JSON.stringify(gDoc));
+        gDoc.refresh(function() {
+          localLastModTime = 0;
+          if(localStorage['lastModTime']) {
+            localLastModTime = localStorage['lastModTime']
+          }
+          remoteLastModTime = getRemoteLastModTime();
+        //        alert(localLastModTime);
+        //        alert(remoteLastModTime);
+          if (remoteLastModTime === localLastModTime)
+            return;
+          if (remoteLastModTime > localLastModTime) {
+            syncToLocal();
+          } else {
+            syncToRemote();
+          }
+        });
+      };
 
-      //      function sync() {}
-
-      //      window.setInterval(sync, SYNC_INTERVAL);
+      window.setInterval(sync, SYNC_INTERVAL);
     </script>
     <title>Page Notes</title>
   </head>

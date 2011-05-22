@@ -51,7 +51,7 @@
             } else {
               bgPage.setPageNotes(tabHost, notes.innerHTML);
             }
-            localStorage.setItem('last_mod_time', new Date().getTime());
+            localStorage.setItem('lastModTime', new Date().getTime());
             window.close();
           }
         });
@@ -62,7 +62,7 @@
             key = tabHost;
           }
           bgPage.removePageNotes(key);
-          localStorage.setItem('last_mod_time', new Date().getTime());
+          localStorage.setItem('lastModTime', new Date().getTime());
           window.close();
         });
         // Add event listner to the site-level checkbox

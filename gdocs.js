@@ -11,13 +11,13 @@ function sendRequest(request, url, body) {
   return xhr;
 }
 
-function GdocsEntry(entrystring) {
-  if (typeof(entrystring) != 'undefined') {
+function GoogleDoc(entrystring) {
+  if (entrystring !== undefined) {
     this.entry = JSON.parse(entrystring);
   }
 }
 
-GdocsEntry.prototype.parseFeed = function(feed_response) {
+GoogleDoc.prototype.parseFeed = function(feed_response) {
   var feed_response = JSON.parse(feed_response)
   if('entry' in feed_response) {
     this.entry = feed_response.entry;
@@ -37,55 +37,55 @@ GdocsEntry.prototype.parseFeed = function(feed_response) {
   }
 };
 //
-GdocsEntry.prototype.persist = function() {
-  localStorage['remoteDocEntry'] = JSON.stringify(this.entry);
+GoogleDoc.prototype.persist = function() {
+  localStorage['gDoc'] = JSON.stringify(this.entry);
 };
 //
-GdocsEntry.prototype.getEtag = function() {
+GoogleDoc.prototype.getEtag = function() {
   return this.entry.gd$etag;
 };
 //
-GdocsEntry.prototype.getId = function() {
+GoogleDoc.prototype.getId = function() {
   return this.entry.id.$t;
 };
 //
-GdocsEntry.prototype.getResourceId = function() {
+GoogleDoc.prototype.getResourceId = function() {
   return this.entry.gd$resourceId.$t.split(':')[1];
 };
 //
-GdocsEntry.prototype.getEditMediaLink = function() {
-  var edit_media_link;
+GoogleDoc.prototype.getEditMediaLink = function() {
+  var editMediaLink;
   for (var e in this.entry.link) {
     if (this.entry.link[e].rel == 'edit-media') {
-      edit_media_link = this.entry.link[e].href;
+      editMediaLink = this.entry.link[e].href;
       break;
     }
   }
-  return edit_media_link;
+  return editMediaLink;
 };
 //
-GdocsEntry.prototype.getSelfLink = function() {
+GoogleDoc.prototype.getSelfLink = function() {
   var self_link;
-  for (var e in this.entry.link) {
-    if (this.entry.link[e].rel == 'self') {
-      self_link = this.entry.link[e].href;
+  for (var i=0; i < this.entry.link.length; i++) {
+    if (this.entry.link[i].rel == 'self') {
+      self_link = this.entry.link[i].href;
       break;
     }
   }
   return self_link;
 };
 //
-GdocsEntry.prototype.getExportLink = function() {
+GoogleDoc.prototype.getExportLink = function() {
   return this.entry.content.src;
 };
 //
-GdocsEntry.prototype.getLastUpdateTime = function() {
-  var last_update_time = new Date(this.entry.updated.$t);
-  return last_update_time.getTime();
+GoogleDoc.prototype.getLastUpdateTime = function() {
+  var lastUpdateTime = new Date(this.entry.updated.$t);
+  return lastUpdateTime.getTime();
 };
 //
-GdocsEntry.prototype.refresh = function() {
-  //  alert(this.getEtag());
+GoogleDoc.prototype.refresh = function(callback) {
+  // alert(this.getEtag());
   var url = this.getSelfLink();
   var request = {
     'method': 'GET',
@@ -97,21 +97,27 @@ GdocsEntry.prototype.refresh = function() {
       'alt': 'json'
     }
   };
-  var xhr = sendRequest(request, url);
-  if(xhr.status == 304 || xhr.status == 412)
-    return;  // Nothing has changed.
-  if(xhr.status != 200) {
-    alert('There was a problem in refreshing the doc entry.');
-    alert(xhr.responseText);
-    return;
+
+  var f = function(gdocEntry) {
+    return function (resp, xhr) {
+      if (xhr.status !== 200 && xhr.status !== 304 && xhr.status !== 412) {
+        alert('There was a problem in refreshing the doc entry.');
+        alert(xhr.status);
+        return;
+      }
+      if (xhr.status !== 304 && xhr.status !== 412) {
+        gdocEntry.parseFeed(xhr.responseText);
+        if(gdocEntry.entry) {
+          gdocEntry.persist();
+        }
+      }
+      callback();
+    };
   }
-  //  alert(xhr.responseText);
-  this.parseFeed(xhr.responseText);
-  if(this.entry)
-    this.persist();
+  bgPage.oauth.sendSignedRequest(url, f(this), request);
 };
 //
-GdocsEntry.prototype.createRemoteDataFile = function () {
+GoogleDoc.prototype.createRemoteDataFile = function () {
   var url = 'https://docs.google.com/feeds/default/private/full';
   var request = {
     'method': 'POST',
@@ -137,7 +143,7 @@ GdocsEntry.prototype.createRemoteDataFile = function () {
     this.persist();
 };
 //
-GdocsEntry.prototype.getRemoteDataFile= function() {
+GoogleDoc.prototype.getRemoteDataFile= function() {
   var url = 'https://docs.google.com/feeds/default/private/full';
   var request = {
     'method': 'GET',
@@ -162,7 +168,7 @@ GdocsEntry.prototype.getRemoteDataFile= function() {
   if (this.entry)
     this.persist();
 };
-GdocsEntry.prototype.getData = function() {
+GoogleDoc.prototype.getData = function() {
   var url = 'https://docs.google.com/feeds/download/documents/Export';
   var request = {
     'method': 'GET',
@@ -172,7 +178,7 @@ GdocsEntry.prototype.getData = function() {
     'parameters': {
       'docId': this.getResourceId(),
       'exportFormat': 'txt'
-     }
+    }
   };
   var xhr = sendRequest(request, url);
   if(xhr.status != 200) {
@@ -180,11 +186,11 @@ GdocsEntry.prototype.getData = function() {
     alert(xhr.status);
     return;
   }
-  alert(xhr.status);
-  alert(xhr.responseText);
+  // alert(xhr.status);
+  // alert(xhr.responseText);
   return xhr.responseText;
 };
-GdocsEntry.prototype.setData = function(data) {
+GoogleDoc.prototype.setData = function(data) {
   var url = this.getEditMediaLink();
   var request = {
     'method': 'PUT',

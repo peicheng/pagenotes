@@ -8,7 +8,7 @@
 <html>
   <head>
     <title>Options</title>
-    <style>
+    <style type="text/css">
       body {
         font-family: Helvetica, Arial, sans-serif;
         font-size: small;
@@ -27,21 +27,21 @@
           alert('Set up authentication first.');
           return;
         }
-        if(!localStorage['remoteDocEntry']) {
+        if(!localStorage['gDoc']) {
           // alert('no exisiting entry');
-          docentry = new bgPage.GdocsEntry();
+          docentry = new bgPage.GoogleDoc();
           docentry.getRemoteDataFile();
           // alert(docentry);
-          if(!localStorage['remoteDocEntry']) {
+          if(!localStorage['gDoc']) {
             docentry.createRemoteDataFile();
           }
         }
-        // alert(localStorage['remoteDocEntry']);
+        // alert(localStorage['gDoc']);
         location.reload();
       }
 
       function clearSync() {
-        localStorage.removeItem('remoteDocEntry');
+        localStorage.removeItem('gDoc');
         location.reload();
       }
       
@@ -54,9 +54,9 @@
         if (!bgPage.oauth.hasToken()) {
           document.getElementById('revoke').disabled = true;
         } else {
-          document.getElementById('auth').disabled = true;
+          document.getElementById('get_auth_token').disabled = true;
         }
-        if (localStorage['remoteDocEntry']) {
+        if (localStorage['gDoc']) {
           document.getElementById('setup_sync').disabled = true;
         } else {
           document.getElementById('clear_sync').disabled = true;
@@ -83,10 +83,10 @@
       Authentication Settings:
     </p>
     <p style="margin-left:10px; margin-top:10px">
-      <button id="auth" onclick="bgPage.do_oauth(location.reload())">
+      <button id="get_auth_token" onclick="bgPage.oauth.authorize(function(){location.reload();});">
         Get Google Docs OAuth Token
       </button>
-      <button id="revoke" onclick="logout();">
+      <button id="revoke" onclick="logout();clearSync();">
         Revoke Google Docs OAuth Token
       </button>
     </p>
