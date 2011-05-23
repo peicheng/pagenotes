@@ -56,7 +56,7 @@ GoogleDoc.prototype.getResourceId = function() {
 //
 GoogleDoc.prototype.getEditMediaLink = function() {
   var editMediaLink;
-  for (var i=0; i < this.entry.link.length; i++) {
+  for (var i = 0; i < this.entry.link.length; i++) {
     if (this.entry.link[i].rel == 'edit-media') {
       editMediaLink = this.entry.link[i].href;
       break;
@@ -67,7 +67,7 @@ GoogleDoc.prototype.getEditMediaLink = function() {
 //
 GoogleDoc.prototype.getSelfLink = function() {
   var selfLink;
-  for (var i=0; i < this.entry.link.length; i++) {
+  for (var i = 0; i < this.entry.link.length; i++) {
     if (this.entry.link[i].rel == 'self') {
       selfLink = this.entry.link[i].href;
       break;
@@ -85,7 +85,7 @@ GoogleDoc.prototype.getLastUpdateTime = function() {
   return lastUpdateTime.getTime();
 };
 //
-GoogleDoc.prototype.createRemoteDataFile = function () {
+GoogleDoc.prototype.createRemoteDataFile = function() {
   var url = 'https://docs.google.com/feeds/default/private/full';
   var request = {
     'method': 'POST',
@@ -95,12 +95,12 @@ GoogleDoc.prototype.createRemoteDataFile = function () {
       'Slug': 'Page Notes Data'
     },
     'parameters': {
-      'alt': 'json',
+      'alt': 'json'
     },
     'body': ''
   };
   var xhr = sendRequest(request, url);
-  if(xhr.status != 201) {
+  if (xhr.status != 201) {
     throw 'There was a problem in setting up the sync. ' +
     'Last request status: ' + xhr.status + '\n' + xhr.responseText;
     return;
@@ -110,12 +110,12 @@ GoogleDoc.prototype.createRemoteDataFile = function () {
     this.persist();
 };
 //
-GoogleDoc.prototype.getRemoteDataFile= function() {
+GoogleDoc.prototype.getRemoteDataFile = function() {
   var url = 'https://docs.google.com/feeds/default/private/full';
   var request = {
     'method': 'GET',
     'headers': {
-      'GData-Version': '3.0',
+      'GData-Version': '3.0'
     },
     'parameters': {
       'alt': 'json',
@@ -124,7 +124,7 @@ GoogleDoc.prototype.getRemoteDataFile= function() {
     }
   };
   var xhr = sendRequest(request, url);
-  if(xhr.status != 200) {
+  if (xhr.status != 200) {
     throw 'There was a problem in searching for the existing doc.' +
     'Last request status: ' + xhr.status + '\n' + xhr.responseText;
     return;
@@ -156,7 +156,7 @@ GoogleDoc.prototype.refresh = function(callback) {
   }
   if (xhr.status !== 304 && xhr.status !== 412) {
     this.parseFeed(xhr.responseText);
-    if(this.entry) {
+    if (this.entry) {
       this.persist();
     }
   }
@@ -168,7 +168,7 @@ GoogleDoc.prototype.getData = function() {
   var request = {
     'method': 'GET',
     'headers': {
-      'GData-Version': '3.0',
+      'GData-Version': '3.0'
     },
     'parameters': {
       'docId': this.getResourceId(),
@@ -176,7 +176,7 @@ GoogleDoc.prototype.getData = function() {
     }
   };
   var xhr = sendRequest(request, url);
-  if(xhr.status != 200) {
+  if (xhr.status != 200) {
     throw 'There was a problem downloading the doc. ' +
     'Last request status: ' + xhr.status + '\n' + xhr.responseText;
     return;
@@ -198,7 +198,7 @@ GoogleDoc.prototype.setData = function(data) {
     }
   };
   var xhr = sendRequest(request, url, data);
-  if(xhr.status != 200) {
+  if (xhr.status != 200) {
     throw 'There was a problem in updating the doc. ' +
     'Last request status: ' + xhr.status + '\n' + xhr.responseText;
     return;
@@ -207,3 +207,4 @@ GoogleDoc.prototype.setData = function(data) {
   if (this.entry)
     this.persist();
 };
+

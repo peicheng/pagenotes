@@ -1,5 +1,5 @@
 function getPageNotes(key) {
-  if(localStorage.getItem('pagenotes')) {
+  if (localStorage.getItem('pagenotes')) {
     var pagenotes = JSON.parse(localStorage.getItem('pagenotes'));
     if (key in pagenotes)
       return pagenotes[key];
@@ -8,7 +8,7 @@ function getPageNotes(key) {
 }
 
 function setPageNotes(key, value) {
-  if(localStorage.getItem('pagenotes')) {
+  if (localStorage.getItem('pagenotes')) {
     var pagenotes = JSON.parse(localStorage.getItem('pagenotes'));
     pagenotes[key] = value;
   } else {
@@ -19,7 +19,7 @@ function setPageNotes(key, value) {
 }
 
 function removePageNotes(key) {
-  if(localStorage.getItem('pagenotes')) {
+  if (localStorage.getItem('pagenotes')) {
     var pagenotes = JSON.parse(localStorage.getItem('pagenotes'));
     delete pagenotes[key];
     localStorage.setItem('pagenotes', JSON.stringify(pagenotes));
@@ -34,3 +34,4 @@ function setAllPageNotes(data) {
   localStorage.removeItem('pagenotes');
   localStorage.setItem('pagenotes', data);
 }
+
