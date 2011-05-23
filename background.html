@@ -5,7 +5,7 @@
     <script type="text/javascript" src="gdocs.js"></script>
     <script type="text/javascript" src="pagenotes.js"></script>
     <script type="text/javascript">
-      var SYNC_INTERVAL = 5 * 60 * 1000; // In ms. Equivalent to 5 min.
+      var SYNC_INTERVAL = 1 * 60 * 1000; // In ms. Equivalent to 5 min.
       var DOCLIST_SCOPE = 'https://docs.google.com/feeds';
       var DOCLIST_FEED = DOCLIST_SCOPE + '/default/private/full/';
       var docs = [];
@@ -20,6 +20,11 @@
         'scope': DOCLIST_SCOPE,
         'app_name': 'Page Notes - Chrome Extension'
       });
+      
+      var debug = {
+        msg: '',
+        log: function(s) { this.msg += s + '\n';}
+      }
 
       function stringify(parameters) {
         var params = [];
@@ -66,28 +71,34 @@
         if(!localStorage['gDoc']) {
           return;
         }
-
+        debug.msg = ''
         var gDoc = new GoogleDoc(localStorage.gDoc);
         //        alert(JSON.stringify(gDoc));
         try {
-          gDoc.refresh( function() {
+          gDoc.refresh(function() {
             localLastModTime = 0;
             if(localStorage.lastModTime) {
-              localLastModTime = localStorage.lastModTime
+              localLastModTime = parseInt(localStorage.lastModTime);
             }
-            remoteLastModTime = getRemoteLastModTime();
-            //        alert(localLastModTime);
-            //        alert(remoteLastModTime);
-            if (remoteLastModTime === localLastModTime)
+            remoteLastModTime = parseInt(getRemoteLastModTime());
+            debug.log('sync: Local last mod time: ' + localLastModTime);
+            debug.log('sync: Remote last mod time: ' + localLastModTime);
+            if (remoteLastModTime === localLastModTime) {
+              debug.log('sync: Local and remote data are equally recent.');
               return;
-            if (remoteLastModTime > localLastModTime) {
+            }
+            else if (remoteLastModTime > localLastModTime) {
+              debug.log('sync: Remote data is more recent.');
               syncToLocal();
-            } else {
+            }
+            else {
+              debug.log('sync: Local data is more recent.');
               syncToRemote();
             }
           });
         } catch (e) {
           localStorage.lastSyncStatus = e;
+          return;
         }
         localStorage.lastSyncStatus = 'Last synced at: ' + new Date();
       };

@@ -27,9 +27,7 @@ GoogleDoc.prototype.parseFeed = function(feedResponseString) {
     return;
   }
   feed = feedResponse.feed;
-  //alert(JSON.stringify(feed));
   if (feed.entry) {
-    // alert(feed.entry);
     if (feed.entry instanceof Array) {
       delete this.entry;
       this.entry = feed.entry[0];
@@ -87,39 +85,6 @@ GoogleDoc.prototype.getLastUpdateTime = function() {
   return lastUpdateTime.getTime();
 };
 //
-GoogleDoc.prototype.refresh = function(callback) {
-  // alert(this.getEtag());
-  var url = this.getSelfLink();
-  var request = {
-    'method': 'GET',
-    'headers': {
-      'GData-Version': '3.0',
-      'If-None-Match': this.getEtag()
-    },
-    'parameters': {
-      'alt': 'json'
-    }
-  };
-
-  var f = function(gdocEntry) {
-    return function (resp, xhr) {
-      if (xhr.status !== 200 && xhr.status !== 304 && xhr.status !== 412) {
-        throw 'There was a problem in refreshing the doc entry. ' +
-            'Last request status: ' + xhr.status + '\n' + xhr.responseText;
-        return;
-      }
-      if (xhr.status !== 304 && xhr.status !== 412) {
-        gdocEntry.parseFeed(xhr.responseText);
-        if(gdocEntry.entry) {
-          gdocEntry.persist();
-        }
-      }
-      callback();
-    };
-  }
-  bgPage.oauth.sendSignedRequest(url, f(this), request);
-};
-//
 GoogleDoc.prototype.createRemoteDataFile = function () {
   var url = 'https://docs.google.com/feeds/default/private/full';
   var request = {
@@ -136,11 +101,10 @@ GoogleDoc.prototype.createRemoteDataFile = function () {
   };
   var xhr = sendRequest(request, url);
   if(xhr.status != 201) {
-    throw 'There was a problem in setting up the sync. ' + 
-        'Last request status: ' + xhr.status + '\n' + xhr.responseText;
+    throw 'There was a problem in setting up the sync. ' +
+    'Last request status: ' + xhr.status + '\n' + xhr.responseText;
     return;
   }
-  //  alert(xhr.responseText);
   this.parseFeed(xhr.responseText);
   if (this.entry)
     this.persist();
@@ -162,14 +126,41 @@ GoogleDoc.prototype.getRemoteDataFile= function() {
   var xhr = sendRequest(request, url);
   if(xhr.status != 200) {
     throw 'There was a problem in searching for the existing doc.' +
-        'Last request status: ' + xhr.status + '\n' + xhr.responseText;
+    'Last request status: ' + xhr.status + '\n' + xhr.responseText;
     return;
   }
-  // alert(xhr.responseText);
   this.parseFeed(xhr.responseText);
-  // alert(this.entry);
   if (this.entry)
     this.persist();
+};
+//
+GoogleDoc.prototype.refresh = function(callback) {
+  var url = this.getSelfLink();
+  var request = {
+    'method': 'GET',
+    'headers': {
+      'GData-Version': '3.0',
+      'If-None-Match': this.getEtag()
+    },
+    'parameters': {
+      'alt': 'json'
+    }
+  };
+
+  var xhr = sendRequest(request, url);
+
+  if (xhr.status !== 200 && xhr.status !== 304 && xhr.status !== 412) {
+    throw 'There was a problem in refreshing the doc entry. ' +
+    'Last request status: ' + xhr.status + '\n' + xhr.responseText;
+    return;
+  }
+  if (xhr.status !== 304 && xhr.status !== 412) {
+    this.parseFeed(xhr.responseText);
+    if(this.entry) {
+      this.persist();
+    }
+  }
+  callback();
 };
 //
 GoogleDoc.prototype.getData = function() {
@@ -186,12 +177,10 @@ GoogleDoc.prototype.getData = function() {
   };
   var xhr = sendRequest(request, url);
   if(xhr.status != 200) {
-    throw 'There was a problem downloading the doc. ' + 
-        'Last request status: ' + xhr.status + '\n' + xhr.responseText;
+    throw 'There was a problem downloading the doc. ' +
+    'Last request status: ' + xhr.status + '\n' + xhr.responseText;
     return;
   }
-  // alert(xhr.status);
-  // alert(xhr.responseText);
   return xhr.responseText;
 };
 //
@@ -211,7 +200,7 @@ GoogleDoc.prototype.setData = function(data) {
   var xhr = sendRequest(request, url, data);
   if(xhr.status != 200) {
     throw 'There was a problem in updating the doc. ' +
-        'Last request status: ' + xhr.status + '\n' + xhr.responseText;
+    'Last request status: ' + xhr.status + '\n' + xhr.responseText;
     return;
   }
   this.parseFeed(xhr.responseText);

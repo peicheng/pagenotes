@@ -9,7 +9,7 @@
   <head>
     <title>Options</title>
     <style type="text/css">
-      body {
+      body, table {
         font-family: Helvetica, Arial, sans-serif;
         font-size: small;
       }
@@ -28,19 +28,16 @@
             alert('Set up authentication first.');
             return;
           }
-          if(!localStorage['gDoc']) {
-            // alert('no exisiting entry');
-            docentry = new bgPage.GoogleDoc();
-            docentry.getRemoteDataFile();
-            // alert(docentry);
-            if(!localStorage['gDoc']) {
-              docentry.createRemoteDataFile();
+          if(!localStorage.gDoc) {
+            gDoc = new bgPage.GoogleDoc();
+            gDoc.getRemoteDataFile();
+            if(!localStorage.gDoc) {
+              gDoc.createRemoteDataFile();
             }
           }
         } catch (e) {
           alert(e);
         }
-        // alert(localStorage['gDoc']);
         location.reload();
       }
 
@@ -70,13 +67,31 @@
         }
         if (localStorage.lastSyncStatus) {
           document.getElementById('sync_status').innerHTML = localStorage.lastSyncStatus;
+          document.getElementById('local_last_mod_time').innerHTML = localStorage.lastModTime;
+          document.getElementById('remote_last_mod_time').innerHTML = bgPage.getRemoteLastModTime();
+        }
+        if (bgPage.debug.msg){
+          document.getElementById('debug').innerHTML = bgPage.debug.msg;
         }
       }
     </script>
   </head>
   <body onload="initUI();">
-    <div id="sync_status">
-    </div>
+
+    <table>
+      <tr>
+        <td>Last Sync Status</td>
+        <td id="sync_status"></td>
+      </tr>
+      <tr>
+        <td>Local Last Mod Time</td>
+        <td id="local_last_mod_time"></td>
+      </tr>
+      <tr>
+        <td>Remote Last Mod Time</td>
+        <td id="remote_last_mod_time"></td>
+      </tr>
+    </table>
     <p>
       <button id="clear_local" onclick="clearLocalData();">
         Clear Local Data
@@ -101,5 +116,6 @@
         Revoke Google Docs OAuth Token
       </button>
     </p>
+    <pre id="debug"></pre>
   </body>
 </html>
