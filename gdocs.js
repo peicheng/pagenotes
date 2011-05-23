@@ -3,13 +3,16 @@ var bgPage = chrome.extension.getBackgroundPage();
 function sendRequest(request, url, body) {
   var xhr = new XMLHttpRequest();
   var header;
-  xhr.open(request.method, url + '?' + bgPage.stringify(request.parameters), false);
+  xhr.open(request.method, url + '?' + bgPage.stringify(request.parameters),
+      false);
+  xhr.setRequestHeader('GData-Version', '3.0');
   for (var header in request.headers) {
     if (request.headers.hasOwnProperty(header)) {
       xhr.setRequestHeader(header, request.headers[header]);
     }
   }
-  xhr.setRequestHeader('Authorization', bgPage.oauth.getAuthorizationHeader(url, request.method, request.parameters));
+  xhr.setRequestHeader('Authorization', bgPage.oauth.getAuthorizationHeader(
+       url, request.method, request.parameters));
   xhr.send(body);
   return xhr;
 }
@@ -90,7 +93,6 @@ GoogleDoc.prototype.createRemoteDataFile = function() {
   var request = {
     'method': 'POST',
     'headers': {
-      'GData-Version': '3.0',
       'Content-Type': 'text/plain',
       'Slug': 'Page Notes Data'
     },
@@ -114,9 +116,6 @@ GoogleDoc.prototype.getRemoteDataFile = function() {
   var url = 'https://docs.google.com/feeds/default/private/full';
   var request = {
     'method': 'GET',
-    'headers': {
-      'GData-Version': '3.0'
-    },
     'parameters': {
       'alt': 'json',
       'title': 'Page Notes Data',
@@ -139,7 +138,6 @@ GoogleDoc.prototype.refresh = function(callback) {
   var request = {
     'method': 'GET',
     'headers': {
-      'GData-Version': '3.0',
       'If-None-Match': this.getEtag()
     },
     'parameters': {
@@ -167,9 +165,6 @@ GoogleDoc.prototype.getData = function() {
   var url = 'https://docs.google.com/feeds/download/documents/Export';
   var request = {
     'method': 'GET',
-    'headers': {
-      'GData-Version': '3.0'
-    },
     'parameters': {
       'docId': this.getResourceId(),
       'exportFormat': 'txt'
@@ -189,7 +184,6 @@ GoogleDoc.prototype.setData = function(data) {
   var request = {
     'method': 'PUT',
     'headers': {
-      'GData-Version': '3.0',
       'If-Match': '*',
       'Content-Type': 'text/plain'
     },

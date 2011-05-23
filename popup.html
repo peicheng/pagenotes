@@ -13,15 +13,21 @@
     </style>
     <script type="text/javascript">
       var bgPage = chrome.extension.getBackgroundPage();
-      
+
       function getHostFromUrl(url) {
         var a_element = document.createElement("a");
         a_element.href = url;
         return a_element.hostname;
       }
 
+      function e(id) {
+        return document.getElementById(id);
+      }
+
       function retrievePageNotes(tab) {
-        var notes = document.getElementById("notes");
+        var notes = e("notes");
+        var editButton = e('editbutton');
+
         // Get notes for the current tab and display.
         notes.innerHTML = "&nbsp;";
         tabUrl = tab.url;
@@ -30,23 +36,24 @@
           notes.innerHTML = bgPage.getPageNotes(tabUrl);
         } else if(bgPage.getPageNotes(tabHost)) {
           notes.innerHTML = bgPage.getPageNotes(tabHost);
-          document.getElementById("site-level").checked = true;
+          e("site-level").checked = true;
         } else {
-          document.getElementById("save-edit-button").value = "Edit";
-          document.getElementById("save-edit-button").innerHTML = "Add";
-          document.getElementById("site-level-div").style.display = "none";
+          editButton.value = "Edit";
+          editButton.innerHTML = "Add";
+          e("site-level-div").style.display = "none";
         }
+
         // Add event listener to the Edit/Save button.
-        document.getElementById("save-edit-button").addEventListener("click", function() {
+        editButton.addEventListener("click", function() {
           if (this.value == "Edit") {
             notes.contentEditable = true;
             notes.focus();
-            document.getElementById("site-level-div").style.display = "block";
+            e("site-level-div").style.display = "block";
             this.innerHTML = "Save";
             this.value = "Save";
           } else if (this.value == "Save") {
             notes.contentEditable = false;
-            if (document.getElementById("site-level").checked == false) {
+            if (e("site-level").checked == false) {
               bgPage.setPageNotes(tabUrl, notes.innerHTML);
             } else {
               bgPage.setPageNotes(tabHost, notes.innerHTML);
@@ -56,9 +63,9 @@
           }
         });
         // Add event listener to the Delete button.
-        document.getElementById("delete-button").addEventListener("click", function() {
+        e("delete-button").addEventListener("click", function() {
           key = tabUrl;
-          if (document.getElementById("site-level").checked) {
+          if (e("site-level").checked) {
             key = tabHost;
           }
           bgPage.removePageNotes(key);
@@ -66,11 +73,12 @@
           window.close();
         });
         // Add event listner to the site-level checkbox
-        document.getElementById("site-level").addEventListener("change", function() {
-          document.getElementById("save-edit-button").value = "Save";
-          document.getElementById("save-edit-button").innerHTML = "Save";
+        e("site-level").addEventListener("change", function() {
+          editButton.value = "Save";
+          editButton.innerHTML = "Save";
         });
       }
+
       // Chrome extensions API call to get the current tab (URL).
       chrome.tabs.getSelected(null, retrievePageNotes);
     </script>
@@ -83,7 +91,7 @@
       <input type="checkbox" name="site-level" id="site-level"/>
       Site Level Notes
     </div>
-    <button id="save-edit-button" value="Edit">
+    <button id="editbutton" value="Edit">
       Edit
     </button>
     <button id="delete-button" value="Delete">

@@ -73,7 +73,6 @@
         }
         debug.msg = ''
         var gDoc = new GoogleDoc(localStorage.gDoc);
-        //        alert(JSON.stringify(gDoc));
         try {
           gDoc.refresh(function() {
             localLastModTime = 0;
