@@ -79,22 +79,19 @@ GoogleDoc.prototype.getSelfLink = function() {
   return selfLink;
 };
 //
-GoogleDoc.prototype.getExportLink = function() {
-  return this.entry.content.src;
-};
-//
 GoogleDoc.prototype.getLastUpdateTime = function() {
   var lastUpdateTime = new Date(this.entry.updated.$t);
   return lastUpdateTime.getTime();
 };
 //
-GoogleDoc.prototype.createRemoteDataFile = function() {
+GoogleDoc.prototype.createNewDoc = function(docName) {
+  if (!docName) { throw 'Doc name is not defined'; }
   var url = 'https://docs.google.com/feeds/default/private/full';
   var request = {
     'method': 'POST',
     'headers': {
       'Content-Type': 'text/plain',
-      'Slug': 'Page Notes Data'
+      'Slug': docName
     },
     'parameters': {
       'alt': 'json'
@@ -112,13 +109,14 @@ GoogleDoc.prototype.createRemoteDataFile = function() {
     this.persist();
 };
 //
-GoogleDoc.prototype.getRemoteDataFile = function() {
+GoogleDoc.prototype.getDocByName = function(docName) {
+  if (!docName) { throw 'Doc name is not defined'; }
   var url = 'https://docs.google.com/feeds/default/private/full';
   var request = {
     'method': 'GET',
     'parameters': {
       'alt': 'json',
-      'title': 'Page Notes Data',
+      'title': docName,
       'title-exact': 'true'
     }
   };
@@ -133,7 +131,7 @@ GoogleDoc.prototype.getRemoteDataFile = function() {
     this.persist();
 };
 //
-GoogleDoc.prototype.refresh = function(callback) {
+GoogleDoc.prototype.refreshLocalMetadata = function(callback) {
   var url = this.getSelfLink();
   var request = {
     'method': 'GET',
@@ -144,9 +142,7 @@ GoogleDoc.prototype.refresh = function(callback) {
       'alt': 'json'
     }
   };
-
   var xhr = sendRequest(request, url);
-
   if (xhr.status !== 200 && xhr.status !== 304 && xhr.status !== 412) {
     throw 'There was a problem in refreshing the doc entry. ' +
     'Last request status: ' + xhr.status + '\n' + xhr.responseText;

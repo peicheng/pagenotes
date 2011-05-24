@@ -30,9 +30,9 @@
           }
           if(!localStorage.gDoc) {
             gDoc = new bgPage.GoogleDoc();
-            gDoc.getRemoteDataFile();
+            gDoc.getDocByName(bgPage.REMOTE_DOC_NAME);
             if(!localStorage.gDoc) {
-              gDoc.createRemoteDataFile();
+              gDoc.createNewDoc(bgPage.REMOTE_DOC_NAME);
             }
           }
         } catch (e) {
@@ -80,7 +80,7 @@
 
     <table>
       <tr>
-        <td>Last Sync Status</td>
+        <td>Sync Status</td>
         <td id="sync_status"></td>
       </tr>
       <tr>
@@ -119,3 +119,4 @@
     <pre id="debug"></pre>
   </body>
 </html>
+
