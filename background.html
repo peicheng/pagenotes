@@ -65,6 +65,7 @@
 
       function sync() {
 
+        debug.msg = ''
         debug.log('sync: Starting sync at: ' + new Date());
 
         if(!oauth.hasToken()) {
@@ -75,7 +76,6 @@
           debug.log('sync: Sync gdoc is not setup.');
           return;
         }
-        debug.msg = ''
         var gDoc = new GoogleDoc(localStorage.gDoc);
         try {
           gDoc.refreshLocalMetadata(function() {

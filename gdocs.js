@@ -122,7 +122,7 @@ GoogleDoc.prototype.getDocByName = function(docName) {
   };
   var xhr = sendRequest(request, url);
   if (xhr.status != 200) {
-    throw 'There was a problem in searching for the existing doc.' +
+    throw 'There was a problem in searching for the doc - ' + docName + '.' +
     'Last request status: ' + xhr.status + '\n' + xhr.responseText;
     return;
   }
