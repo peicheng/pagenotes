@@ -18,69 +18,64 @@ function sendRequest(request, url, body) {
 }
 
 function GoogleDoc(entrystring) {
-  if (entrystring !== undefined) {
-    this.entry = JSON.parse(entrystring);
-  }
+  this.getEntry = function() { return JSON.parse(entrystring);};
+  this.setEntry = function(entry) { entrystring = JSON.stringify(entry); };
 }
 
 GoogleDoc.prototype.parseFeed = function(feedResponseString) {
   var feedResponse = JSON.parse(feedResponseString);
   if (feedResponse.entry) {
-    this.entry = feedResponse.entry;
+    this.setEntry(feedResponse.entry);
     return;
   }
   feed = feedResponse.feed;
   if (feed.entry) {
     if (feed.entry instanceof Array) {
-      delete this.entry;
-      this.entry = feed.entry[0];
+      this.setEntry(feed.entry[0]);
     } else {
-      delete this.entry;
-      this.entry = feed.entry;
+      this.setEntry(feed.entry);
     }
   }
 };
 //
 GoogleDoc.prototype.persist = function() {
-  localStorage.gDoc = JSON.stringify(this.entry);
+  if (this.getEntry()) {
+    localStorage.gDoc = JSON.stringify(this.getEntry());
+  }
 };
 //
 GoogleDoc.prototype.getEtag = function() {
-  return this.entry.gd$etag;
+  return this.getEntry().gd$etag;
 };
 //
 GoogleDoc.prototype.getId = function() {
-  return this.entry.id.$t;
+  return this.getEntry().id.$t;
 };
 //
 GoogleDoc.prototype.getResourceId = function() {
-  return this.entry.gd$resourceId.$t.split(':')[1];
+  return this.getEntry().gd$resourceId.$t.split(':')[1];
 };
 //
 GoogleDoc.prototype.getEditMediaLink = function() {
-  var editMediaLink;
-  for (var i = 0; i < this.entry.link.length; i++) {
-    if (this.entry.link[i].rel == 'edit-media') {
-      editMediaLink = this.entry.link[i].href;
-      break;
+  var docLinks = this.getEntry().link;
+  for (var i = 0; i < docLinks.length; i++) {
+    if (docLinks[i].rel == 'edit-media') {
+      return docLinks[i].href;
     }
   }
-  return editMediaLink;
 };
 //
 GoogleDoc.prototype.getSelfLink = function() {
-  var selfLink;
-  for (var i = 0; i < this.entry.link.length; i++) {
-    if (this.entry.link[i].rel == 'self') {
-      selfLink = this.entry.link[i].href;
-      break;
+  var docLinks = this.getEntry().link;
+  for (var i = 0; i < docLinks.length; i++) {
+    if (docLinks[i].rel == 'self') {
+      return docLinks[i].href;
     }
   }
-  return selfLink;
 };
 //
 GoogleDoc.prototype.getLastUpdateTime = function() {
-  var lastUpdateTime = new Date(this.entry.updated.$t);
+  var lastUpdateTime = new Date(this.getEntry().updated.$t);
   return lastUpdateTime.getTime();
 };
 //
@@ -105,8 +100,7 @@ GoogleDoc.prototype.createNewDoc = function(docName) {
     return;
   }
   this.parseFeed(xhr.responseText);
-  if (this.entry)
-    this.persist();
+  this.persist();
 };
 //
 GoogleDoc.prototype.getDocByName = function(docName) {
@@ -127,8 +121,7 @@ GoogleDoc.prototype.getDocByName = function(docName) {
     return;
   }
   this.parseFeed(xhr.responseText);
-  if (this.entry)
-    this.persist();
+  this.persist();
 };
 //
 GoogleDoc.prototype.refreshLocalMetadata = function(callback) {
@@ -150,9 +143,7 @@ GoogleDoc.prototype.refreshLocalMetadata = function(callback) {
   }
   if (xhr.status !== 304 && xhr.status !== 412) {
     this.parseFeed(xhr.responseText);
-    if (this.entry) {
-      this.persist();
-    }
+    this.persist();
   }
   callback();
 };
@@ -194,7 +185,6 @@ GoogleDoc.prototype.setData = function(data) {
     return;
   }
   this.parseFeed(xhr.responseText);
-  if (this.entry)
-    this.persist();
+  this.persist();
 };
 
