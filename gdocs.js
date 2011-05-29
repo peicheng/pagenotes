@@ -1,9 +1,18 @@
 var bgPage = chrome.extension.getBackgroundPage();
 
+function stringify(parameters) {
+  var params = [];
+  for(var p in parameters) {
+    params.push(encodeURIComponent(p) + '=' +
+                encodeURIComponent(parameters[p]));
+  }
+  return params.join('&');
+}
+
 function sendRequest(request, url, body) {
   var xhr = new XMLHttpRequest();
   var header;
-  xhr.open(request.method, url + '?' + bgPage.stringify(request.parameters),
+  xhr.open(request.method, url + '?' + stringify(request.parameters),
       false);
   xhr.setRequestHeader('GData-Version', '3.0');
   for (var header in request.headers) {
@@ -17,9 +26,20 @@ function sendRequest(request, url, body) {
   return xhr;
 }
 
-function GoogleDoc(entrystring) {
-  this.getEntry = function() { return JSON.parse(entrystring);};
-  this.setEntry = function(entry) { entrystring = JSON.stringify(entry); };
+function GoogleDoc(entryString, onSetEntry) {
+  this.getEntry = function() {
+    if (entryString) {
+      try {
+        return JSON.parse(entryString);
+      } catch(e) {
+        throw 'Not a valid object string: ' + entryString;
+      }
+    }
+  };
+  this.setEntry = function(entry) {
+    entryString = JSON.stringify(entry);
+    onSetEntry(entryString);
+  };
 }
 
 GoogleDoc.prototype.parseFeed = function(feedResponseString) {
@@ -38,45 +58,17 @@ GoogleDoc.prototype.parseFeed = function(feedResponseString) {
   }
 };
 //
-GoogleDoc.prototype.persist = function() {
-  if (this.getEntry()) {
-    localStorage.gDoc = JSON.stringify(this.getEntry());
-  }
-};
-//
-GoogleDoc.prototype.getEtag = function() {
-  return this.getEntry().gd$etag;
-};
-//
-GoogleDoc.prototype.getId = function() {
-  return this.getEntry().id.$t;
-};
-//
-GoogleDoc.prototype.getResourceId = function() {
-  return this.getEntry().gd$resourceId.$t.split(':')[1];
-};
-//
-GoogleDoc.prototype.getEditMediaLink = function() {
+GoogleDoc.prototype.getLink = function(linkType) {
   var docLinks = this.getEntry().link;
   for (var i = 0; i < docLinks.length; i++) {
-    if (docLinks[i].rel == 'edit-media') {
-      return docLinks[i].href;
-    }
-  }
-};
-//
-GoogleDoc.prototype.getSelfLink = function() {
-  var docLinks = this.getEntry().link;
-  for (var i = 0; i < docLinks.length; i++) {
-    if (docLinks[i].rel == 'self') {
+    if (docLinks[i].rel == linkType) {
       return docLinks[i].href;
     }
   }
 };
 //
 GoogleDoc.prototype.getLastUpdateTime = function() {
-  var lastUpdateTime = new Date(this.getEntry().updated.$t);
-  return lastUpdateTime.getTime();
+  return new Date(this.getEntry().updated.$t).getTime();
 };
 //
 GoogleDoc.prototype.createNewDoc = function(docName) {
@@ -100,10 +92,9 @@ GoogleDoc.prototype.createNewDoc = function(docName) {
     return;
   }
   this.parseFeed(xhr.responseText);
-  this.persist();
 };
 //
-GoogleDoc.prototype.getDocByName = function(docName) {
+GoogleDoc.prototype.searchDocByName = function(docName) {
   if (!docName) { throw 'Doc name is not defined'; }
   var url = 'https://docs.google.com/feeds/default/private/full';
   var request = {
@@ -121,15 +112,14 @@ GoogleDoc.prototype.getDocByName = function(docName) {
     return;
   }
   this.parseFeed(xhr.responseText);
-  this.persist();
 };
 //
 GoogleDoc.prototype.refreshLocalMetadata = function(callback) {
-  var url = this.getSelfLink();
+  var url = this.getLink('self');
   var request = {
     'method': 'GET',
     'headers': {
-      'If-None-Match': this.getEtag()
+      'If-None-Match': this.getEntry().gd$etag
     },
     'parameters': {
       'alt': 'json'
@@ -143,17 +133,17 @@ GoogleDoc.prototype.refreshLocalMetadata = function(callback) {
   }
   if (xhr.status !== 304 && xhr.status !== 412) {
     this.parseFeed(xhr.responseText);
-    this.persist();
   }
-  callback();
+  callback(this);
 };
 //
 GoogleDoc.prototype.getData = function() {
   var url = 'https://docs.google.com/feeds/download/documents/Export';
+  var docId = this.getEntry().gd$resourceId.$t.split(':')[1];
   var request = {
     'method': 'GET',
     'parameters': {
-      'docId': this.getResourceId(),
+      'docId': docId,
       'exportFormat': 'txt'
     }
   };
@@ -167,7 +157,7 @@ GoogleDoc.prototype.getData = function() {
 };
 //
 GoogleDoc.prototype.setData = function(data) {
-  var url = this.getEditMediaLink();
+  var url = this.getLink('edit-media');
   var request = {
     'method': 'PUT',
     'headers': {
@@ -185,6 +175,5 @@ GoogleDoc.prototype.setData = function(data) {
     return;
   }
   this.parseFeed(xhr.responseText);
-  this.persist();
 };
 

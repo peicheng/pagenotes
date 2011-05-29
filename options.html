@@ -1,9 +1,5 @@
 <!--
-* Copyright (c) 2010 The Chromium Authors. All rights reserved.  Use of this
-* source code is governed by a BSD-style license that can be found in the
-* LICENSE file.
-*
-* Author: Eric Bidelman <ericbidelman@chromium.org>
+* Author: Manu Garg <manugarg@gmail.com>
 -->
 <html>
   <head>
@@ -13,14 +9,23 @@
         font-family: Helvetica, Arial, sans-serif;
         font-size: small;
       }
+
+      h1 { font-size: 156% }
+
+      h1 img {
+        margin: 1px 5px 0 1px;
+        vertical-align: middle
+      }
+
+      h2 {
+        border-top: 1px solid #9cc2ef;
+        background-color: #ebeff9;
+        padding: 3px 5px;
+        font-size: 100%
+      }
     </style>
     <script type="text/javascript">
       var bgPage = chrome.extension.getBackgroundPage();
-
-      function logout() {
-        bgPage.logout();
-        location.reload();
-      }
 
       function setupSync() {
         try {
@@ -29,8 +34,10 @@
             return;
           }
           if(!localStorage.gDoc) {
-            gDoc = new bgPage.GoogleDoc();
-            gDoc.getDocByName(bgPage.REMOTE_DOC_NAME);
+            gDoc = new bgPage.GoogleDoc(null, function(gDoc){
+                localStorage.gDoc = gDoc;
+              });
+            gDoc.searchDocByName(bgPage.REMOTE_DOC_NAME);
             if(!localStorage.gDoc) {
               gDoc.createNewDoc(bgPage.REMOTE_DOC_NAME);
             }
@@ -38,85 +45,128 @@
         } catch (e) {
           alert(e);
         }
-        location.reload();
       }
 
       function clearSync() {
-        localStorage.removeItem('gDoc');
+      }
+
+      function handleSyncButton() {
+        syncButton = document.getElementById('sync_button');
+        if (syncButton.name === 'cancel_sync') {
+          if (confirm('Are you sure you want to clear the sync setup?')) {
+            localStorage.removeItem('gDoc');
+          }
+        } else {
+          setupSync();
+        }
+        location.reload();
+      }
+
+      function handleAuthButton() {
+        authButton = document.getElementById('auth_button');
+        if (authButton.name === 'revoke_token') {
+          if (confirm('Are you sure you want to revoke the auth token. It ' +
+                      'will cancel the sync as well.')) {
+            bgPage.oauth.clearTokens();
+            localStorage.removeItem('gDoc');
+          }
+        } else {
+          bgPage.oauth.authorize(function(){location.reload();});
+        }
         location.reload();
       }
 
       function clearLocalData() {
-        localStorage.removeItem('pagenotes');
-        location.reload();
+        if (confirm('Are you sure you want to delete all local data?')) {
+          localStorage.removeItem('pagenotes');
+          location.reload();
+        }
       }
 
       function initUI() {
+        var syncButton = document.getElementById('sync_button');
+        var authButton = document.getElementById('auth_button');
         if (!bgPage.oauth.hasToken()) {
-          document.getElementById('revoke').disabled = true;
+          authButton.innerHTML = 'Get Google Docs Auth Token';
+          authButton.name = 'get_token';
         } else {
-          document.getElementById('get_auth_token').disabled = true;
+          authButton.innerHTML = 'Revoke Google Docs Auth Token';
+          authButton.name = 'revoke_token';
         }
         if (localStorage.gDoc) {
-          document.getElementById('setup_sync').disabled = true;
+          syncButton.innerHTML = 'Stop Syncing';
+          syncButton.name = 'cancel_sync';
         } else {
-          document.getElementById('clear_sync').disabled = true;
+          syncButton.innerHTML = 'Setup Sync';
+          syncButton.name = 'setup_sync';
         }
         if (!localStorage.pagenotes) {
           document.getElementById('clear_local').disabled = true;
         }
-        if (localStorage.lastSyncStatus) {
-          document.getElementById('sync_status').innerHTML = localStorage.lastSyncStatus;
-          document.getElementById('local_last_mod_time').innerHTML = localStorage.lastModTime;
-          document.getElementById('remote_last_mod_time').innerHTML = bgPage.getRemoteLastModTime();
+        if (bgPage.lastSyncStatus === 'good') {
+          var lastSyncTime = new Date(localStorage.lastSyncTime);
+          var syncLast = Math.floor((new Date() - lastSyncTime) / 60000);
+          document.getElementById('sync_status').innerHTML += 'Synced ' +
+            (syncLast === 0 ? 'less than a minute ago.' :
+             syncLast + ' min ago.');
+        } else {
+          document.getElementById('sync_status').innerHTML +=
+            bgPage.lastSyncStatus;
         }
-        if (bgPage.debug.msg){
-          document.getElementById('debug').innerHTML = bgPage.debug.msg;
+      }
+
+      function showHideDebugInfo() {
+        var showDebugAnchor = document.getElementById('showdebug');
+        if (showDebugAnchor.name === 'show') {
+          debugInfo = 'Messages from last sync: \n' + bgPage.debug.msg
+          document.getElementById('debug').innerHTML = debugInfo;
+          showDebugAnchor.innerHTML = 'Hide debug info';
+          showDebugAnchor.name = 'hide';
+        } else {
+          document.getElementById('debug').innerHTML = '';
+          showDebugAnchor.innerHTML = 'Show debug info';
+          showDebugAnchor.name = 'show';
         }
       }
     </script>
   </head>
   <body onload="initUI();">
-
-    <table>
-      <tr>
-        <td>Sync Status</td>
-        <td id="sync_status"></td>
-      </tr>
-      <tr>
-        <td>Local Last Mod Time</td>
-        <td id="local_last_mod_time"></td>
-      </tr>
-      <tr>
-        <td>Remote Last Mod Time</td>
-        <td id="remote_last_mod_time"></td>
-      </tr>
-    </table>
+    <h1>
+      <img src="icon-80.png" width=36px height=36px align=center>
+        &nbsp;Page Notes
+      </img>
+    </h1>
+    <h2>Sync Status and Setup</h2>
     <p>
-      <button id="clear_local" onclick="clearLocalData();">
-        Clear Local Data
-      </button>
+      You can sync your 'page notes' to the cloud (Google Docs more
+      specifically). This feature can be used to sync page notes between
+      multiple computers.
     </p>
     <p>
-      <button id="setup_sync" onclick="setupSync();">
+      Last Sync Status:
+      <span id="sync_status"></span>
+      (<a id="showdebug" name="show" href=javascript:showHideDebugInfo()>Show debug info</a>)
+    </p>
+    <pre id="debug"></pre>
+    <p>
+      <button id="sync_button" onclick="handleSyncButton();">
         Setup Sync
-      </button>
-      <button id="clear_sync" onclick="clearSync();">
-        Clear Sync
       </button>
     </p>
     <p>
       Authentication Settings:
     </p>
-    <p style="margin-left:10px; margin-top:10px">
-      <button id="get_auth_token" onclick="bgPage.oauth.authorize(function(){location.reload();});">
+    <p>
+      <button id="auth_button" name="get_token" onclick=handleAuthButton()>
         Get Google Docs OAuth Token
       </button>
-      <button id="revoke" onclick="logout();clearSync();">
-        Revoke Google Docs OAuth Token
+    </p>
+    <h2>Page Notes Data</h2>
+    <p>
+      <button id="clear_local" onclick="clearLocalData();">
+        Clear Local Data
       </button>
     </p>
-    <pre id="debug"></pre>
   </body>
 </html>
 
