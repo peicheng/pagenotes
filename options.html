@@ -95,8 +95,11 @@
           authButton.name = 'revoke_token';
         }
         if (localStorage.gDoc) {
-          syncStatus.innerHTML = 'Syncing to ' +
-            bgPage.getRemoteFile().getEntry().author[0].email.$t + '. ';
+          var gDoc = bgPage.getRemoteFile().getEntry();
+          if (gDoc && gDoc.author instanceof Array && gDoc.author[0].email) {
+            syncStatus.innerHTML = 'Syncing to ' + gDoc.author[0].email.$t +
+              '. ';
+          }
           syncButton.innerHTML = 'Stop Syncing';
           syncButton.name = 'cancel_sync';
         } else {
