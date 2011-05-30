@@ -86,6 +86,7 @@
       function initUI() {
         var syncButton = document.getElementById('sync_button');
         var authButton = document.getElementById('auth_button');
+        var syncStatus = document.getElementById('sync_status');
         if (!bgPage.oauth.hasToken()) {
           authButton.innerHTML = 'Get Google Docs Auth Token';
           authButton.name = 'get_token';
@@ -94,9 +95,12 @@
           authButton.name = 'revoke_token';
         }
         if (localStorage.gDoc) {
+          syncStatus.innerHTML = 'Syncing to ' +
+            bgPage.getRemoteFile().getEntry().author[0].email.$t + '. ';
           syncButton.innerHTML = 'Stop Syncing';
           syncButton.name = 'cancel_sync';
         } else {
+          syncStatus.innerHTML = 'Not syncing now. '
           syncButton.innerHTML = 'Setup Sync';
           syncButton.name = 'setup_sync';
         }
@@ -106,12 +110,10 @@
         if (bgPage.lastSyncStatus === 'good') {
           var lastSyncTime = new Date(localStorage.lastSyncTime);
           var syncLast = Math.floor((new Date() - lastSyncTime) / 60000);
-          document.getElementById('sync_status').innerHTML += 'Synced ' +
-            (syncLast === 0 ? 'less than a minute ago.' :
-             syncLast + ' min ago.');
+          syncStatus.innerHTML += 'Synced ' + (syncLast === 0 ?
+            'less than a minute ago.' : syncLast + ' min ago.');
         } else {
-          document.getElementById('sync_status').innerHTML +=
-            bgPage.lastSyncStatus;
+          syncStatus.innerHTML += bgPage.lastSyncStatus;
         }
       }
 
@@ -143,7 +145,7 @@
       multiple computers.
     </p>
     <p>
-      Last Sync Status:
+      <b>Sync Status: </b>
       <span id="sync_status"></span>
       (<a id="showdebug" name="show" href=javascript:showHideDebugInfo()>Show debug info</a>)
     </p>
