@@ -72,7 +72,16 @@
             localStorage.removeItem('gDoc');
           }
         } else {
-          bgPage.oauth.authorize(function(){location.reload();});
+          var app_id = document.getElementById('app_id').value;
+          if (!app_id) {
+            if (!confirm('Auth identifier is empty. It\'s ok, but not ' +
+                         'recommended if you have multiple instances of ' +
+                         'this extension syncing to the same Google account.' +
+                         ' Do you still want to continue?')) {
+               return;
+             }
+          }
+          bgPage.doAuth(app_id, function(){location.reload();});
         }
         location.reload();
       }
@@ -94,6 +103,7 @@
         } else {
           authButton.innerHTML = 'Revoke Google Docs Auth Token';
           authButton.name = 'revoke_token';
+          document.getElementById('app_id').style.display = 'none';
         }
         if (localStorage.gDoc) {
           var gDoc = bgPage.getRemoteFile().getEntry();
@@ -164,6 +174,8 @@
       Authentication Settings:
     </p>
     <p>
+    <input type="text" id="app_id" placeholder="Auth Identifier"
+      title="A string to uniquely identify this instance of extension to Google Accounts. E.g. home-laptop, super-chrome etc." />
       <button id="auth_button" name="get_token" onclick=handleAuthButton()>
         Get Google Docs OAuth Token
       </button>
