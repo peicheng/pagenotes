@@ -1,3 +1,7 @@
+/**
+ * @author manugarg@gmail.com (Manu Garg)
+ */
+
 var bgPage = chrome.extension.getBackgroundPage();
 
 function stringify(parameters) {

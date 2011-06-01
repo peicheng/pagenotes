@@ -1,3 +1,4 @@
+<!DOCTYPE html>
 <!--
 * Author: Manu Garg <manugarg@gmail.com>
 -->
@@ -96,7 +97,7 @@
         }
         if (localStorage.gDoc) {
           var gDoc = bgPage.getRemoteFile().getEntry();
-          if (gDoc && gDoc.author instanceof Array && gDoc.author[0].email) {
+          if (gDoc && gDoc.author && gDoc.author[0] && gDoc.author[0].email) {
             syncStatus.innerHTML = 'Syncing to ' + gDoc.author[0].email.$t +
               '. ';
           }
@@ -137,8 +138,8 @@
   </head>
   <body onload="initUI();">
     <h1>
-      <img src="icon-80.png" width=36px height=36px align=center>
-        &nbsp;Page Notes
+      <img src="icon48.png" width=36px height=36px align=center>
+        Page Notes
       </img>
     </h1>
     <h2>Sync Status and Setup</h2>
@@ -150,6 +151,7 @@
     <p>
       <b>Sync Status: </b>
       <span id="sync_status"></span>
+      <a href=javascript:bgPage.sync();location.reload()>Sync Now</a>
       (<a id="showdebug" name="show" href=javascript:showHideDebugInfo()>Show debug info</a>)
     </p>
     <pre id="debug"></pre>
