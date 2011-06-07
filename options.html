@@ -97,7 +97,7 @@
         var syncButton = document.getElementById('sync_button');
         var authButton = document.getElementById('auth_button');
         var syncStatus = document.getElementById('sync_status');
-        if (!bgPage.oauth.hasToken()) {
+        if (!bgPage.oauth || !bgPage.oauth.hasToken()) {
           authButton.innerHTML = 'Get Google Docs Auth Token';
           authButton.name = 'get_token';
         } else {

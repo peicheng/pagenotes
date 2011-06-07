@@ -6,7 +6,7 @@ var bgPage = chrome.extension.getBackgroundPage();
 
 function stringify(parameters) {
   var params = [];
-  for(var p in parameters) {
+  for (var p in parameters) {
     params.push(encodeURIComponent(p) + '=' +
                 encodeURIComponent(parameters[p]));
   }
