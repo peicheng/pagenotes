@@ -81,7 +81,8 @@
                return;
              }
           }
-          bgPage.doAuth(app_id, function(){location.reload();});
+          localStorage.app_id = app_id;
+          bgPage.doAuth(function(){location.reload();});
         }
         location.reload();
       }
