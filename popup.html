@@ -17,12 +17,6 @@
     <script type="text/javascript">
       var bgPage = chrome.extension.getBackgroundPage();
 
-      function getHostFromUrl(url) {
-        var a_element = document.createElement("a");
-        a_element.href = url;
-        return a_element.hostname;
-      }
-
       function e(id) {
         return document.getElementById(id);
       }
@@ -34,7 +28,7 @@
         // Get notes for the current tab and display.
         notes.innerHTML = "&nbsp;";
         tabUrl = tab.url;
-        tabHost = getHostFromUrl(tabUrl);
+        tabHost = bgPage.getHostFromUrl(tabUrl);
         if(bgPage.getPageNotes(tabUrl)) {
           notes.innerHTML = bgPage.getPageNotes(tabUrl);
         } else if(bgPage.getPageNotes(tabHost)) {

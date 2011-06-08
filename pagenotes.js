@@ -35,3 +35,9 @@ function setAllPageNotes(data) {
   localStorage.setItem('pagenotes', data);
 }
 
+function getHostFromUrl(url) {
+  var a_element = document.createElement("a");
+  a_element.href = url;
+  return a_element.hostname;
+}
+

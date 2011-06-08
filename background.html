@@ -14,8 +14,8 @@
       var DOCLIST_FEED = DOCLIST_SCOPE + '/default/private/full/';
       var GOOGLE_ACCOUNTS = 'https://www.google.com/accounts';
       var REMOTE_DOC_NAME = 'Page Notes Data'
-      var RED_COLOR = {'color': [255, 0, 0, 255]}
-      var GREEN_COLOR = {'color': [50, 100, 50, 255]}
+      var RED_COLOR = {'color': [255, 0, 0, 150]}
+      var GREEN_COLOR = {'color': [50, 100, 50, 150]}
 
       var oauth = null;
 
@@ -42,6 +42,25 @@
         msg: '',
         log: function(s) { this.msg += s + '\n';}
       };
+
+      chrome.tabs.onSelectionChanged.addListener(function(tabId) {
+        chrome.tabs.get(tabId, updateBadgeForTab)
+      });
+
+      chrome.tabs.onUpdated.addListener(function(tabId, changeinfo, tab) {
+        updateBadgeForTab(tab);
+      });
+
+      function updateBadgeForTab(tab) {
+        var tabUrl = tab.url;
+        var tabHost = getHostFromUrl(tabUrl);
+        var pn = getPageNotes(tabUrl) ? getPageNotes(tabUrl) : getPageNotes(tabHost);
+        if (pn) {
+          chrome.browserAction.setBadgeText({'text': 'pn'});
+        } else {
+          chrome.browserAction.setBadgeText({'text': '0'});
+        }
+      }
 
       var lastSyncStatus;
       chrome.browserAction.setBadgeText({'text': 'pn'});
