@@ -1,3 +1,6 @@
+/**
+ * @author manugarg@gmail.com (Manu Garg)
+ */
 function getPageNotes(key) {
   if (localStorage.getItem('pagenotes')) {
     var pagenotes = JSON.parse(localStorage.getItem('pagenotes'));

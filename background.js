@@ -1,3 +1,6 @@
+/**
+ * @author manugarg@gmail.com (Manu Garg)
+ */
 var SYNC_INTERVAL = 5 * 60 * 1000; // In ms. Equivalent to 5 min.
 var DOCLIST_SCOPE = 'https://docs.google.com/feeds';
 var DOCLIST_FEED = DOCLIST_SCOPE + '/default/private/full/';
