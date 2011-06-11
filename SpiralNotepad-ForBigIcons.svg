@@ -15,11 +15,11 @@
    inkscape:version="0.47 r22583"
    width="100%"
    height="100%"
-   sodipodi:docname="SpiralNotepad1.svg"
+   sodipodi:docname="SpiralNotepad-ForBigIcons.svg"
    style="fill:none;stroke:none"
-   inkscape:export-filename="/home/manugarg/creation/code/chrome-page-notes/icon48.png"
-   inkscape:export-xdpi="14.637617"
-   inkscape:export-ydpi="14.637617">
+   inkscape:export-filename="/home/manugarg/creation/code/chrome-page-notes/icon19.png"
+   inkscape:export-xdpi="5.8000002"
+   inkscape:export-ydpi="5.8000002">
   <metadata
      id="metadata55">
     <rdf:RDF>
@@ -144,7 +144,7 @@
      id="namedview51"
      showgrid="false"
      inkscape:zoom="1"
-     inkscape:cx="163.73495"
+     inkscape:cx="-15.26505"
      inkscape:cy="139.51085"
      inkscape:window-x="0"
      inkscape:window-y="24"
@@ -164,6 +164,49 @@
      inkscape:export-xdpi="6.0942888"
      inkscape:export-ydpi="6.0942888"
      style="fill:#ffffff;fill-rule:nonzero;stroke:#274e13;stroke-width:21.65600014;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:10;stroke-dasharray:none;marker-end:none" />
+  <rect
+     style="fill:#ffffff;fill-opacity:1;stroke:#2a736d;stroke-width:13.46693265999999944;stroke-linecap:butt;stroke-linejoin:round;stroke-miterlimit:10;stroke-opacity:1;stroke-dasharray:none;filter:url(#filter4481)"
+     id="rect3780"
+     width="226.86568"
+     height="254.13358"
+     x="33.54583"
+     y="33.450592"
+     inkscape:export-filename="/home/manugarg/creation/code/chrome-page-notes/icon48.png"
+     inkscape:export-xdpi="14.637506"
+     inkscape:export-ydpi="14.637506"
+     transform="matrix(1.0592271,0,0,1,-7.7051102,0)" />
+  <path
+     d="m 66.631278,10.258559 0,0 c 0,-5.0077695 4.521129,-9.0673795 10.098247,-9.0673795 l 0,0 0,0 c 2.67822,0 5.246775,0.95531 7.140577,2.65578 1.893791,1.70046 2.95769,4.00679 2.95769,6.4115995 l 0,43.13825 c 0,5.0078 -4.521149,9.0674 -10.098267,9.0674 l 0,0 0,0 c -5.577118,0 -10.098247,-4.0596 -10.098247,-9.0674 z"
+     id="path9"
+     inkscape:export-filename="/home/manugarg/creation/code/chrome-page-notes/icon48.png"
+     inkscape:export-xdpi="14.637506"
+     inkscape:export-ydpi="14.637506"
+     style="fill:#2a736d;fill-opacity:1;fill-rule:nonzero;stroke:#577899;stroke-width:1.12224269;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:10;stroke-opacity:1;stroke-dasharray:none;marker-end:none;filter:url(#filter4477)"
+     transform="matrix(1.0592271,0,0,1,-7.7051102,0)" />
+  <path
+     d="m 113.44478,10.418999 0,0 c 0,-5.0077595 4.52113,-9.0673695 10.09827,-9.0673695 l 0,0 0,0 c 2.6782,0 5.24674,0.9553 7.14053,2.65578 1.89381,1.70045 2.95773,4.00679 2.95773,6.4115895 l 0,43.13829 c 0,5.00776 -4.52117,9.06738 -10.09826,9.06738 l 0,0 0,0 c -5.57714,0 -10.09827,-4.05962 -10.09827,-9.06738 z"
+     id="path23"
+     inkscape:export-filename="/home/manugarg/creation/code/chrome-page-notes/icon48.png"
+     inkscape:export-xdpi="14.637506"
+     inkscape:export-ydpi="14.637506"
+     style="fill:#2a736d;fill-opacity:1;fill-rule:nonzero;stroke:#577899;stroke-width:1.12224269;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:10;stroke-opacity:1;stroke-dasharray:none;marker-end:none;filter:url(#filter4473)"
+     transform="matrix(1.0592271,0,0,1,-7.7051102,0)" />
+  <path
+     d="m 160.07961,10.338789 0,0 c 0,-5.0077695 4.52113,-9.0673695 10.09825,-9.0673695 l 0,0 0,0 c 2.67824,0 5.24676,0.95531 7.14055,2.65575 1.89379,1.70047 2.95772,4.00679 2.95772,6.4116195 l 0,43.13827 c 0,5.00777 -4.52114,9.06737 -10.09827,9.06737 l 0,0 0,0 c -5.57712,0 -10.09825,-4.0596 -10.09825,-9.06737 z"
+     id="path25"
+     inkscape:export-filename="/home/manugarg/creation/code/chrome-page-notes/icon48.png"
+     inkscape:export-xdpi="14.637506"
+     inkscape:export-ydpi="14.637506"
+     style="fill:#2a736d;fill-opacity:1;fill-rule:nonzero;stroke:#577899;stroke-width:1.12224269;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:10;stroke-opacity:1;stroke-dasharray:none;marker-end:none;filter:url(#filter4469)"
+     transform="matrix(1.0592271,0,0,1,-7.7051102,0)" />
+  <path
+     d="m 206.89311,10.499219 0,0 c 0,-5.0077495 4.52115,-9.0673595 10.09827,-9.0673595 l 0,0 0,0 c 2.6782,0 5.24674,0.9553 7.14055,2.65577 1.89379,1.70045 2.95772,4.00677 2.95772,6.4115895 l 0,43.13829 c 0,5.00775 -4.52118,9.06737 -10.09827,9.06737 l 0,0 0,0 c -5.57712,0 -10.09827,-4.05962 -10.09827,-9.06737 z"
+     id="path27"
+     inkscape:export-filename="/home/manugarg/creation/code/chrome-page-notes/icon48.png"
+     inkscape:export-xdpi="14.637506"
+     inkscape:export-ydpi="14.637506"
+     style="fill:#2a736d;fill-opacity:1;fill-rule:nonzero;stroke:#577899;stroke-width:1.12224269;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:10;stroke-opacity:1;stroke-dasharray:none;marker-end:none;filter:url(#filter4465)"
+     transform="matrix(1.0592271,0,0,1,-7.7051102,0)" />
   <path
      d="m 53.191097,125.07922 188.650363,0"
      id="path11"
@@ -211,48 +254,5 @@
      inkscape:export-xdpi="14.637506"
      inkscape:export-ydpi="14.637506"
      style="stroke:#2a736d;stroke-width:6.7334547;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:10;stroke-opacity:1;stroke-dasharray:none;marker-end:none;filter:url(#filter4485)"
-     transform="matrix(1.0592271,0,0,1,-7.7051102,0)" />
-  <rect
-     style="fill:#800000;fill-opacity:0;stroke:#2a736d;stroke-width:13.4667778;stroke-linecap:butt;stroke-linejoin:round;stroke-miterlimit:10;stroke-opacity:1;stroke-dasharray:none;filter:url(#filter4481)"
-     id="rect3780"
-     width="226.86568"
-     height="254.13358"
-     x="33.54583"
-     y="33.450592"
-     inkscape:export-filename="/home/manugarg/creation/code/chrome-page-notes/icon48.png"
-     inkscape:export-xdpi="14.637506"
-     inkscape:export-ydpi="14.637506"
-     transform="matrix(1.0592271,0,0,1,-7.7051102,0)" />
-  <path
-     d="m 66.631278,10.258559 0,0 c 0,-5.0077695 4.521129,-9.0673795 10.098247,-9.0673795 l 0,0 0,0 c 2.67822,0 5.246775,0.95531 7.140577,2.65578 1.893791,1.70046 2.95769,4.00679 2.95769,6.4115995 l 0,43.13825 c 0,5.0078 -4.521149,9.0674 -10.098267,9.0674 l 0,0 0,0 c -5.577118,0 -10.098247,-4.0596 -10.098247,-9.0674 z"
-     id="path9"
-     inkscape:export-filename="/home/manugarg/creation/code/chrome-page-notes/icon48.png"
-     inkscape:export-xdpi="14.637506"
-     inkscape:export-ydpi="14.637506"
-     style="fill:#2a736d;fill-opacity:1;fill-rule:nonzero;stroke:#577899;stroke-width:1.12224269;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:10;stroke-opacity:1;stroke-dasharray:none;marker-end:none;filter:url(#filter4477)"
-     transform="matrix(1.0592271,0,0,1,-7.7051102,0)" />
-  <path
-     d="m 113.44478,10.418999 0,0 c 0,-5.0077595 4.52113,-9.0673695 10.09827,-9.0673695 l 0,0 0,0 c 2.6782,0 5.24674,0.9553 7.14053,2.65578 1.89381,1.70045 2.95773,4.00679 2.95773,6.4115895 l 0,43.13829 c 0,5.00776 -4.52117,9.06738 -10.09826,9.06738 l 0,0 0,0 c -5.57714,0 -10.09827,-4.05962 -10.09827,-9.06738 z"
-     id="path23"
-     inkscape:export-filename="/home/manugarg/creation/code/chrome-page-notes/icon48.png"
-     inkscape:export-xdpi="14.637506"
-     inkscape:export-ydpi="14.637506"
-     style="fill:#2a736d;fill-opacity:1;fill-rule:nonzero;stroke:#577899;stroke-width:1.12224269;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:10;stroke-opacity:1;stroke-dasharray:none;marker-end:none;filter:url(#filter4473)"
-     transform="matrix(1.0592271,0,0,1,-7.7051102,0)" />
-  <path
-     d="m 160.07961,10.338789 0,0 c 0,-5.0077695 4.52113,-9.0673695 10.09825,-9.0673695 l 0,0 0,0 c 2.67824,0 5.24676,0.95531 7.14055,2.65575 1.89379,1.70047 2.95772,4.00679 2.95772,6.4116195 l 0,43.13827 c 0,5.00777 -4.52114,9.06737 -10.09827,9.06737 l 0,0 0,0 c -5.57712,0 -10.09825,-4.0596 -10.09825,-9.06737 z"
-     id="path25"
-     inkscape:export-filename="/home/manugarg/creation/code/chrome-page-notes/icon48.png"
-     inkscape:export-xdpi="14.637506"
-     inkscape:export-ydpi="14.637506"
-     style="fill:#2a736d;fill-opacity:1;fill-rule:nonzero;stroke:#577899;stroke-width:1.12224269;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:10;stroke-opacity:1;stroke-dasharray:none;marker-end:none;filter:url(#filter4469)"
-     transform="matrix(1.0592271,0,0,1,-7.7051102,0)" />
-  <path
-     d="m 206.89311,10.499219 0,0 c 0,-5.0077495 4.52115,-9.0673595 10.09827,-9.0673595 l 0,0 0,0 c 2.6782,0 5.24674,0.9553 7.14055,2.65577 1.89379,1.70045 2.95772,4.00677 2.95772,6.4115895 l 0,43.13829 c 0,5.00775 -4.52118,9.06737 -10.09827,9.06737 l 0,0 0,0 c -5.57712,0 -10.09827,-4.05962 -10.09827,-9.06737 z"
-     id="path27"
-     inkscape:export-filename="/home/manugarg/creation/code/chrome-page-notes/icon48.png"
-     inkscape:export-xdpi="14.637506"
-     inkscape:export-ydpi="14.637506"
-     style="fill:#2a736d;fill-opacity:1;fill-rule:nonzero;stroke:#577899;stroke-width:1.12224269;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:10;stroke-opacity:1;stroke-dasharray:none;marker-end:none;filter:url(#filter4465)"
      transform="matrix(1.0592271,0,0,1,-7.7051102,0)" />
 </svg>
