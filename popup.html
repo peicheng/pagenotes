@@ -68,6 +68,7 @@
             key = tabHost;
           }
           bgPage.removePageNotes(key);
+          bgPage.updateBadgeForTab(tab);
           localStorage.lastModTime = new Date().getTime();
           window.close();
         });

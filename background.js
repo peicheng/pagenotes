@@ -6,8 +6,8 @@ var DOCLIST_SCOPE = 'https://docs.google.com/feeds';
 var DOCLIST_FEED = DOCLIST_SCOPE + '/default/private/full/';
 var GOOGLE_ACCOUNTS = 'https://www.google.com/accounts';
 var REMOTE_DOC_NAME = 'Page Notes Data'
-var RED_COLOR = {'color': [255, 0, 0, 150]}
-var GREEN_COLOR = {'color': [42, 115, 109, 150]}
+var RED_COLOR = {'color': [255, 0, 0, 255]}
+var GREEN_COLOR = {'color': [42, 115, 109, 255]}
 
 var oauth = null;
 
