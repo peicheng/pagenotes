@@ -35,6 +35,9 @@ var debug = {
   log: function(s) { this.msg += s + '\n';}
 };
 
+var lastSyncStatus;
+chrome.browserAction.setBadgeText({'text': 'pn'});
+
 // Update badge text on tab change.
 chrome.tabs.onSelectionChanged.addListener(function(tabId) {
   chrome.tabs.get(tabId, updateBadgeForTab)
@@ -50,19 +53,27 @@ function updateBadgeForTab(tab) {
   var tabHost = getHostFromUrl(tabUrl);
   var pn = getPageNotes(tabUrl) ? getPageNotes(tabUrl) : getPageNotes(tabHost);
   if (pn) {
-    chrome.browserAction.setBadgeText({'text': 'pn'});
+    chrome.browserAction.setBadgeText({'text': 'pn', 'tabId': tab.id});
   } else {
-    chrome.browserAction.setBadgeText({'text': '0'});
+    chrome.browserAction.setBadgeText({'text': '0', 'tabId': tab.id});
   }
 }
-
-var lastSyncStatus;
-chrome.browserAction.setBadgeText({'text': 'pn'});
 
 function getRemoteFile() {
   return new GoogleDoc(localStorage.gDoc, function(gDoc) {
         localStorage.gDoc = gDoc;
       });
+}
+
+function setVisualCues() {
+  if (lastSyncStatus !== 'good') {
+    chrome.browserAction.setBadgeBackgroundColor(RED_COLOR);
+    chrome.browserAction.setTitle({'title': 'Page Notes - Sync is not '+
+                                            'happening.'})
+  } else {
+    chrome.browserAction.setBadgeBackgroundColor(GREEN_COLOR);
+    chrome.browserAction.setTitle({'title': 'Page Notes'})
+  }
 }
 
 function sync() {
@@ -72,14 +83,13 @@ function sync() {
   if (!oauth && localStorage['oauth_token' + DOCLIST_SCOPE]) {
     setUpOauth();
   }
-
   if (!oauth || !oauth.hasToken()) {
-    chrome.browserAction.setBadgeBackgroundColor(RED_COLOR);
+    setVisualCues();
     debug.log('sync: No Oauth token found.');
     return;
   }
   if (!localStorage.gDoc) {
-    chrome.browserAction.setBadgeBackgroundColor(RED_COLOR);
+    setVisualCues();
     debug.log('sync: Sync gdoc is not setup.');
     return;
   }
@@ -111,12 +121,16 @@ function sync() {
       }
     });
   } catch (e) {
-    chrome.browserAction.setBadgeBackgroundColor(RED_COLOR);
+    setVisualCues();
     lastSyncStatus = e;
     return;
   }
   lastSyncStatus = 'good';
   localStorage.lastSyncTime = new Date();
-  chrome.browserAction.setBadgeBackgroundColor(GREEN_COLOR);
+  setVisualCues();
 };
 
+function init() {
+  chrome.tabs.getSelected(null, updateBadgeForTab);
+  sync();
+}
