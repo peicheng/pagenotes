@@ -1,7 +1,7 @@
 {
   "name": "Page Notes",
   "version": "1.0",
-  "description": "Notes for a web page.",
+  "description": "A simple and easy-to-use extension to take notes for web pages and automatically sync them to Google Docs.",
   "background_page": "background.html",
   "options_page": "options.html",
   "browser_action": {
