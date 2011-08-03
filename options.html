@@ -128,7 +128,9 @@
           syncStatus.innerHTML += 'Synced ' + (syncLast === 0 ?
             'less than a minute ago.' : syncLast + ' min ago.');
         } else {
-          syncStatus.innerHTML += bgPage.lastSyncStatus;
+          if (bgPage.lastSyncStatus) {
+            syncStatus.innerHTML += bgPage.lastSyncStatus;
+          }
         }
       }
 

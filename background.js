@@ -5,7 +5,7 @@ var SYNC_INTERVAL = 5 * 60 * 1000; // In ms. Equivalent to 5 min.
 var DOCLIST_SCOPE = 'https://docs.google.com/feeds';
 var DOCLIST_FEED = DOCLIST_SCOPE + '/default/private/full/';
 var GOOGLE_ACCOUNTS = 'https://www.google.com/accounts';
-var REMOTE_DOC_NAME = 'Page Notes Data'
+var REMOTE_DOC_NAME = 'Page Notes Data [Do Not Edit]'
 var RED_COLOR = {'color': [255, 0, 0, 255]}
 var GREEN_COLOR = {'color': [42, 115, 109, 255]}
 
