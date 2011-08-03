@@ -30,7 +30,7 @@
 
       function setupSync() {
         try {
-          if(!bgPage.oauth.hasToken()) {
+          if(!bgPage.oauth || !bgPage.oauth.hasToken()) {
             alert('Set up authentication first.');
             return;
           }
