@@ -46,9 +46,7 @@
         } catch (e) {
           alert(e);
         }
-      }
-
-      function clearSync() {
+        bgPage.lastSyncStatus = '';
       }
 
       function handleSyncButton() {
@@ -56,6 +54,7 @@
         if (syncButton.name === 'cancel_sync') {
           if (confirm('Are you sure you want to clear the sync setup?')) {
             localStorage.removeItem('gDoc');
+            bgPage.lastSyncStatus = '';
           }
         } else {
           setupSync();
@@ -66,7 +65,7 @@
       function handleAuthButton() {
         authButton = document.getElementById('auth_button');
         if (authButton.name === 'revoke_token') {
-          if (confirm('Are you sure you want to revoke the auth token. It ' +
+          if (confirm('Are you sure you want to revoke authentication. It ' +
                       'will cancel the sync as well.')) {
             bgPage.oauth.clearTokens();
             localStorage.removeItem('gDoc');
@@ -74,7 +73,7 @@
         } else {
           var app_id = document.getElementById('app_id').value;
           if (!app_id) {
-            if (!confirm('Auth identifier is empty. It\'s ok, but not ' +
+            if (!confirm('App identifier is empty. It\'s ok, but not ' +
                          'recommended if you have multiple instances of ' +
                          'this extension syncing to the same Google account.' +
                          ' Do you still want to continue?')) {
@@ -99,10 +98,10 @@
         var authButton = document.getElementById('auth_button');
         var syncStatus = document.getElementById('sync_status');
         if (!bgPage.oauth || !bgPage.oauth.hasToken()) {
-          authButton.innerHTML = 'Get Google Docs Auth Token';
+          authButton.innerHTML = 'Setup Authentication';
           authButton.name = 'get_token';
         } else {
-          authButton.innerHTML = 'Revoke Google Docs Auth Token';
+          authButton.innerHTML = 'Revoke Authentication';
           authButton.name = 'revoke_token';
           document.getElementById('app_id').style.display = 'none';
         }
@@ -118,6 +117,7 @@
           syncStatus.innerHTML = 'Not syncing now. '
           syncButton.innerHTML = 'Setup Sync';
           syncButton.name = 'setup_sync';
+          bgPage.lastSyncStatus = '';
         }
         if (!localStorage.pagenotes) {
           document.getElementById('clear_local').disabled = true;
@@ -129,7 +129,8 @@
             'less than a minute ago.' : syncLast + ' min ago.');
         } else {
           if (bgPage.lastSyncStatus) {
-            syncStatus.innerHTML += bgPage.lastSyncStatus;
+            syncStatus.innerHTML += 'There was a problem in syncing. Look at' +
+                                    ' debug info for more details.';
           }
         }
       }
@@ -176,10 +177,10 @@
       Authentication Settings:
     </p>
     <p>
-    <input type="text" id="app_id" placeholder="Auth Identifier"
+    <input type="text" id="app_id" placeholder="App Identifier"
       title="A string to uniquely identify this instance of the extension to the Google Accounts. E.g. home-desktop, laptop etc." />
       <button id="auth_button" name="get_token" onclick=handleAuthButton()>
-        Get Google Docs OAuth Token
+        Setup Authentication
       </button>
     </p>
     <h2>Page Notes Data</h2>

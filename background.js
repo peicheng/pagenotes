@@ -121,8 +121,9 @@ function sync() {
       }
     });
   } catch (e) {
+    lastSyncStatus = 'bad'
     setVisualCues();
-    lastSyncStatus = e;
+    debug.log(e);
     return;
   }
   lastSyncStatus = 'good';
