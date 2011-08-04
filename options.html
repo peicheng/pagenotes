@@ -41,6 +41,7 @@
             gDoc.searchDocByName(bgPage.REMOTE_DOC_NAME);
             if(!localStorage.gDoc) {
               gDoc.createNewDoc(bgPage.REMOTE_DOC_NAME);
+              localStorage.lastModTime = new Date().getTime();
             }
           }
         } catch (e) {
