@@ -31,7 +31,15 @@
       function setupSync() {
         try {
           if(!bgPage.oauth || !bgPage.oauth.hasToken()) {
-            alert('Set up authentication first.');
+            if(!confirm('You\'ll be redirected to Google website to set '+
+                        'up authentication.')){
+              return;
+            }
+            localStorage.nextAction = 'setup_sync';
+            if (!bgPage.oauth) {
+              bgPage.setUpOauth();
+            }
+            bgPage.oauth.authorize(function(){location.reload()});
             return;
           }
           if(!localStorage.gDoc) {
@@ -48,6 +56,7 @@
           alert(e);
         }
         bgPage.lastSyncStatus = '';
+        location.reload();
       }
 
       function handleSyncButton() {
@@ -55,36 +64,13 @@
         if (syncButton.name === 'cancel_sync') {
           if (confirm('Are you sure you want to clear the sync setup?')) {
             localStorage.removeItem('gDoc');
+            bgPage.oauth.clearTokens();
             bgPage.lastSyncStatus = '';
+            location.reload();
           }
         } else {
           setupSync();
         }
-        location.reload();
-      }
-
-      function handleAuthButton() {
-        authButton = document.getElementById('auth_button');
-        if (authButton.name === 'revoke_token') {
-          if (confirm('Are you sure you want to revoke authentication. It ' +
-                      'will cancel the sync as well.')) {
-            bgPage.oauth.clearTokens();
-            localStorage.removeItem('gDoc');
-          }
-        } else {
-          var app_id = document.getElementById('app_id').value;
-          if (!app_id) {
-            if (!confirm('App identifier is empty. It\'s ok, but not ' +
-                         'recommended if you have multiple instances of ' +
-                         'this extension syncing to the same Google account.' +
-                         ' Do you still want to continue?')) {
-               return;
-             }
-          }
-          localStorage.app_id = app_id;
-          bgPage.doAuth(function(){location.reload();});
-        }
-        location.reload();
       }
 
       function clearLocalData() {
@@ -98,14 +84,6 @@
         var syncButton = document.getElementById('sync_button');
         var authButton = document.getElementById('auth_button');
         var syncStatus = document.getElementById('sync_status');
-        if (!bgPage.oauth || !bgPage.oauth.hasToken()) {
-          authButton.innerHTML = 'Setup Authentication';
-          authButton.name = 'get_token';
-        } else {
-          authButton.innerHTML = 'Revoke Authentication';
-          authButton.name = 'revoke_token';
-          document.getElementById('app_id').style.display = 'none';
-        }
         if (localStorage.gDoc) {
           var gDoc = bgPage.getRemoteFile().getEntry();
           if (gDoc && gDoc.author && gDoc.author[0] && gDoc.author[0].email) {
@@ -134,6 +112,10 @@
                                     ' debug info for more details.';
           }
         }
+        if ('nextAction' in localStorage && localStorage.nextAction === 'setup_sync') {
+          localStorage.nextAction = '';
+          setupSync();
+        }
       }
 
       function showHideDebugInfo() {
@@ -151,6 +133,7 @@
       }
     </script>
   </head>
+
   <body onload="initUI();">
     <h1>
       <img src="icon32.png" width=32px>
@@ -172,16 +155,6 @@
     <p>
       <button id="sync_button" onclick="handleSyncButton();">
         Setup Sync
-      </button>
-    </p>
-    <p>
-      Authentication Settings:
-    </p>
-    <p>
-    <input type="text" id="app_id" placeholder="App Identifier"
-      title="A string to uniquely identify this instance of the extension to the Google Accounts. E.g. home-desktop, laptop etc." />
-      <button id="auth_button" name="get_token" onclick=handleAuthButton()>
-        Setup Authentication
       </button>
     </p>
     <h2>Page Notes Data</h2>

@@ -12,7 +12,6 @@ var GREEN_COLOR = {'color': [42, 115, 109, 255]}
 var oauth = null;
 
 function setUpOauth() {
-  var app_id = localStorage.app_id;
   oauth = ChromeExOAuth.initBackgroundPage({
     'request_url': GOOGLE_ACCOUNTS + '/OAuthGetRequestToken',
     'authorize_url': GOOGLE_ACCOUNTS + '/OAuthAuthorizeToken',
@@ -20,14 +19,8 @@ function setUpOauth() {
     'consumer_key': 'anonymous',
     'consumer_secret': 'anonymous',
     'scope': DOCLIST_SCOPE,
-    'app_name': 'Page Notes - Chrome Extension' + (
-      app_id ? ' - ' + app_id : '')
+    'app_name': 'Page Notes - Chrome Extension'
   });
-}
-
-function doAuth(callback) {
-  setUpOauth();
-  oauth.authorize(callback);
 }
 
 var debug = {
