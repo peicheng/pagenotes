@@ -30,7 +30,7 @@
 
       function setupSync() {
         try {
-          if(!bgPage.oauth || !bgPage.oauth.hasToken()) {
+          if(!bgPage.oauth || !bgPage.oauth.hasAccessToken()) {
             if(!confirm('You\'ll be redirected to Google website to set '+
                         'up authentication.')){
               return;

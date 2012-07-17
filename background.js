@@ -4,7 +4,6 @@
 var SYNC_INTERVAL = 5 * 60 * 1000; // In ms. Equivalent to 5 min.
 var DOCLIST_SCOPE = 'https://docs.google.com/feeds';
 var DOCLIST_FEED = DOCLIST_SCOPE + '/default/private/full/';
-var GOOGLE_ACCOUNTS = 'https://www.google.com/accounts';
 var REMOTE_DOC_NAME = 'Page Notes Data [Do Not Edit]'
 var RED_COLOR = {'color': [255, 0, 0, 255]}
 var GREEN_COLOR = {'color': [42, 115, 109, 255]}
@@ -12,14 +11,11 @@ var GREEN_COLOR = {'color': [42, 115, 109, 255]}
 var oauth = null;
 
 function setUpOauth() {
-  oauth = ChromeExOAuth.initBackgroundPage({
-    'request_url': GOOGLE_ACCOUNTS + '/OAuthGetRequestToken',
-    'authorize_url': GOOGLE_ACCOUNTS + '/OAuthAuthorizeToken',
-    'access_url': GOOGLE_ACCOUNTS + '/OAuthGetAccessToken',
-    'consumer_key': 'anonymous',
-    'consumer_secret': 'anonymous',
-    'scope': DOCLIST_SCOPE,
-    'app_name': 'Page Notes - Chrome Extension'
+  oauth = new OAuth2({
+    'client_id': '702868056438.apps.googleusercontent.com',
+    'client_secret': 'P-jAwCRjzcXEGZsWZVNQwvWE',
+    'api_scope': DOCLIST_SCOPE,
+    'redirect_url': 'urn:ietf:wg:oauth:2.0:oob',
   });
 }
 
@@ -73,10 +69,10 @@ function sync() {
   debug.msg = ''
   debug.log('sync: Starting sync at: ' + new Date());
 
-  if (!oauth && localStorage['oauth_token' + DOCLIST_SCOPE]) {
+  if (!oauth && localStorage['oauth']) {
     setUpOauth();
   }
-  if (!oauth || !oauth.hasToken()) {
+  if (!oauth || !oauth.hasAccessToken()) {
     setVisualCues();
     debug.log('sync: No Oauth token found.');
     return;

@@ -1,1 +1,1 @@
-hg archive -t zip -X ".*" -X "*.svg" chrome-page-notes.zip
+git archive --format=zip --output=../chrome-page-notes.zip .
