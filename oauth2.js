@@ -21,18 +21,16 @@
  * @param {Object} config Containing clientId, clientSecret and apiScope
  * @param {String} config Alternatively, OAuth2.FINISH for the finish flow
  */
+
 var OAuth2 = function(config) {
   var that = this;
-  if (config == OAuth2.FINISH) {
-    that.finishAuth();
-  } else if (config) {
-    var data = that.get();
-    data.clientId = config.client_id;
-    data.clientSecret = config.client_secret;
-    data.apiScope = config.api_scope;
-    data.redirectURL = config.redirect_url;
-    that.setSource(data);
-  }
+  var data = that.get();
+  data.clientId = config.client_id;
+  data.clientSecret = config.client_secret;
+  data.apiScope = config.api_scope;
+  data.redirectURL = config.redirect_url;
+  data.accessTokenURL = 'https://accounts.google.com/o/oauth2/token';
+  that.setSource(data);
 };
 
 
@@ -49,11 +47,11 @@ OAuth2.prototype.authorizationCodeURL = function(config) {
 }
 
 OAuth2.prototype.parseAuthorizationCode = function(title) {
-  var error = url.match(/[&\?]error=([^&]+)/);
+  var error = title.match(/[&\?]error=([^&]+)/);
   if (error) {
     throw 'Error getting authorization code: ' + error[1];
   }
-  return url.match(/Success code=([\w\/\-]+)/)[1];
+  return title.match(/Success code=([\w\/\-]+)/)[1];
 }
 
 OAuth2.prototype.accessTokenParams = function(authorizationCode, config) {
@@ -87,7 +85,6 @@ OAuth2.FINISH = 'finish';
 OAuth2.prototype.openAuthorizationCodePopup = function(callback) {
   // Store a reference to the callback so that the newly opened window can call
   // it later.
-  window['oauth-callback'] = callback;
   that = this;
 
   // Create a new tab with the OAuth 2.0 prompt
@@ -110,7 +107,7 @@ OAuth2.prototype.openAuthorizationCodePopup = function(callback) {
               if (newTab.title.search('code') > 0) {
                 title = newTab.title;
                 chrome.tabs.remove(tab.id, function() {
-                  that.finishAuth(newTab.title);
+                  that.finishAuth(newTab.title, callback);
                 });
               }
             }
@@ -147,10 +144,10 @@ OAuth2.prototype.getAccessAndRefreshTokens = function(authorizationCode, callbac
     for (key in items) {
       formData.append(key, items[key]);
     }
-    xhr.open(method, that.accessTokenURL, true);
+    xhr.open(method, that.get('accessTokenURL'), true);
     xhr.send(formData);
   } else if (method == 'GET') {
-    var url = that.accessTokenURL;
+    var url = that.get('accessTokenURL');
     var params = '?';
     for (key in items) {
       params += encodeURIComponent(key) + '=' +
@@ -189,7 +186,7 @@ OAuth2.prototype.refreshAccessToken = function(refreshToken, callback) {
   formData.append('client_secret', data.clientSecret);
   formData.append('refresh_token', refreshToken);
   formData.append('grant_type', 'refresh_token');
-  xhr.open('POST', this.accessTokenURL, true);
+  xhr.open('POST', this.get('accessTokenURL'), true);
   xhr.send(formData);
 };
 
@@ -197,17 +194,15 @@ OAuth2.prototype.refreshAccessToken = function(refreshToken, callback) {
  * Extracts authorizationCode from the URL and makes a request to the last
  * leg of the OAuth 2.0 process.
 */
-OAuth2.prototype.finishAuth = function(title) {
+OAuth2.prototype.finishAuth = function(title, callback) {
   var authorizationCode = null;
   var that = this;
 
   try {
     authorizationCode = that.parseAuthorizationCode(title);
-    alert(authorizationCode);
     console.log(authorizationCode);
   } catch (e) {
     console.error(e);
-    callback(e);
   }
 
   that.getAccessAndRefreshTokens(authorizationCode, function(response) {
