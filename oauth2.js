@@ -376,3 +376,10 @@ OAuth2.prototype.hasAccessToken = function() {
 OAuth2.prototype.clearAccessToken = function() {
   this.clear('accessToken');
 };
+
+/**
+ * Returns authorization header.
+ */
+OAuth2.prototype.getAuthorizationHeader = function() {
+  return 'Bearer ' + this.get('accessToken');
+}
