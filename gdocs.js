@@ -30,62 +30,31 @@ function sendRequest(request, url) {
   return xhr;
 }
 
-function GoogleFile(entryString, onSetEntry) {
-  this.getEntry = function() {
-    if (entryString) {
+function GoogleFile(gFileString, onSetValue) {
+  this.getValue = function() {
+    if (gFileString) {
       try {
-        return JSON.parse(entryString);
+        return JSON.parse(gFileString);
       } catch(e) {
-        throw 'Not a valid object string: ' + entryString;
+        throw 'Not a valid object string: ' + gFileString;
       }
     }
   };
-  this.setEntry = function(entry) {
-    entryString = JSON.stringify(entry);
-    onSetEntry(entryString);
+  this.setValue = function(entry) {
+    onSetValue(JSON.stringify(entry));
   };
 }
 
-GoogleFile.prototype.parseFeed = function(feedResponseString) {
-  var feedResponse = JSON.parse(feedResponseString);
-  if (feedResponse.entry) {
-    this.setEntry(feedResponse.entry);
-    return;
-  }
-  feed = feedResponse.feed;
-  if (feed.entry) {
-    if (feed.entry instanceof Array) {
-      this.setEntry(feed.entry[0]);
-    } else {
-      this.setEntry(feed.entry);
-    }
-  }
-};
-//
-GoogleFile.prototype.parseFeed2 = function(feedResponseString) {
+GoogleFile.prototype.setGfile = function(feedResponseString) {
   var feedResponse = JSON.parse(feedResponseString);
   if (feedResponse.kind == 'drive#file') {
-    this.setEntry(feedResponse);
+    this.setValue(feedResponse);
     return;
-  }
-  if (feedResponse.kind == 'drive#fileList') {
-    if (feedResponse.items.length > 0) {
-      this.setEntry(feedResponse.items[0]);
-    }
-  }
-};
-//
-GoogleFile.prototype.getLink = function(linkType) {
-  var docLinks = this.getEntry().link;
-  for (var i = 0; i < docLinks.length; i++) {
-    if (docLinks[i].rel == linkType) {
-      return docLinks[i].href;
-    }
   }
 };
 //
 GoogleFile.prototype.getLastUpdateTime = function() {
-  return new Date(this.getEntry().modifiedDate).getTime();
+  return new Date(this.getValue().modifiedDate).getTime();
 };
 //
 GoogleFile.prototype.createNewFile = function(fileName) {
@@ -107,7 +76,7 @@ GoogleFile.prototype.createNewFile = function(fileName) {
     'Last request status: ' + xhr.status + '\n' + xhr.responseText;
     return;
   }
-  this.parseFeed2(xhr.responseText);
+  this.setGfile(xhr.responseText);
 };
 //
 GoogleFile.prototype.searchFileByName = function(fileName) {
@@ -125,11 +94,16 @@ GoogleFile.prototype.searchFileByName = function(fileName) {
     'Last request status: ' + xhr.status + '\n' + xhr.responseText;
     return;
   }
-  this.parseFeed2(xhr.responseText);
+  var response = JSON.parse(xhr.responseText);
+  if (response.hasOwnProperty('items') &&
+      response.items instanceof Array &&
+      response.items.length > 0) {
+      this.setValue(response.items[0]);
+  }
 };
 //
 GoogleFile.prototype.refreshLocalMetadata = function(callback) {
-  var url = this.getEntry().selfLink;
+  var url = this.getValue().selfLink;
   var request = {
     'method': 'GET',
   };
@@ -139,12 +113,12 @@ GoogleFile.prototype.refreshLocalMetadata = function(callback) {
     'Last request status: ' + xhr.status + '\n' + xhr.responseText;
     return;
   }
-  this.parseFeed2(xhr.responseText);
+  this.setGfile(xhr.responseText);
   callback(this);
 };
 //
 GoogleFile.prototype.getData = function() {
-  var url = this.getEntry().downloadUrl;
+  var url = this.getValue().downloadUrl;
   var request = {
     'method': 'GET',
   };
@@ -158,7 +132,7 @@ GoogleFile.prototype.getData = function() {
 };
 //
 GoogleFile.prototype.setData = function(data) {
-  var url = 'https://www.googleapis.com/upload/drive/v2/files/' + this.getEntry().id;
+  var url = 'https://www.googleapis.com/upload/drive/v2/files/' + this.getValue().id;
   // Make sure data is not undefined.
   data = data ? data : '';
   var request = {
@@ -178,6 +152,6 @@ GoogleFile.prototype.setData = function(data) {
     'Last request status: ' + xhr.status + '\n' + xhr.responseText;
     return;
   }
-  this.parseFeed2(xhr.responseText);
+  this.setGfile(xhr.responseText);
 };
 

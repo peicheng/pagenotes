@@ -57,7 +57,7 @@ function initUI() {
   var authButton = document.getElementById('auth_button');
   var syncStatus = document.getElementById('sync_status');
   if (localStorage.gFile) {
-    var gFile = bgPage.getRemoteFile().getEntry();
+    var gFile = bgPage.getRemoteFile().getValue();
     if (gFile && gFile.alternateLink) {
       syncStatus.innerHTML = 'Syncing to <a href="' + gFile.alternateLink
         + '">this file</a>. ';
