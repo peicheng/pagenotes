@@ -1,13 +1,16 @@
 {
   "name": "Page Notes",
   "version": "1.0.4",
+  "manifest_version": 2,
   "description": "Lets you take notes for web pages and sync them automatically to your Google Docs.",
-  "background_page": "background.html",
+  "background": {
+     "page": "background.html"
+  },
   "options_page": "options.html",
   "browser_action": {
     "default_icon": "icon19.png",
     "default_title": "Page Notes",
-    "popup": "popup.html"
+    "default_popup": "popup.html"
   },
   "icons": {
     "16": "icon16.png",
@@ -17,7 +20,7 @@
   },
   "permissions": [
     "tabs",
-    "https://docs.google.com/feeds/*",
+    "https://www.googleapis.com/",
     "https://accounts.google.com/o/oauth2/token"
    ]
 }

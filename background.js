@@ -2,9 +2,9 @@
  * @author manugarg@gmail.com (Manu Garg)
  */
 var SYNC_INTERVAL = 5 * 60 * 1000; // In ms. Equivalent to 5 min.
-var DOCLIST_SCOPE = 'https://docs.google.com/feeds';
+var DOCLIST_SCOPE = 'https://www.googleapis.com/auth/drive.file';
 var DOCLIST_FEED = DOCLIST_SCOPE + '/default/private/full/';
-var REMOTE_DOC_NAME = 'Page Notes Data [Do Not Edit]'
+var REMOTE_DOC_NAME = 'pagenotes.data'
 var RED_COLOR = {'color': [255, 0, 0, 255]}
 var GREEN_COLOR = {'color': [42, 115, 109, 255]}
 
@@ -49,8 +49,8 @@ function updateBadgeForTab(tab) {
 }
 
 function getRemoteFile() {
-  return new GoogleDoc(localStorage.gDoc, function(gDoc) {
-        localStorage.gDoc = gDoc;
+  return new GoogleFile(localStorage.gFile, function(gFile) {
+        localStorage.gFile = gFile;
       });
 }
 
@@ -77,21 +77,21 @@ function sync() {
     debug.log('sync: No Oauth token found.');
     return;
   }
-  if (!localStorage.gDoc) {
+  if (!localStorage.gFile) {
     setVisualCues();
     debug.log('sync: Sync gdoc is not setup.');
     return;
   }
   var remoteFile = getRemoteFile();
   try {
-    remoteFile.refreshLocalMetadata(function(gDoc) {
+    remoteFile.refreshLocalMetadata(function(gFile) {
       localLastModTime = 0;
       if(localStorage.lastModTime) {
         localLastModTime = parseInt(localStorage.lastModTime);
       }
-      remoteLastModTime = parseInt(gDoc.getLastUpdateTime());
+      remoteLastModTime = parseInt(gFile.getLastUpdateTime());
       debug.log('sync: Local last mod time: ' + localLastModTime);
-      debug.log('sync: Remote last mod time: ' + localLastModTime);
+      debug.log('sync: Remote last mod time: ' + remoteLastModTime);
       if (remoteLastModTime === localLastModTime) {
         debug.log('sync: Local and remote data are equally recent.');
         return;
@@ -99,14 +99,14 @@ function sync() {
       else if (remoteLastModTime > localLastModTime) {
         debug.log('sync: Remote data is more recent.');
         // syncToLocal();
-        setAllPageNotes(gDoc.getData());
-        localStorage.lastModTime = gDoc.getLastUpdateTime();
+        setAllPageNotes(gFile.getData());
+        localStorage.lastModTime = gFile.getLastUpdateTime();
       }
       else {
         debug.log('sync: Local data is more recent.');
         // syncToRemote();
-        gDoc.setData(getAllPageNotes());
-        localStorage.lastModTime = gDoc.getLastUpdateTime();
+        gFile.setData(getAllPageNotes());
+        localStorage.lastModTime = gFile.getLastUpdateTime();
       }
     });
   } catch (e) {
@@ -124,3 +124,8 @@ function init() {
   chrome.tabs.getSelected(null, updateBadgeForTab);
   sync();
 }
+
+document.addEventListener('DOMContentLoaded', function () {
+  window.setInterval(sync, SYNC_INTERVAL);
+  init();
+})

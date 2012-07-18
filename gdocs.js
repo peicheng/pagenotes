@@ -13,24 +13,24 @@ function stringify(parameters) {
   return params.join('&');
 }
 
-function sendRequest(request, url, body) {
+function sendRequest(request, url) {
   var xhr = new XMLHttpRequest();
   var header;
-  xhr.open(request.method, url + '?' + stringify(request.parameters),
-      false);
-  xhr.setRequestHeader('GData-Version', '3.0');
+  if (request.parameters) {
+    url = url + '?' + stringify(request.parameters);
+  }
+  xhr.open(request.method, url, false);
   for (var header in request.headers) {
     if (request.headers.hasOwnProperty(header)) {
       xhr.setRequestHeader(header, request.headers[header]);
     }
   }
-  xhr.setRequestHeader('Authorization', bgPage.oauth.getAuthorizationHeader(
-       url, request.method, request.parameters));
-  xhr.send(body);
+  xhr.setRequestHeader('Authorization', bgPage.oauth.getAuthorizationHeader());
+  xhr.send(request.body);
   return xhr;
 }
 
-function GoogleDoc(entryString, onSetEntry) {
+function GoogleFile(entryString, onSetEntry) {
   this.getEntry = function() {
     if (entryString) {
       try {
@@ -46,7 +46,7 @@ function GoogleDoc(entryString, onSetEntry) {
   };
 }
 
-GoogleDoc.prototype.parseFeed = function(feedResponseString) {
+GoogleFile.prototype.parseFeed = function(feedResponseString) {
   var feedResponse = JSON.parse(feedResponseString);
   if (feedResponse.entry) {
     this.setEntry(feedResponse.entry);
@@ -62,7 +62,20 @@ GoogleDoc.prototype.parseFeed = function(feedResponseString) {
   }
 };
 //
-GoogleDoc.prototype.getLink = function(linkType) {
+GoogleFile.prototype.parseFeed2 = function(feedResponseString) {
+  var feedResponse = JSON.parse(feedResponseString);
+  if (feedResponse.kind == 'drive#file') {
+    this.setEntry(feedResponse);
+    return;
+  }
+  if (feedResponse.kind == 'drive#fileList') {
+    if (feedResponse.items.length > 0) {
+      this.setEntry(feedResponse.items[0]);
+    }
+  }
+};
+//
+GoogleFile.prototype.getLink = function(linkType) {
   var docLinks = this.getEntry().link;
   for (var i = 0; i < docLinks.length; i++) {
     if (docLinks[i].rel == linkType) {
@@ -71,23 +84,18 @@ GoogleDoc.prototype.getLink = function(linkType) {
   }
 };
 //
-GoogleDoc.prototype.getLastUpdateTime = function() {
-  return new Date(this.getEntry().updated.$t).getTime();
+GoogleFile.prototype.getLastUpdateTime = function() {
+  return new Date(this.getEntry().modifiedDate).getTime();
 };
 //
-GoogleDoc.prototype.createNewDoc = function(docName) {
-  if (!docName) { throw 'Doc name is not defined'; }
-  var url = 'https://docs.google.com/feeds/default/private/full';
+GoogleFile.prototype.createNewFile = function(fileName) {
+  if (!fileName) { throw 'File name is not defined'; }
+  var url = 'https://www.googleapis.com/drive/v2/files';
   var request = {
     'method': 'POST',
     'headers': {
-      'Content-Type': 'text/plain',
-      'Slug': docName
+      'Content-Type': 'application/json',
     },
-    'parameters': {
-      'alt': 'json'
-    },
-    'body': ''
   };
   var xhr = sendRequest(request, url);
   if (xhr.status != 201) {
@@ -95,61 +103,46 @@ GoogleDoc.prototype.createNewDoc = function(docName) {
     'Last request status: ' + xhr.status + '\n' + xhr.responseText;
     return;
   }
-  this.parseFeed(xhr.responseText);
+  this.parseFeed2(xhr.responseText);
 };
 //
-GoogleDoc.prototype.searchDocByName = function(docName) {
-  if (!docName) { throw 'Doc name is not defined'; }
-  var url = 'https://docs.google.com/feeds/default/private/full';
+GoogleFile.prototype.searchFileByName = function(fileName) {
+  if (!fileName) { throw 'File name is not defined'; }
+  var url = 'https://www.googleapis.com/drive/v2/files';
   var request = {
     'method': 'GET',
     'parameters': {
-      'alt': 'json',
-      'title': docName,
-      'title-exact': 'true'
+      'q': 'title=\'' + fileName + '\'',
     }
   };
   var xhr = sendRequest(request, url);
   if (xhr.status != 200) {
-    throw 'There was a problem in searching for the doc - ' + docName + '.' +
+    throw 'There was a problem in searching for the doc - ' + fileName + '.' +
     'Last request status: ' + xhr.status + '\n' + xhr.responseText;
     return;
   }
-  this.parseFeed(xhr.responseText);
+  this.parseFeed2(xhr.responseText);
 };
 //
-GoogleDoc.prototype.refreshLocalMetadata = function(callback) {
-  var url = this.getLink('self');
+GoogleFile.prototype.refreshLocalMetadata = function(callback) {
+  var url = this.getEntry().selfLink;
   var request = {
     'method': 'GET',
-    'headers': {
-      'If-None-Match': this.getEntry().gd$etag
-    },
-    'parameters': {
-      'alt': 'json'
-    }
   };
   var xhr = sendRequest(request, url);
-  if (xhr.status !== 200 && xhr.status !== 304 && xhr.status !== 412) {
+  if (xhr.status !== 200) {
     throw 'There was a problem in refreshing the doc entry. ' +
     'Last request status: ' + xhr.status + '\n' + xhr.responseText;
     return;
   }
-  if (xhr.status !== 304 && xhr.status !== 412) {
-    this.parseFeed(xhr.responseText);
-  }
+  this.parseFeed2(xhr.responseText);
   callback(this);
 };
 //
-GoogleDoc.prototype.getData = function() {
-  var url = 'https://docs.google.com/feeds/download/documents/Export';
-  var docId = this.getEntry().gd$resourceId.$t.split(':')[1];
+GoogleFile.prototype.getData = function() {
+  var url = this.getEntry().downloadUrl;
   var request = {
     'method': 'GET',
-    'parameters': {
-      'docId': docId,
-      'exportFormat': 'txt'
-    }
   };
   var xhr = sendRequest(request, url);
   if (xhr.status != 200) {
@@ -160,24 +153,25 @@ GoogleDoc.prototype.getData = function() {
   return xhr.responseText;
 };
 //
-GoogleDoc.prototype.setData = function(data) {
-  var url = this.getLink('edit-media');
+GoogleFile.prototype.setData = function(data) {
+  var url = 'https://www.googleapis.com/upload/drive/v2/files/' + this.getEntry().id;
   var request = {
     'method': 'PUT',
     'headers': {
-      'If-Match': '*',
-      'Content-Type': 'text/plain'
+        'Content-Type': 'text/plain',
+        'Content-Length': data.length
     },
     'parameters': {
-      'alt': 'json'
-    }
+      'uploadType': 'media'
+    },
+    'body': data
   };
-  var xhr = sendRequest(request, url, data);
+  var xhr = sendRequest(request, url);
   if (xhr.status != 200) {
     throw 'There was a problem in updating the doc. ' +
     'Last request status: ' + xhr.status + '\n' + xhr.responseText;
     return;
   }
-  this.parseFeed(xhr.responseText);
+  this.parseFeed2(xhr.responseText);
 };
 

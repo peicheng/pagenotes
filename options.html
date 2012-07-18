@@ -25,116 +25,11 @@
         font-size: 100%
       }
     </style>
-    <script type="text/javascript">
-      var bgPage = chrome.extension.getBackgroundPage();
-
-      function setupSync() {
-        try {
-          if(!bgPage.oauth || !bgPage.oauth.hasAccessToken()) {
-            if(!confirm('You\'ll be redirected to Google website to set '+
-                        'up authentication.')){
-              return;
-            }
-            localStorage.nextAction = 'setup_sync';
-            if (!bgPage.oauth) {
-              bgPage.setUpOauth();
-            }
-            bgPage.oauth.authorize(function(){location.reload()});
-            return;
-          }
-          if(!localStorage.gDoc) {
-            gDoc = new bgPage.GoogleDoc(null, function(gDoc){
-                localStorage.gDoc = gDoc;
-              });
-            gDoc.searchDocByName(bgPage.REMOTE_DOC_NAME);
-            if(!localStorage.gDoc) {
-              gDoc.createNewDoc(bgPage.REMOTE_DOC_NAME);
-              localStorage.lastModTime = new Date().getTime();
-            }
-          }
-        } catch (e) {
-          alert(e);
-        }
-        bgPage.lastSyncStatus = '';
-        location.reload();
-      }
-
-      function handleSyncButton() {
-        syncButton = document.getElementById('sync_button');
-        if (syncButton.name === 'cancel_sync') {
-          if (confirm('Are you sure you want to clear the sync setup?')) {
-            localStorage.removeItem('gDoc');
-            bgPage.oauth.clearTokens();
-            bgPage.lastSyncStatus = '';
-            location.reload();
-          }
-        } else {
-          setupSync();
-        }
-      }
-
-      function clearLocalData() {
-        if (confirm('Are you sure you want to delete all local data?')) {
-          localStorage.removeItem('pagenotes');
-          location.reload();
-        }
-      }
-
-      function initUI() {
-        var syncButton = document.getElementById('sync_button');
-        var authButton = document.getElementById('auth_button');
-        var syncStatus = document.getElementById('sync_status');
-        if (localStorage.gDoc) {
-          var gDoc = bgPage.getRemoteFile().getEntry();
-          if (gDoc && gDoc.author && gDoc.author[0] && gDoc.author[0].email) {
-            syncStatus.innerHTML = 'Syncing to ' + gDoc.author[0].email.$t +
-              '. ';
-          }
-          syncButton.innerHTML = 'Stop Syncing';
-          syncButton.name = 'cancel_sync';
-        } else {
-          syncStatus.innerHTML = 'Not syncing now. '
-          syncButton.innerHTML = 'Setup Sync';
-          syncButton.name = 'setup_sync';
-          bgPage.lastSyncStatus = '';
-        }
-        if (!localStorage.pagenotes) {
-          document.getElementById('clear_local').disabled = true;
-        }
-        if (bgPage.lastSyncStatus === 'good') {
-          var lastSyncTime = new Date(localStorage.lastSyncTime);
-          var syncLast = Math.floor((new Date() - lastSyncTime) / 60000);
-          syncStatus.innerHTML += 'Synced ' + (syncLast === 0 ?
-            'less than a minute ago.' : syncLast + ' min ago.');
-        } else {
-          if (bgPage.lastSyncStatus) {
-            syncStatus.innerHTML += 'There was a problem in syncing. Look at' +
-                                    ' debug info for more details.';
-          }
-        }
-        if ('nextAction' in localStorage && localStorage.nextAction === 'setup_sync') {
-          localStorage.nextAction = '';
-          setupSync();
-        }
-      }
-
-      function showHideDebugInfo() {
-        var showDebugAnchor = document.getElementById('showdebug');
-        if (showDebugAnchor.name === 'show') {
-          debugInfo = 'Messages from last sync: \n' + bgPage.debug.msg
-          document.getElementById('debug').innerHTML = debugInfo;
-          showDebugAnchor.innerHTML = 'Hide debug info';
-          showDebugAnchor.name = 'hide';
-        } else {
-          document.getElementById('debug').innerHTML = '';
-          showDebugAnchor.innerHTML = 'Show debug info';
-          showDebugAnchor.name = 'show';
-        }
-      }
+    <script src="options.js">
     </script>
   </head>
 
-  <body onload="initUI();">
+  <body>
     <h1>
       <img src="icon32.png" width=32px>
         Page Notes
@@ -142,18 +37,18 @@
     </h1>
     <h2>Sync Status and Setup</h2>
     <p>
-      You can sync your 'page notes' to your Google Docs account. This
+      You can sync your 'page notes' to your Google Drive. This
       feature can be used to sync page notes between multiple computers.
     </p>
     <p>
       <b>Sync Status: </b>
       <span id="sync_status"></span>
-      <a href=javascript:bgPage.sync();location.reload()>Sync Now</a>
-      (<a id="showdebug" name="show" href=javascript:showHideDebugInfo()>Show debug info</a>)
+      <button id="sync_now">Sync Now</button>.
+      <button id="showdebug" name="show">Show debug info</button>
     </p>
     <pre id="debug"></pre>
     <p>
-      <button id="sync_button" onclick="handleSyncButton();">
+      <button id="sync_button">
         Setup Sync
       </button>
     </p>
