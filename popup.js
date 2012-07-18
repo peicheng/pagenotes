@@ -25,15 +25,15 @@ function retrievePageNotes(tab) {
 
   // Add event listener to the Edit/Save button.
   editButton.addEventListener('click', function() {
-    if (this.value == 'Edit') {
+    if (this.value === 'Edit') {
       notes.contentEditable = true;
       notes.focus();
       e('site-level-div').style.display = 'block';
       this.innerHTML = 'Save';
       this.value = 'Save';
-    } else if (this.value == 'Save') {
+    } else if (this.value === 'Save') {
       notes.contentEditable = false;
-      if (e('site-level').checked == false) {
+      if (e('site-level').checked === false) {
         bgPage.setPageNotes(tabUrl, notes.innerHTML);
         bgPage.updateBadgeForTab(tab);
       } else {

@@ -14,15 +14,20 @@
  * limitations under the License.
  */
 
+/*
+ * Directive for JSLint, so that it doesn't complain about these names not being
+ * defined.
+ */
+/*global location, localStorage, alert, chrome, confirm, console, FormData, XMLHttpRequest */
+
+"use strict";
 
 /**
  * Constructor
  *
  * @param {Object} config Containing clientId, clientSecret and apiScope
- * @param {String} config Alternatively, OAuth2.FINISH for the finish flow
  */
-
-var OAuth2 = function(config) {
+var OAuth2 = function (config) {
   var that = this;
   var data = that.get();
   data.clientId = config.client_id;
@@ -33,8 +38,7 @@ var OAuth2 = function(config) {
   that.setSource(data);
 };
 
-
-OAuth2.prototype.authorizationCodeURL = function(config) {
+OAuth2.prototype.authorizationCodeURL = function (config) {
   return ('https://accounts.google.com/o/oauth2/auth?' +
       'client_id={{CLIENT_ID}}&' +
       'redirect_uri={{REDIRECT_URI}}&' +
@@ -44,17 +48,17 @@ OAuth2.prototype.authorizationCodeURL = function(config) {
         .replace('{{CLIENT_ID}}', config.clientId)
         .replace('{{REDIRECT_URI}}', config.redirectURL)
         .replace('{{API_SCOPE}}', config.apiScope);
-}
+};
 
-OAuth2.prototype.parseAuthorizationCode = function(title) {
+OAuth2.prototype.parseAuthorizationCode = function (title) {
   var error = title.match(/[&\?]error=([^&]+)/);
   if (error) {
     throw 'Error getting authorization code: ' + error[1];
   }
   return title.match(/Success code=([\w\/\-]+)/)[1];
-}
+};
 
-OAuth2.prototype.accessTokenParams = function(authorizationCode, config) {
+OAuth2.prototype.accessTokenParams = function (authorizationCode, config) {
   return {
     code: authorizationCode,
     client_id: config.clientId,
@@ -62,52 +66,47 @@ OAuth2.prototype.accessTokenParams = function(authorizationCode, config) {
     redirect_uri: config.redirectURL,
     grant_type: 'authorization_code'
   };
-}
+};
 
-OAuth2.prototype.parseAccessToken = function(response) {
+OAuth2.prototype.parseAccessToken = function (response) {
   var parsedResponse = JSON.parse(response);
   return {
     accessToken: parsedResponse.access_token,
     refreshToken: parsedResponse.refresh_token,
     expiresIn: parsedResponse.expires_in
   };
-}
-/**
- * Pass instead of config to specify the finishing OAuth flow.
- */
-OAuth2.FINISH = 'finish';
+};
 
 /**
  * Opens up an authorization popup window. This starts the OAuth 2.0 flow.
  *
  * @param {Function} callback Method to call when the user finished auth.
  */
-OAuth2.prototype.openAuthorizationCodePopup = function(callback) {
+OAuth2.prototype.openAuthorizationCodePopup = function (callback) {
   // Store a reference to the callback so that the newly opened window can call
   // it later.
   var that = this;
 
   // Create a new tab with the OAuth 2.0 prompt
   // Get current tab index. We want to create new tab next to the current one.
-  chrome.tabs.create({
-      url: this.authorizationCodeURL(this.getConfig()),
-    },
-    function(tab) {
+  chrome.tabs.create({url: this.authorizationCodeURL(this.getConfig())},
+    function (tab) {
       // 1. Watch the tab.
       // 2. When code becomes available in the title, get the title.
       // 3. Close the tab and finish OAuth flow.
       chrome.tabs.onUpdated.addListener(
-        function(tabId, changeInfo, newTab) {
-          if (tabId != tab.id) {
+        function (tabId, changeInfo, newTab) {
+          if (tabId !== tab.id) {
             return;
           }
-          if (changeInfo.status == 'complete') {
+          if (changeInfo.status === 'complete') {
             if (newTab.title.search('code') > 0) {
-              title = newTab.title;
-              chrome.tabs.remove(tab.id, function() { that.finishAuth(title, callback); });
+              var title = newTab.title;
+              chrome.tabs.remove(tab.id, function () { that.finishAuth(title, callback); });
             }
           }
-        });
+        }
+      );
     });
 };
 
@@ -118,13 +117,13 @@ OAuth2.prototype.openAuthorizationCodePopup = function(callback) {
  * @param {Function} callback Called back with 3 params:
  *                            access token, refresh token and expiry time
  */
-OAuth2.prototype.getAccessAndRefreshTokens = function(authorizationCode, callback) {
+OAuth2.prototype.getAccessAndRefreshTokens = function (authorizationCode, callback) {
   var that = this;
   // Make an XHR to get the token
   var xhr = new XMLHttpRequest();
-  xhr.addEventListener('readystatechange', function(event) {
-    if (xhr.readyState == 4) {
-      if (xhr.status == 200) {
+  xhr.addEventListener('readystatechange', function (event) {
+    if (xhr.readyState === 4) {
+      if (xhr.status === 200) {
         // Callback with the data (incl. tokens).
         callback(that.parseAccessToken(xhr.responseText));
       }
@@ -134,14 +133,14 @@ OAuth2.prototype.getAccessAndRefreshTokens = function(authorizationCode, callbac
   var method = 'POST';
   var items = that.accessTokenParams(authorizationCode, that.getConfig());
   var key = null;
-  if (method == 'POST') {
+  if (method === 'POST') {
     var formData = new FormData();
     for (key in items) {
       formData.append(key, items[key]);
     }
     xhr.open(method, that.get('accessTokenURL'), true);
     xhr.send(formData);
-  } else if (method == 'GET') {
+  } else if (method === 'GET') {
     var url = that.get('accessTokenURL');
     var params = '?';
     for (key in items) {
@@ -161,12 +160,11 @@ OAuth2.prototype.getAccessAndRefreshTokens = function(authorizationCode, callbac
  * @param {String} refreshToken A valid refresh token
  * @param {Function} callback On success, called with access token and expiry time
  */
-OAuth2.prototype.refreshAccessToken = function(refreshToken, callback) {
+OAuth2.prototype.refreshAccessToken = function (refreshToken, callback) {
   var xhr = new XMLHttpRequest();
-  xhr.onreadystatechange = function(event) {
-    if (xhr.readyState == 4) {
-      if(xhr.status == 200) {
-        console.log(xhr.responseText);
+  xhr.onreadystatechange = function (event) {
+    if (xhr.readyState === 4) {
+      if (xhr.status === 200) {
         // Parse response with JSON
         var obj = JSON.parse(xhr.responseText);
         // Callback with the tokens
@@ -189,18 +187,17 @@ OAuth2.prototype.refreshAccessToken = function(refreshToken, callback) {
  * Extracts authorizationCode from the URL and makes a request to the last
  * leg of the OAuth 2.0 process.
 */
-OAuth2.prototype.finishAuth = function(title, callback) {
+OAuth2.prototype.finishAuth = function (title, callback) {
   var authorizationCode = null;
   var that = this;
 
   try {
     authorizationCode = that.parseAuthorizationCode(title);
-    console.log(authorizationCode);
   } catch (e) {
     console.error(e);
   }
 
-  that.getAccessAndRefreshTokens(authorizationCode, function(response) {
+  that.getAccessAndRefreshTokens(authorizationCode, function (response) {
     var data = that.get();
     data.accessTokenDate = new Date().valueOf();
 
@@ -219,7 +216,7 @@ OAuth2.prototype.finishAuth = function(title, callback) {
 /**
  * @return True iff the current access token has expired
  */
-OAuth2.prototype.isAccessTokenExpired = function() {
+OAuth2.prototype.isAccessTokenExpired = function () {
   var data = this.get();
   return (new Date().valueOf() - data.accessTokenDate) > data.expiresIn * 1000;
 };
@@ -244,7 +241,7 @@ OAuth2.prototype.get = function(name) {
  * @param {String} name The name of the property to change.
  * @param value The value to be set.
  */
-OAuth2.prototype.set = function(name, value) {
+OAuth2.prototype.set = function (name, value) {
   var obj = this.get();
   obj[name] = value;
   this.setSource(obj);
@@ -256,13 +253,13 @@ OAuth2.prototype.set = function(name, value) {
  *
  * @param {String} [name] The name of the property to clear.
  */
-OAuth2.prototype.clear = function(name) {
+OAuth2.prototype.clear = function (name) {
   if (name) {
     var obj = this.get();
     delete obj[name];
     this.setSource(obj);
   } else {
-    delete localStorage['oauth2'];
+    delete localStorage.oauth2;
   }
 };
 
@@ -271,8 +268,8 @@ OAuth2.prototype.clear = function(name) {
  *
  * @return {String} The source JSON string.
  */
-OAuth2.prototype.getSource = function() {
-  return localStorage['oauth2'];
+OAuth2.prototype.getSource = function () {
+  return localStorage.oauth2;
 };
 
 /**
@@ -280,14 +277,14 @@ OAuth2.prototype.getSource = function() {
  *
  * @param {Object|String} source The new JSON string/object to be set.
  */
-OAuth2.prototype.setSource = function(source) {
+OAuth2.prototype.setSource = function (source) {
   if (!source) {
     return;
   }
   if (typeof source !== 'string') {
     source = JSON.stringify(source);
   }
-  localStorage['oauth2'] = source;
+  localStorage.oauth2 = source;
 };
 
 /**
@@ -295,7 +292,7 @@ OAuth2.prototype.setSource = function(source) {
  *
  * @returns {Object} Contains clientId, clientSecret and apiScope.
  */
-OAuth2.prototype.getConfig = function() {
+OAuth2.prototype.getConfig = function () {
   var data = this.get();
   return {
     clientId: data.clientId,
@@ -317,7 +314,7 @@ OAuth2.prototype.getConfig = function() {
  * @param {Function} callback Tries to callback when auth is successful
  *                            Note: does not callback if grant popup required
  */
-OAuth2.prototype.authorize = function(callback) {
+OAuth2.prototype.authorize = function (callback) {
   var that = this;
   var data = that.get();
   if (!data.accessToken) {
@@ -326,7 +323,7 @@ OAuth2.prototype.authorize = function(callback) {
   } else if (that.isAccessTokenExpired()) {
     // There's an existing access token but it's expired
     if (data.refreshToken) {
-      that.refreshAccessToken(data.refreshToken, function(at, exp) {
+      that.refreshAccessToken(data.refreshToken, function (at, exp) {
         var newData = that.get();
         newData.accessTokenDate = new Date().valueOf();
         newData.accessToken = at;
@@ -352,7 +349,7 @@ OAuth2.prototype.authorize = function(callback) {
 /**
  * @returns A valid access token.
  */
-OAuth2.prototype.getAccessToken = function() {
+OAuth2.prototype.getAccessToken = function () {
   return this.get('accessToken');
 };
 
@@ -361,20 +358,20 @@ OAuth2.prototype.getAccessToken = function() {
  *
  * @returns {Boolean} True if an access token exists; otherwise false.
  */
-OAuth2.prototype.hasAccessToken = function() {
+OAuth2.prototype.hasAccessToken = function () {
   return !!this.get('accessToken');
 };
 
 /**
  * Clears an access token, effectively "logging out" of the service.
  */
-OAuth2.prototype.clearAccessToken = function() {
+OAuth2.prototype.clearAccessToken = function () {
   this.clear('accessToken');
 };
 
 /**
  * Returns authorization header.
  */
-OAuth2.prototype.getAuthorizationHeader = function() {
+OAuth2.prototype.getAuthorizationHeader = function () {
   return 'Bearer ' + this.get('accessToken');
-}
+};

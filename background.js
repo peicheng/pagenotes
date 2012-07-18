@@ -2,11 +2,10 @@
  * @author manugarg@gmail.com (Manu Garg)
  */
 var SYNC_INTERVAL = 5 * 60 * 1000; // In ms. Equivalent to 5 min.
-var DOCLIST_SCOPE = 'https://www.googleapis.com/auth/drive.file';
-var DOCLIST_FEED = DOCLIST_SCOPE + '/default/private/full/';
-var REMOTE_DOC_NAME = 'pagenotes.data'
-var RED_COLOR = {'color': [255, 0, 0, 255]}
-var GREEN_COLOR = {'color': [42, 115, 109, 255]}
+var DRIVE_SCOPE = 'https://www.googleapis.com/auth/drive.file';
+var REMOTE_DOC_NAME = 'pagenotes.data';
+var RED_COLOR = {'color': [255, 0, 0, 255]};
+var GREEN_COLOR = {'color': [42, 115, 109, 255]};
 
 var oauth = null;
 
@@ -14,8 +13,8 @@ function setUpOauth() {
   oauth = new OAuth2({
     'client_id': '702868056438.apps.googleusercontent.com',
     'client_secret': 'P-jAwCRjzcXEGZsWZVNQwvWE',
-    'api_scope': DOCLIST_SCOPE,
-    'redirect_url': 'urn:ietf:wg:oauth:2.0:oob',
+    'api_scope': DRIVE_SCOPE,
+    'redirect_url': 'urn:ietf:wg:oauth:2.0:oob'
   });
 }
 
@@ -29,7 +28,7 @@ chrome.browserAction.setBadgeText({'text': 'pn'});
 
 // Update badge text on tab change.
 chrome.tabs.onSelectionChanged.addListener(function(tabId) {
-  chrome.tabs.get(tabId, updateBadgeForTab)
+  chrome.tabs.get(tabId, updateBadgeForTab);
 });
 
 // Update badge text on tab update.
@@ -58,18 +57,18 @@ function setVisualCues() {
   if (lastSyncStatus !== 'good') {
     chrome.browserAction.setBadgeBackgroundColor(RED_COLOR);
     chrome.browserAction.setTitle({'title': 'Page Notes - Sync is not '+
-                                            'happening.'})
+                                            'happening.'});
   } else {
     chrome.browserAction.setBadgeBackgroundColor(GREEN_COLOR);
-    chrome.browserAction.setTitle({'title': 'Page Notes'})
+    chrome.browserAction.setTitle({'title': 'Page Notes'});
   }
 }
 
 function sync() {
-  debug.msg = ''
+  debug.msg = '';
   debug.log('sync: Starting sync at: ' + new Date());
 
-  if (!oauth && localStorage['oauth']) {
+  if (!oauth && localStorage.oauth) {
     setUpOauth();
   }
   if (!oauth || !oauth.hasAccessToken()) {
@@ -87,9 +86,9 @@ function sync() {
     remoteFile.refreshLocalMetadata(function(gFile) {
       localLastModTime = 0;
       if(localStorage.lastModTime) {
-        localLastModTime = parseInt(localStorage.lastModTime);
+        localLastModTime = parseInt(localStorage.lastModTime, 10);
       }
-      remoteLastModTime = parseInt(gFile.getLastUpdateTime());
+      remoteLastModTime = parseInt(gFile.getLastUpdateTime(), 10);
       debug.log('sync: Local last mod time: ' + localLastModTime);
       debug.log('sync: Remote last mod time: ' + remoteLastModTime);
       if (remoteLastModTime === localLastModTime) {
@@ -110,7 +109,7 @@ function sync() {
       }
     });
   } catch (e) {
-    lastSyncStatus = 'bad'
+    lastSyncStatus = 'bad';
     setVisualCues();
     debug.log(e);
     return;
@@ -118,7 +117,7 @@ function sync() {
   lastSyncStatus = 'good';
   localStorage.lastSyncTime = new Date();
   setVisualCues();
-};
+}
 
 function init() {
   chrome.tabs.getSelected(null, updateBadgeForTab);
@@ -128,4 +127,4 @@ function init() {
 document.addEventListener('DOMContentLoaded', function () {
   window.setInterval(sync, SYNC_INTERVAL);
   init();
-})
+});
