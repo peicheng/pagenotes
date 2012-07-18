@@ -32,11 +32,11 @@ function setupSync() {
 }
 
 function handleSyncButton() {
-  syncButton = document.getElementById('sync_button');
+  syncButton = document.getElementById('setup_sync');
   if (syncButton.name === 'cancel_sync') {
     if (confirm('Are you sure you want to clear the sync setup?')) {
       localStorage.removeItem('gFile');
-      bgPage.oauth.clearTokens();
+      bgPage.oauth.clearAccessToken();
       bgPage.lastSyncStatus = '';
       location.reload();
     }
@@ -53,9 +53,10 @@ function clearLocalData() {
 }
 
 function initUI() {
-  var syncButton = document.getElementById('sync_button');
+  var syncButton = document.getElementById('setup_sync');
   var authButton = document.getElementById('auth_button');
   var syncStatus = document.getElementById('sync_status');
+  var syncNowButton = document.getElementById('sync_now');
   if (localStorage.gFile) {
     var gFile = bgPage.getRemoteFile().getValue();
     if (gFile && gFile.alternateLink) {
@@ -64,10 +65,12 @@ function initUI() {
     }
     syncButton.innerHTML = 'Stop Syncing';
     syncButton.name = 'cancel_sync';
+    syncNowButton.style.display = '';
   } else {
     syncStatus.innerHTML = 'Not syncing now. '
     syncButton.innerHTML = 'Setup Sync';
     syncButton.name = 'setup_sync';
+    syncNowButton.style.display = 'none';
     bgPage.lastSyncStatus = '';
   }
   if (!localStorage.pagenotes) {
@@ -111,7 +114,7 @@ function syncNow() {
 
 document.addEventListener('DOMContentLoaded', function () {
   initUI();
-  document.getElementById('sync_button').addEventListener('click', handleSyncButton);
+  document.getElementById('setup_sync').addEventListener('click', handleSyncButton);
   document.getElementById('sync_now').addEventListener('click', syncNow);
   document.getElementById('showdebug').addEventListener('click', showHideDebugInfo);
 })
