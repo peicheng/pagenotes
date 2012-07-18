@@ -96,9 +96,13 @@ GoogleFile.prototype.createNewFile = function(fileName) {
     'headers': {
       'Content-Type': 'application/json',
     },
+    'body': JSON.stringify({
+      'title': fileName,
+      'mimeType': 'text/plain'
+    })
   };
   var xhr = sendRequest(request, url);
-  if (xhr.status != 201) {
+  if (xhr.status != 200) {
     throw 'There was a problem in setting up the sync. ' +
     'Last request status: ' + xhr.status + '\n' + xhr.responseText;
     return;
@@ -155,6 +159,8 @@ GoogleFile.prototype.getData = function() {
 //
 GoogleFile.prototype.setData = function(data) {
   var url = 'https://www.googleapis.com/upload/drive/v2/files/' + this.getEntry().id;
+  // Make sure data is not undefined.
+  data = data ? data : '';
   var request = {
     'method': 'PUT',
     'headers': {
