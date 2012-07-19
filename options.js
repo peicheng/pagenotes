@@ -13,6 +13,8 @@
 var bgPage = chrome.extension.getBackgroundPage();
 
 function setupSync() {
+  // Clear debug log.
+  bgPage.debug.msg = '';
   try {
     if (!bgPage.oauth || !bgPage.oauth.hasAccessToken()) {
       if (!confirm('You\'ll be redirected to Google website to set ' +
@@ -35,7 +37,11 @@ function setupSync() {
       }
     }
   } catch (e) {
-    alert(e);
+    var errMsg = 'There was an error in setting up sync. Click on "Show ' +
+                 'debug info" for more information.'
+    document.getElementById('error').innerHTML = errMsg;
+    bgPage.debug.log(e);
+    return;
   }
   bgPage.lastSyncStatus = '';
   location.reload();
@@ -93,8 +99,9 @@ function initUI() {
         'less than a minute ago.' : syncLast + ' min ago.');
   } else {
     if (bgPage.lastSyncStatus) {
-      syncStatus.innerHTML += 'There was a problem in syncing. Look at' +
-                              ' debug info for more details.';
+      var errMsg = 'There was an error during sync. Click on "Show ' +
+                   'debug info" for more information.'
+      document.getElementById('error').innerHTML = errMsg;
     }
   }
   if (localStorage.hasOwnProperty('nextAction') && localStorage.nextAction === 'setup_sync') {
