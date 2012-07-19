@@ -142,7 +142,6 @@ GoogleFile.prototype.setData = function (data) {
     'method': 'PUT',
     'headers': {
       'Content-Type': 'text/plain',
-      'Content-Length': data.length
     },
     'parameters': {
       'uploadType': 'media'
