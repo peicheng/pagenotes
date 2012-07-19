@@ -20,12 +20,11 @@
  */
 /*global location, localStorage, alert, chrome, confirm, console, FormData, XMLHttpRequest */
 
-"use strict";
-
 /**
  * Constructor
  *
- * @param {Object} config Containing clientId, clientSecret and apiScope
+ * @param {Object} config Containing clientId, clientSecret, apiScope and
+ * redirectURL
  */
 var OAuth2 = function (config) {
   var that = this;
@@ -373,5 +372,6 @@ OAuth2.prototype.clearAccessToken = function () {
  * Returns authorization header.
  */
 OAuth2.prototype.getAuthorizationHeader = function () {
+  this.authorize(function () {}); 
   return 'Bearer ' + this.get('accessToken');
 };

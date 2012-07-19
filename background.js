@@ -3,7 +3,7 @@
  */
 var SYNC_INTERVAL = 5 * 60 * 1000; // In ms. Equivalent to 5 min.
 var DRIVE_SCOPE = 'https://www.googleapis.com/auth/drive.file';
-var REMOTE_DOC_NAME = 'pagenotes.data';
+var REMOTE_FILE_NAME = 'pagenotes.data';
 var RED_COLOR = {'color': [255, 0, 0, 255]};
 var GREEN_COLOR = {'color': [42, 115, 109, 255]};
 
@@ -47,10 +47,12 @@ function updateBadgeForTab(tab) {
   }
 }
 
+function saveGFile(src) {
+  localStorage.gFile = src;
+}
+
 function getRemoteFile() {
-  return new GoogleFile(localStorage.gFile, function(gFile) {
-        localStorage.gFile = gFile;
-      });
+  return new GoogleFile(localStorage.gFile, saveGFile);
 }
 
 function setVisualCues() {

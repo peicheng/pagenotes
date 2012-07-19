@@ -6,7 +6,7 @@
  * Directive for JSLint, so that it doesn't complain about these names not being
  * defined.
  */
-/*global location, localStorage, alert, chrome, confirm, XMLHttpRequest */
+/*global location, alert, chrome, confirm, XMLHttpRequest */
 
 "use strict";
 
@@ -37,33 +37,37 @@ function sendRequest(request, url) {
   return xhr;
 }
 
-function GoogleFile(gFileString, onSetValue) {
-  this.getValue = function () {
-    if (gFileString) {
-      try {
-        return JSON.parse(gFileString);
-      } catch (e) {
-        throw 'Not a valid object string: ' + gFileString;
-      }
-    }
-  };
-  this.setValue = function (entry) {
-    onSetValue(JSON.stringify(entry));
-  };
+function GoogleFile(sourceString, setSource) {
+  this.src = sourceString;
+  this.setSource = setSource;
 }
 
-GoogleFile.prototype.setGfile = function (feedResponseString) {
-  var feedResponse = JSON.parse(feedResponseString);
-  if (feedResponse.kind === 'drive#file') {
-    this.setValue(feedResponse);
-    return;
+GoogleFile.prototype.set = function (obj) {
+  this.src = JSON.stringify(obj);
+  this.setSource(this.src);
+};
+
+GoogleFile.prototype.get = function (key) {
+  var obj = this.src ? JSON.parse(this.src) : {};
+  return key ? obj[key] : obj;
+};
+
+GoogleFile.prototype.update = function (response) {
+  var obj = JSON.parse(response);
+  if (obj.kind === 'drive#file') {
+    this.set(obj);
   }
 };
 
 GoogleFile.prototype.getLastUpdateTime = function () {
-  return new Date(this.getValue().modifiedDate).getTime();
+  return new Date(this.get('modifiedDate')).getTime();
 };
 
+/**
+ * Create a new Google drive file..
+ *
+ * @param {Function} fileName Name of the new file.
+ */
 GoogleFile.prototype.createNewFile = function (fileName) {
   if (!fileName) { throw 'File name is not defined'; }
   var request, xhr, url = 'https://www.googleapis.com/drive/v2/files';
@@ -82,9 +86,14 @@ GoogleFile.prototype.createNewFile = function (fileName) {
     throw 'There was a problem in setting up the sync. ' +
       'Last request status: ' + xhr.status + '\n' + xhr.responseText;
   }
-  this.setGfile(xhr.responseText);
+  this.update(xhr.responseText);
 };
 
+/**
+ * Search for a file in Google drive by name.
+ *
+ * @param {Function} fileName Name to search by.
+ */
 GoogleFile.prototype.searchFileByName = function (fileName) {
   if (!fileName) { throw 'File name is not defined'; }
   var request, response, xhr, url = 'https://www.googleapis.com/drive/v2/files';
@@ -103,12 +112,17 @@ GoogleFile.prototype.searchFileByName = function (fileName) {
   if (response.hasOwnProperty('items') &&
       response.items instanceof Array &&
       response.items.length > 0) {
-    this.setValue(response.items[0]);
+    this.set(response.items[0]);
   }
 };
 
+/**
+ * Download remote file's metadata and store it locally.
+ *
+ * @param {Function} callback(gFile) Function to call after local metadata refresh.
+ */
 GoogleFile.prototype.refreshLocalMetadata = function (callback) {
-  var request, xhr, url = this.getValue().selfLink;
+  var request, xhr, url = this.get('selfLink');
   request = {
     'method': 'GET'
   };
@@ -117,12 +131,16 @@ GoogleFile.prototype.refreshLocalMetadata = function (callback) {
     throw 'There was a problem in refreshing the doc entry. ' +
       'Last request status: ' + xhr.status + '\n' + xhr.responseText;
   }
-  this.setGfile(xhr.responseText);
+  this.update(xhr.responseText);
   callback(this);
 };
 
+/**
+ * Get data from the remote file.
+ *
+ */
 GoogleFile.prototype.getData = function () {
-  var request, xhr, url = this.getValue().downloadUrl;
+  var request, xhr, url = this.get('downloadUrl');
   request = {
     'method': 'GET'
   };
@@ -134,14 +152,19 @@ GoogleFile.prototype.getData = function () {
   return xhr.responseText;
 };
 
+/**
+ * Upload local data to the remote file.
+ *
+ * @param {Function} data Data to upload.
+ */
 GoogleFile.prototype.setData = function (data) {
-  var request, xhr, url = 'https://www.googleapis.com/upload/drive/v2/files/' + this.getValue().id;
+  var request, xhr, url = 'https://www.googleapis.com/upload/drive/v2/files/' + this.get('id');
   // Make sure data is not undefined.
   data = data || '';
   request = {
     'method': 'PUT',
     'headers': {
-      'Content-Type': 'text/plain',
+      'Content-Type': 'text/plain'
     },
     'parameters': {
       'uploadType': 'media'
@@ -153,6 +176,6 @@ GoogleFile.prototype.setData = function (data) {
     throw 'There was a problem in updating the doc. ' +
       'Last request status: ' + xhr.status + '\n' + xhr.responseText;
   }
-  this.setGfile(xhr.responseText);
+  this.update(xhr.responseText);
 };
 

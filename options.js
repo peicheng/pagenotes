@@ -27,12 +27,10 @@ function setupSync() {
       return;
     }
     if (!localStorage.gFile) {
-      var gFile = new bgPage.GoogleFile(null, function (gFile) {
-          localStorage.gFile = gFile;
-        });
-      gFile.searchFileByName(bgPage.REMOTE_DOC_NAME);
+      var gFile = new bgPage.GoogleFile(null, bgPage.saveGFile);
+      gFile.searchFileByName(bgPage.REMOTE_FILE_NAME);
       if (!localStorage.gFile) {
-        gFile.createNewFile(bgPage.REMOTE_DOC_NAME);
+        gFile.createNewFile(bgPage.REMOTE_FILE_NAME);
         localStorage.lastModTime = new Date().getTime();
       }
     }
@@ -70,9 +68,9 @@ function initUI() {
   var syncStatus = document.getElementById('sync_status');
   var syncNowButton = document.getElementById('sync_now');
   if (localStorage.gFile) {
-    var gFile = bgPage.getRemoteFile().getValue();
-    if (gFile && gFile.alternateLink) {
-      syncStatus.innerHTML = 'Syncing to <a href="' + gFile.alternateLink
+    var gFile = bgPage.getRemoteFile();
+    if (gFile && gFile.get('alternateLink')) {
+      syncStatus.innerHTML = 'Syncing to <a href="' + gFile.get('alternateLink')
         + '">this file</a>. ';
     }
     syncButton.innerHTML = 'Stop Syncing';
