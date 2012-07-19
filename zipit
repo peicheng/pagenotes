@@ -1,1 +1,1 @@
-git archive --format=zip --output=../chrome-page-notes.zip .
+git archive --output=../chrome-page-notes.zip HEAD
