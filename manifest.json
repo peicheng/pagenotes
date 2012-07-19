@@ -1,10 +1,10 @@
 {
   "name": "Page Notes",
-  "version": "1.0.4",
+  "version": "2.0.0",
   "manifest_version": 2,
   "description": "Lets you take notes for web pages and sync them automatically to your Google Docs.",
   "background": {
-     "page": "background.html"
+     "scripts": ["gdocs.js", "pagenotes.js", "oauth2.js", "background.js"]
   },
   "options_page": "options.html",
   "browser_action": {

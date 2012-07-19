@@ -68,7 +68,8 @@ function sync() {
   debug.msg = '';
   debug.log('sync: Starting sync at: ' + new Date());
 
-  if (!oauth && localStorage.oauth) {
+  if (!oauth && localStorage.oauth2) {
+     // If oauth2 is stored in localStorage, set it up oauth object.
     setUpOauth();
   }
   if (!oauth || !oauth.hasAccessToken()) {
