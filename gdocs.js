@@ -91,7 +91,7 @@ GoogleFile.prototype.searchFileByName = function (fileName) {
   request = {
     'method': 'GET',
     'parameters': {
-      'q': 'title=\'' + fileName + '\''
+      'q': 'title=\'' + fileName + '\' and trashed = false'
     }
   };
   xhr = sendRequest(request, url);
