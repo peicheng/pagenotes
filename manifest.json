@@ -21,6 +21,6 @@
   "permissions": [
     "tabs",
     "https://www.googleapis.com/",
-    "https://accounts.google.com/o/oauth2/token"
+    "https://accounts.google.com/"
    ]
 }
