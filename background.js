@@ -140,7 +140,7 @@ function handleMajorUpdate() {
       }
     }
     localStorage.majorUpdate = true;
-    chrome.tabs.create({'url': string chrome.extension.getURL('options.html')});
+    chrome.tabs.create({'url': chrome.extension.getURL('options.html')});
   }
 }
 
