@@ -10,6 +10,7 @@
 
 "use strict";
 
+var filesUrl = 'https://www.googleapis.com/drive/v2/files';
 var bgPage = chrome.extension.getBackgroundPage();
 
 function stringify(parameters) {
@@ -21,22 +22,37 @@ function stringify(parameters) {
   return params.join('&');
 }
 
+/**
+ * Send an authorized XMLHttpRequest.
+ *
+ * @param {Object} request Request object {'method', 'parameters', 'body'}.
+ * @param {String} url Request URL. (default: filesUrl).
+ */
 function sendRequest(request, url) {
-  var header, xhr = new XMLHttpRequest();
-  if (request.parameters) {
-    url = url + '?' + stringify(request.parameters);
-  }
+  var url = url ? url : filesUrl;
+  url = request.parameters ? url + '?' + stringify(request.parameters) : url;
+
+  var xhr = new XMLHttpRequest();
   xhr.open(request.method, url, false);
+
+  var header;
   for (header in request.headers) {
     if (request.headers.hasOwnProperty(header)) {
       xhr.setRequestHeader(header, request.headers[header]);
     }
   }
+  // Attach the authorization header.
   xhr.setRequestHeader('Authorization', bgPage.oauth.getAuthorizationHeader());
   xhr.send(request.body);
   return xhr;
 }
 
+/**
+ * Constructor for GoogleFile
+ *
+ * @param {String} src Stringified Google file metadata.
+ * @param {Function} setSource Method to call to persist metadata string.
+ */
 function GoogleFile(sourceString, setSource) {
   this.src = sourceString;
   this.setSource = setSource;
@@ -64,14 +80,13 @@ GoogleFile.prototype.getLastUpdateTime = function () {
 };
 
 /**
- * Create a new Google drive file..
+ * Create a new Google drive file.
  *
- * @param {Function} fileName Name of the new file.
+ * @param {String} fileName Name of the new file.
  */
 GoogleFile.prototype.createNewFile = function (fileName) {
   if (!fileName) { throw 'File name is not defined'; }
-  var request, xhr, url = 'https://www.googleapis.com/drive/v2/files';
-  request = {
+  var request = {
     'method': 'POST',
     'headers': {
       'Content-Type': 'application/json'
@@ -81,7 +96,7 @@ GoogleFile.prototype.createNewFile = function (fileName) {
       'mimeType': 'text/plain'
     })
   };
-  xhr = sendRequest(request, url);
+  var xhr = sendRequest(request);
   if (xhr.status !== 200) {
     throw 'There was a problem in setting up the sync. ' +
       'Last request status: ' + xhr.status + '\n' + xhr.responseText;
@@ -92,23 +107,22 @@ GoogleFile.prototype.createNewFile = function (fileName) {
 /**
  * Search for a file in Google drive by name.
  *
- * @param {Function} fileName Name to search by.
+ * @param {String} fileName Name to search by.
  */
 GoogleFile.prototype.searchFileByName = function (fileName) {
   if (!fileName) { throw 'File name is not defined'; }
-  var request, response, xhr, url = 'https://www.googleapis.com/drive/v2/files';
-  request = {
+  var request = {
     'method': 'GET',
     'parameters': {
       'q': 'title=\'' + fileName + '\' and trashed = false'
     }
   };
-  xhr = sendRequest(request, url);
+  var xhr = sendRequest(request);
   if (xhr.status !== 200) {
     throw 'There was a problem in searching for the doc - ' + fileName + '.' +
       'Last request status: ' + xhr.status + '\n' + xhr.responseText;
   }
-  response = JSON.parse(xhr.responseText);
+  var response = JSON.parse(xhr.responseText);
   if (response.hasOwnProperty('items') &&
       response.items instanceof Array &&
       response.items.length > 0) {
@@ -119,14 +133,10 @@ GoogleFile.prototype.searchFileByName = function (fileName) {
 /**
  * Download remote file's metadata and store it locally.
  *
- * @param {Function} callback(gFile) Function to call after local metadata refresh.
+ * @param {String} callback(gFile) Function to call after local metadata refresh.
  */
 GoogleFile.prototype.refreshLocalMetadata = function (callback) {
-  var request, xhr, url = this.get('selfLink');
-  request = {
-    'method': 'GET'
-  };
-  xhr = sendRequest(request, url);
+  var xhr = sendRequest({'method': 'GET'}, this.get('selfLink'));
   if (xhr.status !== 200) {
     throw 'There was a problem in refreshing the doc entry. ' +
       'Last request status: ' + xhr.status + '\n' + xhr.responseText;
@@ -140,11 +150,7 @@ GoogleFile.prototype.refreshLocalMetadata = function (callback) {
  *
  */
 GoogleFile.prototype.getData = function () {
-  var request, xhr, url = this.get('downloadUrl');
-  request = {
-    'method': 'GET'
-  };
-  xhr = sendRequest(request, url);
+  var xhr = sendRequest({'method': 'GET'}, this.get('downloadUrl'));
   if (xhr.status !== 200) {
     throw 'There was a problem downloading the doc. ' +
       'Last request status: ' + xhr.status + '\n' + xhr.responseText;
@@ -155,13 +161,12 @@ GoogleFile.prototype.getData = function () {
 /**
  * Upload local data to the remote file.
  *
- * @param {Function} data Data to upload.
+ * @param {String} data Data to upload.
  */
 GoogleFile.prototype.setData = function (data) {
-  var request, xhr, url = 'https://www.googleapis.com/upload/drive/v2/files/' + this.get('id');
   // Make sure data is not undefined.
   data = data || '';
-  request = {
+  var request = {
     'method': 'PUT',
     'headers': {
       'Content-Type': 'text/plain'
@@ -171,7 +176,8 @@ GoogleFile.prototype.setData = function (data) {
     },
     'body': data
   };
-  xhr = sendRequest(request, url);
+  var url = filesUrl + this.get('id');
+  var xhr = sendRequest(request, url);
   if (xhr.status !== 200) {
     throw 'There was a problem in updating the doc. ' +
       'Last request status: ' + xhr.status + '\n' + xhr.responseText;
