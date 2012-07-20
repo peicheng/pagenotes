@@ -4,7 +4,7 @@
   "manifest_version": 2,
   "description": "Lets you take notes for web pages and sync them automatically to your Google Docs.",
   "background": {
-     "scripts": ["gdocs.js", "pagenotes.js", "oauth2.js", "background.js"]
+     "scripts": ["gfile.js", "pagenotes.js", "oauth2.js", "background.js"]
   },
   "options_page": "options.html",
   "browser_action": {
