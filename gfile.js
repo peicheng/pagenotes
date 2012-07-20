@@ -11,6 +11,8 @@
 "use strict";
 
 var filesUrl = 'https://www.googleapis.com/drive/v2/files';
+var filesUploadUrl = 'https://www.googleapis.com/upload/drive/v2/files';
+
 var bgPage = chrome.extension.getBackgroundPage();
 
 function stringify(parameters) {
@@ -176,7 +178,7 @@ GoogleFile.prototype.setData = function (data) {
     },
     'body': data
   };
-  var url = filesUrl + this.get('id');
+  var url = filesUploadUrl + '/' + this.get('id');
   var xhr = sendRequest(request, url);
   if (xhr.status !== 200) {
     throw 'There was a problem in updating the doc. ' +
