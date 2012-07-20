@@ -123,8 +123,25 @@ function sync() {
 }
 
 function init() {
+  handleMajorUpdate();
   chrome.tabs.getSelected(null, updateBadgeForTab);
   sync();
+}
+
+function handleMajorUpdate() {
+  if (localStorage.gDoc) {
+    // If it's a major update (1->2), clear old data.
+    var item;
+    for (item in localStorage) {
+      if (localStorage.hasOwnProperty(item)) {
+        if (item !== "pagenotes") {
+          localStorage.removeItem(item);
+        }
+      }
+    }
+    localStorage.majorUpdate = true;
+    chrome.tabs.create({'url': string chrome.extension.getURL('options.html')});
+  }
 }
 
 document.addEventListener('DOMContentLoaded', function () {

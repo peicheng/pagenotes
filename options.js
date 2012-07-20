@@ -69,6 +69,12 @@ function clearLocalData() {
 }
 
 function initUI() {
+  if (localStorage.majorUpdate) {
+    var errMsg = 'Your sync has been disabled after the last major update. ' +
+                 'You will have to set it up again. You will not loose the local data.';
+    document.getElementById('error').innerHTML = errMsg;
+    localStorage.removeItem(majorUpdate);
+  }
   var syncButton = document.getElementById('setup_sync');
   var authButton = document.getElementById('auth_button');
   var syncStatus = document.getElementById('sync_status');
