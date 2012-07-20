@@ -88,12 +88,12 @@ function initUI() {
     }
     syncButton.innerHTML = 'Stop Syncing';
     syncButton.name = 'cancel_sync';
-    syncNowButton.style.display = '';
+    syncNowButton.disabled = false;
   } else {
     syncStatus.innerHTML = 'Not syncing now. ';
     syncButton.innerHTML = 'Setup Sync';
     syncButton.name = 'setup_sync';
-    syncNowButton.style.display = 'none';
+    syncNowButton.disabled = true;
     bgPage.lastSyncStatus = '';
   }
   if (!localStorage.pagenotes) {
