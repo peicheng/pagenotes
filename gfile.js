@@ -31,7 +31,7 @@ function stringify(parameters) {
  * @param {String} url Request URL. (default: filesUrl).
  */
 function sendRequest(request, url) {
-  var url = url ? url : filesUrl;
+  url = url ? url : filesUrl;
   url = request.parameters ? url + '?' + stringify(request.parameters) : url;
 
   var xhr = new XMLHttpRequest();

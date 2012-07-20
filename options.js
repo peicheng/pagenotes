@@ -12,6 +12,10 @@
 
 var bgPage = chrome.extension.getBackgroundPage();
 
+function notify(msg) {
+    document.getElementById('error').innerHTML = msg;
+}
+
 function setupSync() {
   // Clear debug log.
   bgPage.debug.msg = '';
@@ -37,9 +41,8 @@ function setupSync() {
       }
     }
   } catch (e) {
-    var errMsg = 'There was an error in setting up sync. Click on "Show ' +
-                 'debug info" for more information.'
-    document.getElementById('error').innerHTML = errMsg;
+    notify('There was an error in setting up sync. Click on "Show debug info" ' +
+           'for more information.');
     bgPage.debug.log(e);
     return;
   }
@@ -70,10 +73,9 @@ function clearLocalData() {
 
 function initUI() {
   if (localStorage.majorUpdate) {
-    var errMsg = 'Note: Your sync has been disabled after the last major ' +
-                 'update. Unfortunately, you will have to set it up again (click ' +
-                 'on "Setup Sync"). Your exsiting data will not be affected.';
-    document.getElementById('error').innerHTML = errMsg;
+    notify('Note: Your sync has been disabled after the last major update. ' +
+           'Unfortunately, you will have to set it up again (click on ' +
+           '"Setup Sync"). Your exsiting data will not be lost.');
     localStorage.removeItem('majorUpdate');
   }
   var syncButton = document.getElementById('setup_sync');
@@ -83,8 +85,8 @@ function initUI() {
   if (localStorage.gFile) {
     var gFile = bgPage.getRemoteFile();
     if (gFile && gFile.get('alternateLink')) {
-      syncStatus.innerHTML = 'Syncing to <a href="' + gFile.get('alternateLink')
-        + '">this file</a>. ';
+      syncStatus.innerHTML = 'Syncing to <a href="' +
+                             gFile.get('alternateLink') + '">this file</a>. ';
     }
     syncButton.innerHTML = 'Stop Syncing';
     syncButton.name = 'cancel_sync';
@@ -106,9 +108,8 @@ function initUI() {
         'less than a minute ago.' : syncLast + ' min ago.');
   } else {
     if (bgPage.lastSyncStatus) {
-      var errMsg = 'There was an error during sync. Click on "Show ' +
-                   'debug info" for more information.'
-      document.getElementById('error').innerHTML = errMsg;
+      notify('There was an error during sync. Click on "Show debug info" for ' + 
+             'more information.');
     }
   }
   if (localStorage.hasOwnProperty('nextAction') && localStorage.nextAction === 'setup_sync') {

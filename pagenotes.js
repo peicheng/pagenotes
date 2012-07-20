@@ -11,11 +11,12 @@ function getPageNotes(key) {
 }
 
 function setPageNotes(key, value) {
+  var pagenotes;
   if (localStorage.getItem('pagenotes')) {
-    var pagenotes = JSON.parse(localStorage.getItem('pagenotes'));
+    pagenotes = JSON.parse(localStorage.getItem('pagenotes'));
     pagenotes[key] = value;
   } else {
-    var pagenotes = {};
+    pagenotes = {};
     pagenotes[key] = value;
   }
   localStorage.setItem('pagenotes', JSON.stringify(pagenotes));
