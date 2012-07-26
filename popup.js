@@ -10,8 +10,8 @@ function retrievePageNotes(tab) {
 
   // Get notes for the current tab and display.
   notes.innerHTML = '&nbsp;';
-  tabUrl = tab.url;
-  tabHost = bgPage.getHostFromUrl(tabUrl);
+  var tabUrl = tab.url;
+  var tabHost = bgPage.getHostFromUrl(tabUrl);
   if(bgPage.getPageNotes(tabUrl)) {
     notes.innerHTML = bgPage.getPageNotes(tabUrl);
   } else if(bgPage.getPageNotes(tabHost)) {
@@ -33,13 +33,13 @@ function retrievePageNotes(tab) {
       this.value = 'Save';
     } else if (this.value === 'Save') {
       notes.contentEditable = false;
+      var data = notes.innerHTML.replace(/&nbsp;/gi, ' ').trim();
       if (e('site-level').checked === false) {
-        bgPage.setPageNotes(tabUrl, notes.innerHTML);
-        bgPage.updateBadgeForTab(tab);
+        bgPage.setPageNotes(tabUrl, data);
       } else {
-        bgPage.setPageNotes(tabHost, notes.innerHTML);
-        bgPage.updateBadgeForTab(tab);
+        bgPage.setPageNotes(tabHost, data);
       }
+      bgPage.updateBadgeForTab(tab);
       localStorage.lastModTime = new Date().getTime();
       window.close();
     }
