@@ -75,7 +75,7 @@ function initUI() {
   if (localStorage.majorUpdate) {
     notify('Note: Your sync has been disabled after the last major update. ' +
            'Unfortunately, you will have to set it up again (click on ' +
-           '"Setup Sync"). Your exsiting data will not be lost.');
+           '"Setup Sync"). Your existing data will not be lost.');
     localStorage.removeItem('majorUpdate');
   }
   var syncButton = document.getElementById('setup_sync');
