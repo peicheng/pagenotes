@@ -56,7 +56,7 @@ function getRemoteFile() {
 }
 
 function setVisualCues() {
-  if (lastSyncStatus !== 'good') {
+  if (getSyncFailCount() >= 2) {
     chrome.browserAction.setBadgeBackgroundColor(RED_COLOR);
     chrome.browserAction.setTitle({'title': 'Page Notes - Sync is not '+
                                             'happening.'});
@@ -113,13 +113,31 @@ function sync() {
     });
   } catch (e) {
     lastSyncStatus = 'bad';
+    incSyncFailCount();
     setVisualCues();
     debug.log(e);
     return;
   }
   lastSyncStatus = 'good';
+  resetSyncFailCount();
   localStorage.lastSyncTime = new Date();
   setVisualCues();
+}
+
+function incSyncFailCount() {
+  if (localStorage.syncFailCount) {
+    localStorage.syncFailCount = parseInt(localStorage.syncFailCount, 10) + 1;
+    return;
+  }
+  localStorage.syncFailCount = '1';
+}
+
+function resetSyncFailCount() {
+  localStorage.syncFailCount = '0';
+}
+
+function getSyncFailCount() {
+  return parseInt(localStorage.syncFailCount, 10);
 }
 
 function init() {
