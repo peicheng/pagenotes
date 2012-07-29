@@ -101,7 +101,7 @@ function sync() {
       else if (remoteLastModTime > localLastModTime) {
         debug.log('sync: Remote data is more recent.');
         // syncToLocal();
-        setAllPageNotes(gFile.getData());
+        gFile.getData(setAllPageNotes);
         localStorage.lastModTime = gFile.getLastUpdateTime();
       }
       else {

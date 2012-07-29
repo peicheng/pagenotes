@@ -330,7 +330,7 @@ OAuth2.prototype.authorize = function (callback) {
         that.setSource(newData);
         // Callback when we finish refreshing
         if (callback) {
-          callback();
+          callback.call(that);
         }
       });
     } else {
@@ -340,7 +340,7 @@ OAuth2.prototype.authorize = function (callback) {
   } else {
     // We have an access token, and it's not expired yet
     if (callback) {
-      callback();
+      callback.call(that);
     }
   }
 };
@@ -371,7 +371,10 @@ OAuth2.prototype.clearAccessToken = function () {
 /**
  * Returns authorization header.
  */
-OAuth2.prototype.getAuthorizationHeader = function () {
-  this.authorize(function () {}); 
-  return 'Bearer ' + this.get('accessToken');
+OAuth2.prototype.getAuthorizationHeader = function (callback) {
+  var authHeader;
+  var that = this;
+  this.authorize(function () {
+    callback('Bearer ' + this.get('accessToken'));
+  });
 };

@@ -30,7 +30,7 @@ function stringify(parameters) {
  * @param {Object} request Request object {'method', 'parameters', 'body'}.
  * @param {String} url Request URL. (default: filesUrl).
  */
-function sendRequest(request, url) {
+function sendRequest(request, url, callback) {
   url = url ? url : filesUrl;
   url = request.parameters ? url + '?' + stringify(request.parameters) : url;
 
@@ -44,9 +44,11 @@ function sendRequest(request, url) {
     }
   }
   // Attach the authorization header.
-  xhr.setRequestHeader('Authorization', bgPage.oauth.getAuthorizationHeader());
-  xhr.send(request.body);
-  return xhr;
+  bgPage.oauth.getAuthorizationHeader(function (authHeader) {
+    xhr.setRequestHeader('Authorization', authHeader);
+    xhr.send(request.body);
+  });
+  callback(xhr);
 }
 
 /**
@@ -98,12 +100,14 @@ GoogleFile.prototype.createNewFile = function (fileName) {
       'mimeType': 'text/plain'
     })
   };
-  var xhr = sendRequest(request);
-  if (xhr.status !== 200) {
-    throw 'There was a problem in setting up the sync. ' +
-      'Last request status: ' + xhr.status + '\n' + xhr.responseText;
-  }
-  this.update(xhr.responseText);
+  var that = this;
+  sendRequest(request, null, function (xhr) {
+    if (xhr.status !== 200) {
+      throw 'There was a problem in setting up the sync. ' +
+        'Last request status: ' + xhr.status + '\n' + xhr.responseText;
+    }
+    that.update(xhr.responseText);
+  });
 };
 
 /**
@@ -119,17 +123,19 @@ GoogleFile.prototype.searchFileByName = function (fileName) {
       'q': 'title=\'' + fileName + '\' and trashed = false'
     }
   };
-  var xhr = sendRequest(request);
-  if (xhr.status !== 200) {
-    throw 'There was a problem in searching for the doc - ' + fileName + '.' +
-      'Last request status: ' + xhr.status + '\n' + xhr.responseText;
-  }
-  var response = JSON.parse(xhr.responseText);
-  if (response.hasOwnProperty('items') &&
-      response.items instanceof Array &&
-      response.items.length > 0) {
-    this.set(response.items[0]);
-  }
+  var that = this;
+  sendRequest(request, null, function (xhr) {
+    if (xhr.status !== 200) {
+      throw 'There was a problem in searching for the doc - ' + fileName + '.' +
+        'Last request status: ' + xhr.status + '\n' + xhr.responseText;
+    }
+    var response = JSON.parse(xhr.responseText);
+    if (response.hasOwnProperty('items') &&
+        response.items instanceof Array &&
+        response.items.length > 0) {
+      that.set(response.items[0]);
+    }
+  });
 };
 
 /**
@@ -138,26 +144,29 @@ GoogleFile.prototype.searchFileByName = function (fileName) {
  * @param {String} callback(gFile) Function to call after local metadata refresh.
  */
 GoogleFile.prototype.refreshLocalMetadata = function (callback) {
-  var xhr = sendRequest({'method': 'GET'}, this.get('selfLink'));
-  if (xhr.status !== 200) {
-    throw 'There was a problem in refreshing the doc entry. ' +
-      'Last request status: ' + xhr.status + '\n' + xhr.responseText;
-  }
-  this.update(xhr.responseText);
-  callback(this);
+  var that = this;
+  sendRequest({'method': 'GET'}, this.get('selfLink'), function (xhr) {
+    if (xhr.status !== 200) {
+      throw 'There was a problem in refreshing the doc entry. ' +
+        'Last request status: ' + xhr.status + '\n' + xhr.responseText;
+    }
+    that.update(xhr.responseText);
+    callback(that);
+  });
 };
 
 /**
  * Get data from the remote file.
  *
  */
-GoogleFile.prototype.getData = function () {
-  var xhr = sendRequest({'method': 'GET'}, this.get('downloadUrl'));
-  if (xhr.status !== 200) {
-    throw 'There was a problem downloading the doc. ' +
-      'Last request status: ' + xhr.status + '\n' + xhr.responseText;
-  }
-  return xhr.responseText;
+GoogleFile.prototype.getData = function (callback) {
+  sendRequest({'method': 'GET'}, this.get('downloadUrl'), function (xhr) {
+    if (xhr.status !== 200) {
+      throw 'There was a problem downloading the doc. ' +
+        'Last request status: ' + xhr.status + '\n' + xhr.responseText;
+    }
+    callback(xhr.responseText);
+  });
 };
 
 /**
@@ -179,11 +188,13 @@ GoogleFile.prototype.setData = function (data) {
     'body': data
   };
   var url = filesUploadUrl + '/' + this.get('id');
-  var xhr = sendRequest(request, url);
-  if (xhr.status !== 200) {
-    throw 'There was a problem in updating the doc. ' +
-      'Last request status: ' + xhr.status + '\n' + xhr.responseText;
-  }
-  this.update(xhr.responseText);
+  var that = this;
+  sendRequest(request, url, function (xhr) {
+    if (xhr.status !== 200) {
+      throw 'There was a problem in updating the doc. ' +
+        'Last request status: ' + xhr.status + '\n' + xhr.responseText;
+    }
+    that.update(xhr.responseText);
+  });
 };
 
