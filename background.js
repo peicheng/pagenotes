@@ -137,6 +137,9 @@ function resetSyncFailCount() {
 }
 
 function getSyncFailCount() {
+  if (!localStorage.syncFailCount) {
+    localStorage.syncFailCount = '0';
+  }
   return parseInt(localStorage.syncFailCount, 10);
 }
 
