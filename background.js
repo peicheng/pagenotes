@@ -145,6 +145,7 @@ function getSyncFailCount() {
 
 function init() {
   handleMajorUpdate();
+  handleFirstRun();
   chrome.tabs.getSelected(null, updateBadgeForTab);
   sync();
 }
@@ -162,6 +163,16 @@ function handleMajorUpdate() {
     }
     localStorage.majorUpdate = true;
     chrome.tabs.create({'url': chrome.extension.getURL('options.html')});
+  }
+}
+
+function handleFirstRun() {
+  if (!localStorage.runOnce) {
+    localStorage.runOnce = true;
+    // If sync is not setup, open the options page.
+    if (!localStorage.gFile) {
+      chrome.tabs.create({'url': chrome.extension.getURL('options.html')});
+    }
   }
 }
 
