@@ -1,6 +1,6 @@
 {
   "name": "Page Notes",
-  "version": "2.0.3",
+  "version": "2.0.4",
   "manifest_version": 2,
   "description": "Lets you take notes for web pages and sync them automatically to your Google Drive.",
   "background": {
