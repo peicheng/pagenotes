@@ -19,8 +19,8 @@ rm -rf $baseVersionDir/* $testVersionDir/*
 testing_version_suffix=$(echo $testing_version | cut -d"." -f4)
 testing_version_base=${testing_version%.${testing_version_suffix}}
 
-testing_version1=${testing_version_base}.`expr $testing_version_sufix + 1`
-testing_version2=${testing_version_base}.`expr $testing_version_sufix + 2`
+testing_version1=${testing_version_base}.`expr $testing_version_suffix + 1`
+testing_version2=${testing_version_base}.`expr $testing_version_suffix + 2`
 
 # Create archive for the base version
 git archive -o $baseVersionDir/1.tar.gz release-$base_version
