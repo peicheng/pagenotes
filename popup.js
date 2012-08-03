@@ -1,67 +1,86 @@
 var bgPage = chrome.extension.getBackgroundPage();
 
+// Global variable for selected tab.
+var tab;
+
 function e(id) {
   return document.getElementById(id);
 }
 
-function retrievePageNotes(tab) {
-  var notes = e('notes');
-  var editButton = e('editbutton');
-
-  // Get notes for the current tab and display.
-  notes.innerHTML = '&nbsp;';
-  var tabUrl = tab.url;
-  var tabHost = bgPage.getHostFromUrl(tabUrl);
-  if(bgPage.getPageNotes(tabUrl)) {
-    notes.innerHTML = bgPage.getPageNotes(tabUrl);
-  } else if(bgPage.getPageNotes(tabHost)) {
-    notes.innerHTML = bgPage.getPageNotes(tabHost);
-    e('site-level').checked = true;
-  } else {
-    editButton.value = 'Edit';
-    editButton.innerHTML = 'Add';
-    e('site-level-div').style.display = 'none';
-  }
-
-  // Add event listener to the Edit/Save button.
-  editButton.addEventListener('click', function() {
-    if (this.value === 'Edit') {
-      notes.contentEditable = true;
-      notes.focus();
-      e('site-level-div').style.display = 'block';
-      this.innerHTML = 'Save';
-      this.value = 'Save';
-    } else if (this.value === 'Save') {
-      notes.contentEditable = false;
-      var data = notes.innerHTML.replace(/&nbsp;/gi, ' ').trim();
-      if (e('site-level').checked === false) {
-        bgPage.setPageNotes(tabUrl, data);
-      } else {
-        bgPage.setPageNotes(tabHost, data);
-      }
-      bgPage.updateBadgeForTab(tab);
-      localStorage.lastModTime = new Date().getTime();
-      window.close();
-    }
-  });
-  // Add event listener to the Delete button.
-  e('delete-button').addEventListener('click', function() {
-    key = tabUrl;
-    if (e('site-level').checked) {
-      key = tabHost;
-    }
-    bgPage.removePageNotes(key);
-    bgPage.updateBadgeForTab(tab);
-    localStorage.lastModTime = new Date().getTime();
-    window.close();
-  });
-  // Add event listner to the site-level checkbox
-  e('site-level').addEventListener('change', function() {
-    editButton.value = 'Save';
-    editButton.innerHTML = 'Save';
-  });
+function enableEdit() {
+  e('edit').disabled = true;
+  e('notes').contentEditable = true;
+  e('notes').focus();
 }
 
-// Chrome extensions API call to get the current tab (URL).
-chrome.tabs.getSelected(null, retrievePageNotes);
+function afterEdit() {
+  e('edit').disabled = false;
+  saveNotes();
+}
 
+function saveNotes() {
+  var data = e('notes').innerHTML.replace(/&nbsp;/gi, ' ').trim();
+  if (e('sitelevel').checked === false) {
+    bgPage.setPageNotes(tab.url, data);
+  } else {
+    bgPage.removePageNotes(tab.url);
+    bgPage.setPageNotes(tag.host(), data);
+  }
+  bgPage.updateBadgeForTab(tab);
+  localStorage.lastModTime = new Date().getTime();
+}
+
+function handleDeleteButton() {
+  key = tab.url;
+  if (e('sitelevel').checked) {
+    key = tab.host();
+  }
+  bgPage.removePageNotes(key);
+  bgPage.updateBadgeForTab(tab);
+  localStorage.lastModTime = new Date().getTime();
+  window.close();
+}
+
+function handleSiteLevelToggle() {
+  if (e('sitelevel').checked === false) {
+    bgPage.setPageNotes(tab.url, bgPage.getPageNotes(tab.host()));
+  } else {
+    bgPage.setPageNotes(tab.host(), bgPage.getPageNotes(tab.url));
+    bgPage.removePageNotes(tab.url);
+  }
+}
+
+function setupEventHandlers() {
+  e('notes').addEventListener('blur', afterEdit);
+  e('notes').addEventListener('click', enableEdit);
+  e('edit').addEventListener('click', enableEdit);
+  document.addEventListener('keydown', function (event) {
+    if (event.which == 13) {
+      event.target.blur();
+      event.preventDefault();
+    }
+  }, true);
+  e('delete').addEventListener('click', handleDeleteButton);
+  e('sitelevel').addEventListener('change', handleSiteLevelToggle);
+}
+
+function updatePopUpForTab(currentTab) {
+  tab = currentTab;
+  tab.host = function () {
+    return bgPage.getHostFromUrl(tab.url);
+  };
+  // Get notes for the current tab and display.
+  if(bgPage.getPageNotes(tab.url)) {
+    e('notes').innerHTML = bgPage.getPageNotes(url);
+  } else if(bgPage.getPageNotes(tab.host())) {
+    e('notes').innerHTML = bgPage.getPageNotes(tab.host());
+    e('sitelevel').checked = true;
+  } else {
+    enableEdit();
+  }
+}
+
+document.addEventListener('DOMContentLoaded', function () {
+  setupEventHandlers();
+  chrome.tabs.getSelected(null, updatePopUpForTab);
+});
