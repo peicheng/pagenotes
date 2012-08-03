@@ -71,7 +71,7 @@ function updatePopUpForTab(currentTab) {
   };
   // Get notes for the current tab and display.
   if(bgPage.getPageNotes(tab.url)) {
-    e('notes').innerHTML = bgPage.getPageNotes(url);
+    e('notes').innerHTML = bgPage.getPageNotes(tab.url);
   } else if(bgPage.getPageNotes(tab.host())) {
     e('notes').innerHTML = bgPage.getPageNotes(tab.host());
     e('sitelevel').checked = true;
