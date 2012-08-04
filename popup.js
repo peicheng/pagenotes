@@ -9,12 +9,14 @@ function e(id) {
 
 function enableEdit() {
   e('notes').contentEditable = true;
+  e('notes').style.color = '#000';
   e('notes').focus();
   e('edit').innerHTML = 'Save';
 }
 
 function afterEdit() {
   e('notes').contentEditable = false;
+  e('notes').style.color = '#333';
   saveNotes();
   e('edit').innerHTML = 'Edit';
 }
