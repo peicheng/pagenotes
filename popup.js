@@ -17,7 +17,6 @@ function afterEdit() {
   e('notes').contentEditable = false;
   saveNotes();
   e('edit').innerHTML = 'Edit';
-  window.close();
 }
 
 function editButton() {
