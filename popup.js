@@ -40,6 +40,9 @@ function saveNotes() {
 }
 
 function handleDeleteButton() {
+  if (!confirm('Are you sure you want to delete notes for this page?')) {
+    return;
+  }
   key = tab.url;
   if (e('sitelevel').checked) {
     key = tab.host();
