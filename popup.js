@@ -16,7 +16,7 @@ function enableEdit() {
 
 function afterEdit() {
   e('notes').contentEditable = false;
-  e('notes').style.color = '#222';
+  e('notes').style.color = '#111';
   saveNotes();
   e('edit').innerHTML = 'Edit';
 }

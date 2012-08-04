@@ -9,13 +9,14 @@
         width: 256px;
         font-family: Helvetica, Arial, sans-serif;
         font-size: small;
-        color: #222;
+        color: #111;
       }
       #notes {
-        margin-bottom: 5px;
+        padding: 1px;
+        margin-bottom: 9px;
       }
       label {
-        padding-left: 2px;
+        padding-left: 1px;
         text-indent: -15px;
         font-size: 90%;
       }
@@ -40,15 +41,17 @@
   <body>
     <div id="notes">
     </div>
-    <div id="sitelevel-div" style="display:block; margin-bottom:8px; margin-top:10px;">
+    <div id="sitelevel-div" style="display:block; margin-bottom:8px;margin-top:8px;">
       <label><input type="checkbox" name="sitelevel" id="sitelevel"/>
       Site Level Notes</label>
     </div>
-    <button id="edit" value="Edit" style="width:45px">
-      Edit
-    </button>
-    <button id="delete" value="Delete">
-      Delete
-    </button>
+    <div style="padding-left:1px">
+      <button id="edit" value="Edit" style="width:45px">
+        Edit
+      </button>
+      <button id="delete" value="Delete">
+        Delete
+      </button>
+    </div>
   </body>
 </html>
