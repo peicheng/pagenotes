@@ -88,6 +88,8 @@ function updatePopUpForTab(currentTab) {
   }
 }
 
+window.setTimeout(function () { e('sitelevel').blur(); }, 100);
+
 document.addEventListener('DOMContentLoaded', function () {
   setupEventHandlers();
   chrome.tabs.getSelected(null, updatePopUpForTab);
