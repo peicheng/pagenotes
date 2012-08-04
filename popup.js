@@ -17,10 +17,11 @@ function afterEdit() {
   e('notes').contentEditable = false;
   saveNotes();
   e('edit').innerHTML = 'Edit';
+  window.close();
 }
 
 function editButton() {
-  if (e('edit').innerHTML === 'Save') {
+  if (e('edit').innerHTML.trim() === 'Save') {
     afterEdit();
   } else if (e('edit').innerHTML.trim() === 'Edit') {
     enableEdit();
@@ -51,11 +52,15 @@ function handleDeleteButton() {
 }
 
 function handleSiteLevelToggle() {
-  if (e('sitelevel').checked === false) {
-    bgPage.setPageNotes(tab.url, bgPage.getPageNotes(tab.host()));
-  } else {
-    bgPage.setPageNotes(tab.host(), bgPage.getPageNotes(tab.url));
-    bgPage.removePageNotes(tab.url);
+  // Handle this toggle, only if we are not in edit mode already.
+  // This button reads 'Save' in edit mode.
+  if (e('edit').innerHTML.trim() === 'Edit') {
+    if (e('sitelevel').checked === false) {
+      bgPage.setPageNotes(tab.url, bgPage.getPageNotes(tab.host()));
+    } else {
+      bgPage.setPageNotes(tab.host(), bgPage.getPageNotes(tab.url));
+      bgPage.removePageNotes(tab.url);
+    }
   }
 }
 
