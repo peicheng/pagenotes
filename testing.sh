@@ -22,6 +22,12 @@ testing_version_base=${testing_version%.${testing_version_suffix}}
 testing_version1=${testing_version_base}.`expr $testing_version_suffix + 1`
 testing_version2=${testing_version_base}.`expr $testing_version_suffix + 2`
 
+# This is to make sure that we don't archive unnecessary files.
+cat > .git/info/attributes << EOF
+*.sh export-ignore
+*.svg export-ignore
+EOF
+
 # Create archive for the base version
 git archive -o $baseVersionDir/1.tar.gz release-$base_version
 cd $baseVersionDir
