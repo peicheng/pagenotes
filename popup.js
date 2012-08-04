@@ -8,14 +8,23 @@ function e(id) {
 }
 
 function enableEdit() {
-  e('edit').disabled = true;
   e('notes').contentEditable = true;
   e('notes').focus();
+  e('edit').innerHTML = 'Save';
 }
 
 function afterEdit() {
-  e('edit').disabled = false;
+  e('notes').contentEditable = false;
   saveNotes();
+  e('edit').innerHTML = 'Edit';
+}
+
+function editButton() {
+  if (e('edit').innerHTML === 'Save') {
+    afterEdit();
+  } else if (e('edit').innerHTML.trim() === 'Edit') {
+    enableEdit();
+  }
 }
 
 function saveNotes() {
@@ -51,13 +60,12 @@ function handleSiteLevelToggle() {
 }
 
 function setupEventHandlers() {
-  e('notes').addEventListener('blur', afterEdit);
-  e('notes').addEventListener('click', enableEdit);
-  e('edit').addEventListener('click', enableEdit);
+  e('edit').addEventListener('click', editButton);
   document.addEventListener('keydown', function (event) {
     if (event.which == 13 && !event.shiftKey) {
       event.target.blur();
       event.preventDefault();
+      afterEdit();
     }
   }, true);
   e('delete').addEventListener('click', handleDeleteButton);
