@@ -24,7 +24,7 @@ function saveNotes() {
     bgPage.setPageNotes(tab.url, data);
   } else {
     bgPage.removePageNotes(tab.url);
-    bgPage.setPageNotes(tag.host(), data);
+    bgPage.setPageNotes(tab.host(), data);
   }
   bgPage.updateBadgeForTab(tab);
   localStorage.lastModTime = new Date().getTime();
@@ -55,7 +55,7 @@ function setupEventHandlers() {
   e('notes').addEventListener('click', enableEdit);
   e('edit').addEventListener('click', enableEdit);
   document.addEventListener('keydown', function (event) {
-    if (event.which == 13) {
+    if (event.which == 13 && !event.shiftKey) {
       event.target.blur();
       event.preventDefault();
     }
