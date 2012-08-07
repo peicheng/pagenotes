@@ -156,8 +156,9 @@ function syncData(gFile) {
 }
 
 function mergeLocalAndRemoteData(gFile) {
-  var mergedData = {};
-  var localData = getAllPageNotes();
+  var mergedDataString;
+  var localDataString = getAllPageNotes();
+  var localData = JSON.parse(localDataString);
 
   // Figure out if remote data is newer. This information is used if a key
   // exists in both locations - local and remote.
@@ -168,29 +169,37 @@ function mergeLocalAndRemoteData(gFile) {
   var remoteIsNewer = parseInt(gFile.getLastUpdateTime(), 10) > localLastModTime;
 
   // Sync the keys (url or host) between local and remote data.
-  gFile.getData(function (remoteData) {
+  gFile.getData(function (remoteDataString) {
     var key;
+    var mergedData = {};
+    if (remoteDataString.trim() === '') {
+      mergedDataString = localDataString;
+      return;
+    }
+    var remoteData = JSON.parse(remoteDataString);
     for (key in localData) {
       if (localData.hasOwnProperty(key)) {
-        mergedData.key = localData.key;
+        mergedData[key] = localData[key];
         if (remoteData.hasOwnProperty(key) && remoteIsNewer) {
-          mergedData.key = remoteData.key;
+          mergedData[key] = remoteData[key];
           // Remove the matched key from 'remoteData'. If any keys are left in
           // remoteData after this loop is done, it would mean that remoteData has
           // more number of keys.
-          delete remoteData.key;
+          delete remoteData[key];
         }
       }
     }
     // Copy extra data in remoteData to local data.
     for (key in remoteData) {
       if (remoteData.hasOwnProperty(key)) {
-        mergedData.key = remoteData.key;
+        mergedData[key] = remoteData[key];
       }
     }
+    mergedDataString = JSON.stringify(mergedData);
   });
-  setAllPageNotes(mergedData);
-  gFile.setData(mergedData);
+  setAllPageNotes(mergedDataString);
+  gFile.setData(mergedDataString);
+  localStorage.lastModTime = gFile.getLastUpdateTime();
 }
 
 function incSyncFailCount() {

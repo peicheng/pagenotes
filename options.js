@@ -61,6 +61,7 @@ function setupSync() {
     return;
   }
   bgPage.lastSyncStatus = '';
+  localStorage.firstSync = 'true';
   location.reload();
 }
 
