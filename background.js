@@ -1,6 +1,29 @@
-/**
+/*
+ * Copyright 2012 Google Inc. All Rights Reserved.
+
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+
  * @author manugarg@gmail.com (Manu Garg)
+ *
+
+ * Directive for JSLint, so that it doesn't complain about these names not being
+ * defined:
  */
+/*global document, window, localStorage, chrome */
+
+"use strict";
+
 var SYNC_INTERVAL = 5 * 60 * 1000; // In ms. Equivalent to 5 min.
 var DRIVE_SCOPE = 'https://www.googleapis.com/auth/drive.file';
 var REMOTE_FILE_NAME = 'pagenotes.data';
@@ -20,26 +43,26 @@ function setUpOauth() {
 
 var debug = {
   msg: '',
-  log: function(s) { this.msg += s + '\n';}
+  log: function (s) { this.msg += s + '\n'; }
 };
 
 var lastSyncStatus;
 chrome.browserAction.setBadgeText({'text': 'pn'});
 
 // Update badge text on tab change.
-chrome.tabs.onSelectionChanged.addListener(function(tabId) {
+chrome.tabs.onSelectionChanged.addListener(function (tabId) {
   chrome.tabs.get(tabId, updateBadgeForTab);
 });
 
 // Update badge text on tab update.
-chrome.tabs.onUpdated.addListener(function(tabId, changeinfo, tab) {
+chrome.tabs.onUpdated.addListener(function (tabId, changeinfo, tab) {
   updateBadgeForTab(tab);
 });
 
 function updateBadgeForTab(tab) {
   var tabUrl = tab.url;
   var tabHost = getHostFromUrl(tabUrl);
-  var pn = getPageNotes(tabUrl) ? getPageNotes(tabUrl) : getPageNotes(tabHost);
+  var pn = getPageNotes(tabUrl) || getPageNotes(tabHost);
   if (pn) {
     chrome.browserAction.setBadgeText({'text': 'pn', 'tabId': tab.id});
   } else {
@@ -58,7 +81,7 @@ function getRemoteFile() {
 function setVisualCues() {
   if (getSyncFailCount() >= 2) {
     chrome.browserAction.setBadgeBackgroundColor(RED_COLOR);
-    chrome.browserAction.setTitle({'title': 'Page Notes - Sync is not '+
+    chrome.browserAction.setTitle({'title': 'Page Notes - Sync is not ' +
                                             'happening.'});
   } else {
     chrome.browserAction.setBadgeBackgroundColor(GREEN_COLOR);
@@ -84,33 +107,16 @@ function sync() {
     debug.log('sync: Sync gdoc is not setup.');
     return;
   }
+
   var remoteFile = getRemoteFile();
   try {
-    remoteFile.refreshLocalMetadata(function(gFile) {
-      localLastModTime = 0;
-      if(localStorage.lastModTime) {
-        localLastModTime = parseInt(localStorage.lastModTime, 10);
-      }
-      remoteLastModTime = parseInt(gFile.getLastUpdateTime(), 10);
-      debug.log('sync: Local last mod time: ' + localLastModTime);
-      debug.log('sync: Remote last mod time: ' + remoteLastModTime);
-      if (remoteLastModTime === localLastModTime) {
-        debug.log('sync: Local and remote data are equally recent.');
-        return;
-      }
-      else if (remoteLastModTime > localLastModTime) {
-        debug.log('sync: Remote data is more recent.');
-        // syncToLocal();
-        gFile.getData(setAllPageNotes);
-        localStorage.lastModTime = gFile.getLastUpdateTime();
-      }
-      else {
-        debug.log('sync: Local data is more recent.');
-        // syncToRemote();
-        gFile.setData(getAllPageNotes());
-        localStorage.lastModTime = gFile.getLastUpdateTime();
-      }
-    });
+    if (localStorage.firstSync === 'true') {
+      debug.log('sync: First sync, merging local and remote data.');
+      mergeLocalAndRemoteData(remoteFile);
+      localStorage.firstSync = 'false';
+    } else {
+      remoteFile.refreshLocalMetadata(syncData);
+    }
   } catch (e) {
     lastSyncStatus = 'bad';
     incSyncFailCount();
@@ -122,6 +128,69 @@ function sync() {
   resetSyncFailCount();
   localStorage.lastSyncTime = new Date();
   setVisualCues();
+}
+
+function syncData(gFile) {
+  var localLastModTime = 0;
+  if (localStorage.lastModTime) {
+    localLastModTime = parseInt(localStorage.lastModTime, 10);
+  }
+  var remoteLastModTime = parseInt(gFile.getLastUpdateTime(), 10);
+  debug.log('sync: Local last mod time: ' + localLastModTime);
+  debug.log('sync: Remote last mod time: ' + remoteLastModTime);
+  if (remoteLastModTime === localLastModTime) {
+    debug.log('sync: Local and remote data are equally recent.');
+    return;
+  }
+  if (remoteLastModTime > localLastModTime) {
+    debug.log('sync: Remote data is more recent.');
+    // syncToLocal();
+    gFile.getData(setAllPageNotes);
+    localStorage.lastModTime = gFile.getLastUpdateTime();
+  } else {
+    debug.log('sync: Local data is more recent.');
+    // syncToRemote();
+    gFile.setData(getAllPageNotes());
+    localStorage.lastModTime = gFile.getLastUpdateTime();
+  }
+}
+
+function mergeLocalAndRemoteData(gFile) {
+  var mergedData = {};
+  var localData = getAllPageNotes();
+
+  // Figure out if remote data is newer. This information is used if a key
+  // exists in both locations - local and remote.
+  var localLastModTime = 0;
+  if (localStorage.lastModTime) {
+    localLastModTime = parseInt(localStorage.lastModTime, 10);
+  }
+  var remoteIsNewer = parseInt(gFile.getLastUpdateTime(), 10) > localLastModTime;
+
+  // Sync the keys (url or host) between local and remote data.
+  gFile.getData(function (remoteData) {
+    var key;
+    for (key in localData) {
+      if (localData.hasOwnProperty(key)) {
+        mergedData.key = localData.key;
+        if (remoteData.hasOwnProperty(key) && remoteIsNewer) {
+          mergedData.key = remoteData.key;
+          // Remove the matched key from 'remoteData'. If any keys are left in
+          // remoteData after this loop is done, it would mean that remoteData has
+          // more number of keys.
+          delete remoteData.key;
+        }
+      }
+    }
+    // Copy extra data in remoteData to local data.
+    for (key in remoteData) {
+      if (remoteData.hasOwnProperty(key)) {
+        mergedData.key = remoteData.key;
+      }
+    }
+  });
+  setAllPageNotes(mergedData);
+  gFile.setData(mergedData);
 }
 
 function incSyncFailCount() {
