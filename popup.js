@@ -21,6 +21,7 @@ function afterEdit() {
   e('notes').style.backgroundColor = '#EFEFEF';
   saveNotes();
   e('edit').innerHTML = 'Edit';
+  window.close();
 }
 
 function editButton() {
