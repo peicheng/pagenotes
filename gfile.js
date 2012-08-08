@@ -57,10 +57,10 @@ function sendRequest(request, url, callback) {
  * @param {String} src Stringified Google file metadata.
  * @param {Function} setSource Method to call to persist metadata string.
  */
-function GoogleFile(sourceString, setSource) {
+var GoogleFile = function (sourceString, setSource) {
   this.src = sourceString;
   this.setSource = setSource;
-}
+};
 
 GoogleFile.prototype.set = function (obj) {
   this.src = JSON.stringify(obj);

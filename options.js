@@ -113,7 +113,7 @@ function initUI() {
     syncNowButton.disabled = true;
     bgPage.lastSyncStatus = '';
   }
-  if (!localStorage.pagenotes) {
+  if (!bgPage.pageNotes.getSource()) {
     document.getElementById('clear_local').disabled = true;
   }
   if (bgPage.lastSyncStatus === 'good') {

@@ -20,7 +20,7 @@
  * Directive for JSLint, so that it doesn't complain about these names not being
  * defined:
  */
-/*global document, window, localStorage, chrome */
+/*global document, window, localStorage, chrome, GoogleFile, PageNotes, OAuth2 */
 
 "use strict";
 
@@ -31,6 +31,7 @@ var RED_COLOR = {'color': [255, 0, 0, 255]};
 var GREEN_COLOR = {'color': [42, 115, 109, 255]};
 
 var oauth = null;
+var pageNotes = new PageNotes();
 
 function setUpOauth() {
   oauth = new OAuth2({
@@ -59,10 +60,16 @@ chrome.tabs.onUpdated.addListener(function (tabId, changeinfo, tab) {
   updateBadgeForTab(tab);
 });
 
+function getHostFromUrl(url) {
+  var a_element = document.createElement("a");
+  a_element.href = url;
+  return a_element.hostname;
+}
+
 function updateBadgeForTab(tab) {
   var tabUrl = tab.url;
   var tabHost = getHostFromUrl(tabUrl);
-  var pn = getPageNotes(tabUrl) || getPageNotes(tabHost);
+  var pn = pageNotes.get(tabUrl) || pageNotes.get(tabHost);
   if (pn) {
     chrome.browserAction.setBadgeText({'text': 'pn', 'tabId': tab.id});
   } else {
@@ -145,19 +152,19 @@ function syncData(gFile) {
   if (remoteLastModTime > localLastModTime) {
     debug.log('sync: Remote data is more recent.');
     // syncToLocal();
-    gFile.getData(setAllPageNotes);
+    gFile.getData(pageNotes.setSource);
     localStorage.lastModTime = gFile.getLastUpdateTime();
   } else {
     debug.log('sync: Local data is more recent.');
     // syncToRemote();
-    gFile.setData(getAllPageNotes());
+    gFile.setData(pageNotes.getSource);
     localStorage.lastModTime = gFile.getLastUpdateTime();
   }
 }
 
 function mergeLocalAndRemoteData(gFile) {
   var mergedDataString;
-  var localDataString = getAllPageNotes();
+  var localDataString = pageNotes.getSource();
   var localData = JSON.parse(localDataString);
 
   // Figure out if remote data is newer. This information is used if a key
@@ -197,7 +204,7 @@ function mergeLocalAndRemoteData(gFile) {
     }
     mergedDataString = JSON.stringify(mergedData);
   });
-  setAllPageNotes(mergedDataString);
+  pageNotes.setSource(mergedDataString);
   gFile.setData(mergedDataString);
   localStorage.lastModTime = gFile.getLastUpdateTime();
 }

@@ -1,47 +1,48 @@
-/**
+/*
+ * Copyright 2012 Google Inc. All Rights Reserved.
+
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+
  * @author manugarg@gmail.com (Manu Garg)
  */
-function getPageNotes(key) {
-  if (localStorage.getItem('pagenotes')) {
-    var pagenotes = JSON.parse(localStorage.getItem('pagenotes'));
-    if (key in pagenotes)
-      return pagenotes[key];
-  }
-  return null;
-}
 
-function setPageNotes(key, value) {
-  var pagenotes;
-  if (localStorage.getItem('pagenotes')) {
-    pagenotes = JSON.parse(localStorage.getItem('pagenotes'));
-    pagenotes[key] = value;
-  } else {
-    pagenotes = {};
-    pagenotes[key] = value;
-  }
-  localStorage.setItem('pagenotes', JSON.stringify(pagenotes));
-}
+var PageNotes = function () {
+};
 
-function removePageNotes(key) {
-  if (localStorage.getItem('pagenotes')) {
-    var pagenotes = JSON.parse(localStorage.getItem('pagenotes'));
-    delete pagenotes[key];
-    localStorage.setItem('pagenotes', JSON.stringify(pagenotes));
-  }
-}
+PageNotes.prototype.getSource = function () {
+  return localStorage.pagenotes;
+};
 
-function getAllPageNotes() {
-  return localStorage.getItem('pagenotes');
-}
+PageNotes.prototype.get = function (key) {
+  var src = this.getSource();
+  var obj = src ? JSON.parse(src) : {};
+  return key ? obj[key] : obj;
+};
 
-function setAllPageNotes(data) {
-  localStorage.removeItem('pagenotes');
-  localStorage.setItem('pagenotes', data);
-}
+PageNotes.prototype.set = function (key, value) {
+  var obj = this.get();
+  obj[key] = value;
+  this.setSource(obj);
+};
 
-function getHostFromUrl(url) {
-  var a_element = document.createElement("a");
-  a_element.href = url;
-  return a_element.hostname;
-}
+PageNotes.prototype.setSource = function (obj) {
+  localStorage.pagenotes = JSON.stringify(obj);
+};
+
+PageNotes.prototype.remove = function (key) {
+  var obj = this.get();
+  delete obj[key];
+  this.setSource(obj);
+};
 

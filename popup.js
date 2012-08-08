@@ -37,10 +37,10 @@ function editButton() {
 function saveNotes() {
   var data = e('notes').innerHTML.replace(/&nbsp;/gi, ' ').trim();
   if (e('sitelevel').checked === false) {
-    bgPage.setPageNotes(tab.url, data);
+    bgPage.pageNotes.set(tab.url, data);
   } else {
-    bgPage.removePageNotes(tab.url);
-    bgPage.setPageNotes(tab.host(), data);
+    bgPage.pageNotes.remove(tab.url);
+    bgPage.pageNotes.set(tab.host(), data);
   }
   bgPage.updateBadgeForTab(tab);
   localStorage.lastModTime = new Date().getTime();
@@ -54,7 +54,7 @@ function handleDeleteButton() {
   if (e('sitelevel').checked) {
     key = tab.host();
   }
-  bgPage.removePageNotes(key);
+  bgPage.pageNotes.remove(key);
   bgPage.updateBadgeForTab(tab);
   localStorage.lastModTime = new Date().getTime();
   window.close();
@@ -65,10 +65,10 @@ function handleSiteLevelToggle() {
   // This button reads 'Save' in edit mode.
   if (e('edit').innerHTML.trim() === 'Edit') {
     if (e('sitelevel').checked === false) {
-      bgPage.setPageNotes(tab.url, bgPage.getPageNotes(tab.host()));
+      bgPage.pageNotes.set(tab.url, bgPage.pageNotes.get(tab.host()));
     } else {
-      bgPage.setPageNotes(tab.host(), bgPage.getPageNotes(tab.url));
-      bgPage.removePageNotes(tab.url);
+      bgPage.pageNotes.set(tab.host(), bgPage.pageNotes.get(tab.url));
+      bgPage.pageNotes.remove(tab.url);
     }
   }
 }
@@ -92,10 +92,10 @@ function updatePopUpForTab(currentTab) {
     return bgPage.getHostFromUrl(tab.url);
   };
   // Get notes for the current tab and display.
-  if(bgPage.getPageNotes(tab.url)) {
-    e('notes').innerHTML = bgPage.getPageNotes(tab.url);
-  } else if(bgPage.getPageNotes(tab.host())) {
-    e('notes').innerHTML = bgPage.getPageNotes(tab.host());
+  if(bgPage.pageNotes.get(tab.url)) {
+    e('notes').innerHTML = bgPage.pageNotes.get(tab.url);
+  } else if(bgPage.pageNotes.get(tab.host())) {
+    e('notes').innerHTML = bgPage.pageNotes.get(tab.host());
     e('sitelevel').checked = true;
   } else {
     enableEdit();
