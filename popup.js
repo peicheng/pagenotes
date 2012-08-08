@@ -100,6 +100,10 @@ function updatePopUpForTab(currentTab) {
   } else {
     enableEdit();
   }
+
+  if (!localStorage.gFile) {
+    document.getElementById("setup-sync").style.visibility = "";
+  }
 }
 
 window.setTimeout(function () { e('sitelevel').blur(); }, 100);
