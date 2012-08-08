@@ -36,8 +36,11 @@ PageNotes.prototype.set = function (key, value) {
   this.setSource(obj);
 };
 
-PageNotes.prototype.setSource = function (obj) {
-  localStorage.pagenotes = JSON.stringify(obj);
+PageNotes.prototype.setSource = function (src) {
+  if (typeof src !== 'string') {
+    src = JSON.stringify(src);
+  }
+  localStorage.pagenotes = src;
 };
 
 PageNotes.prototype.remove = function (key) {

@@ -157,7 +157,7 @@ function syncData(gFile) {
   } else {
     debug.log('sync: Local data is more recent.');
     // syncToRemote();
-    gFile.setData(pageNotes.getSource);
+    gFile.setData(pageNotes.getSource());
     localStorage.lastModTime = gFile.getLastUpdateTime();
   }
 }
