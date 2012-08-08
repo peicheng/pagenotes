@@ -11,6 +11,7 @@ function enableEdit() {
   e('notes').contentEditable = true;
   e('notes').style.color = '#000';
   e('notes').style.backgroundColor = '#FFFFFF';
+  e('notes').style.minHeight = '32px';
   e('notes').focus();
   e('edit').innerHTML = 'Save';
 }
@@ -19,6 +20,7 @@ function afterEdit() {
   e('notes').contentEditable = false;
   e('notes').style.color = '#111';
   e('notes').style.backgroundColor = '#EFEFEF';
+  e('notes').style.minHeight = '';
   saveNotes();
   e('edit').innerHTML = 'Edit';
   window.close();
