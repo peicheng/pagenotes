@@ -46,8 +46,26 @@ function saveNotes() {
   localStorage.lastModTime = new Date().getTime();
 }
 
-function handleDeleteButton() {
-  if (!confirm('Are you sure you want to delete notes for this page?')) {
+function handleDelete() {
+  if (this.innerHTML === 'No') {
+    window.close();
+    return;
+  }
+  if (this.innerHTML !== 'Yes' && this.innerHTML !== 'No') {
+    var controlDiv = document.getElementById('control-div');
+    while (controlDiv.firstChild) controlDiv.removeChild(controlDiv.firstChild);
+
+    controlDiv.innerHTML = 'Are you sure you want to delete notes for this page? ';
+
+    var no = document.createElement('button');
+    no.innerHTML = 'No';
+    no.addEventListener('click', handleDelete);
+    controlDiv.appendChild(no);
+
+    var yes = document.createElement('button');
+    yes.innerHTML = 'Yes';
+    yes.addEventListener('click', handleDelete);
+    controlDiv.appendChild(yes);
     return;
   }
   key = tab.url;
@@ -82,7 +100,7 @@ function setupEventHandlers() {
       afterEdit();
     }
   }, true);
-  e('delete').addEventListener('click', handleDeleteButton);
+  e('delete').addEventListener('click', handleDelete);
   e('sitelevel').addEventListener('change', handleSiteLevelToggle);
 }
 
