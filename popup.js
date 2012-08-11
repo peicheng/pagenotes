@@ -1,3 +1,25 @@
+/*
+ * Copyright 2012 Google Inc. All Rights Reserved.
+ * @author manugarg@google.com (Manu Garg)
+
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+
+ * Directive for JSLint, so that it doesn't complain about these names not being
+ * defined.
+ */
+/*global chrome, document, localStorage, window */
+
 var bgPage = chrome.extension.getBackgroundPage();
 
 // Global variable for selected tab.
@@ -53,7 +75,9 @@ function handleDelete() {
   }
   if (this.innerHTML !== 'Yes' && this.innerHTML !== 'No') {
     var controlDiv = document.getElementById('control-div');
-    while (controlDiv.firstChild) controlDiv.removeChild(controlDiv.firstChild);
+    while (controlDiv.firstChild) {
+      controlDiv.removeChild(controlDiv.firstChild);
+    }
 
     controlDiv.innerHTML = 'Are you sure you want to delete notes for this page? ';
 
@@ -68,7 +92,7 @@ function handleDelete() {
     controlDiv.appendChild(yes);
     return;
   }
-  key = tab.url;
+  var key = tab.url;
   if (e('sitelevel').checked) {
     key = tab.host();
   }
@@ -94,7 +118,7 @@ function handleSiteLevelToggle() {
 function setupEventHandlers() {
   e('edit').addEventListener('click', editButton);
   document.addEventListener('keydown', function (event) {
-    if (event.which == 13 && !event.shiftKey) {
+    if (event.which === 13 && !event.shiftKey) {
       event.target.blur();
       event.preventDefault();
       afterEdit();
@@ -110,9 +134,9 @@ function updatePopUpForTab(currentTab) {
     return bgPage.getHostFromUrl(tab.url);
   };
   // Get notes for the current tab and display.
-  if(bgPage.pageNotes.get(tab.url)) {
+  if (bgPage.pageNotes.get(tab.url)) {
     e('notes').innerHTML = bgPage.pageNotes.get(tab.url);
-  } else if(bgPage.pageNotes.get(tab.host())) {
+  } else if (bgPage.pageNotes.get(tab.host())) {
     e('notes').innerHTML = bgPage.pageNotes.get(tab.host());
     e('sitelevel').checked = true;
   } else {
