@@ -162,7 +162,15 @@ function syncData(gFile) {
 
 function mergeLocalAndRemoteData(gFile) {
   var mergedDataString;
+
   var localDataString = pageNotes.getSource();
+  if (!localDataString) {
+    // If there is no local data, just set local data to remote data.
+    gFile.getData(pageNotes.setSource);
+    localStorage.lastModTime = gFile.getLastUpdateTime();
+    return;
+  }
+
   var localData = JSON.parse(localDataString);
 
   // Figure out if remote data is newer. This information is used if a key
