@@ -155,4 +155,5 @@ document.addEventListener('DOMContentLoaded', function () {
   document.getElementById('setup_sync').addEventListener('click', handleSyncButton);
   document.getElementById('sync_now').addEventListener('click', syncNow);
   document.getElementById('showdebug').addEventListener('click', showHideDebugInfo);
+  document.getElementById('clear_local').addEventListener('click', clearLocalData);
 });
