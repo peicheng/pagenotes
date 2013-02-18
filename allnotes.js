@@ -39,6 +39,9 @@ function initPage() {
     var cell1 = document.createElement('td');
     var link = document.createElement('a');
     link.href = keys[i];
+    if (link.protocol == 'chrome-extension:') {
+	    link.href = 'http://' + keys[i];
+    }
     link.innerHTML = keys[i];
     cell1.appendChild(link);
 
