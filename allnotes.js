@@ -29,7 +29,7 @@ function initPage() {
   var allPageNotes = bgPage.pageNotes.get();
   var table = document.createElement('table');
   var keys = [];
-  for (key in allPageNotes) {
+  for (var key in allPageNotes) {
     keys.push(key);
   }
   keys.sort();
