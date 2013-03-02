@@ -20,9 +20,11 @@
  */
 /*global document, location, localStorage, alert, chrome, confirm */
 
-"use strict";
-
 var bgPage = chrome.extension.getBackgroundPage();
+
+var reload = function () {
+  location.reload();
+};
 
 function initPage() {
   var allNotesDiv = document.getElementById('all-notes');
@@ -40,15 +42,22 @@ function initPage() {
     var link = document.createElement('a');
     link.href = keys[i];
     if (link.protocol == 'chrome-extension:') {
-	    link.href = 'http://' + keys[i];
+      link.href = 'http://' + keys[i];
     }
     link.innerHTML = keys[i];
     cell1.appendChild(link);
+    row.appendChild(cell1);
 
     var cell2 = document.createElement('td');
     cell2.innerHTML = allPageNotes[keys[i]];
-    row.appendChild(cell1);
     row.appendChild(cell2);
+
+    var cell3 = document.createElement('td');
+    var b = bgPage.deleteButton('Delete', keys[i], reload,
+				'Are you sure you want to delete these notes? ');
+    cell3.appendChild(b);
+    row.appendChild(cell3);
+    
     table.appendChild(row);
   }
   allNotesDiv.appendChild(table);

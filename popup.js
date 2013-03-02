@@ -68,40 +68,6 @@ function saveNotes() {
   localStorage.lastModTime = new Date().getTime();
 }
 
-function handleDelete() {
-  if (this.innerHTML === 'No') {
-    window.close();
-    return;
-  }
-  if (this.innerHTML !== 'Yes' && this.innerHTML !== 'No') {
-    var controlDiv = document.getElementById('control-div');
-    while (controlDiv.firstChild) {
-      controlDiv.removeChild(controlDiv.firstChild);
-    }
-
-    controlDiv.innerHTML = 'Are you sure you want to delete notes for this page? ';
-
-    var no = document.createElement('button');
-    no.innerHTML = 'No';
-    no.addEventListener('click', handleDelete);
-    controlDiv.appendChild(no);
-
-    var yes = document.createElement('button');
-    yes.innerHTML = 'Yes';
-    yes.addEventListener('click', handleDelete);
-    controlDiv.appendChild(yes);
-    return;
-  }
-  var key = tab.url;
-  if (e('sitelevel').checked) {
-    key = tab.host();
-  }
-  bgPage.pageNotes.remove(key);
-  bgPage.updateBadgeForTab(tab);
-  localStorage.lastModTime = new Date().getTime();
-  window.close();
-}
-
 function handleSiteLevelToggle() {
   // Handle this toggle, only if we are not in edit mode already.
   // This button reads 'Save' in edit mode.
@@ -124,8 +90,23 @@ function setupEventHandlers() {
       afterEdit();
     }
   }, true);
-  e('delete').addEventListener('click', handleDelete);
   e('sitelevel').addEventListener('change', handleSiteLevelToggle);
+}
+
+function fixDeleteButton(key) {
+  if (key === ''){
+    e('delete').disabled = true;
+    return;
+  }
+  callback = function () {
+    bgPage.updateBadgeForTab(tab);
+    window.close();
+  };
+  e('control-div').replaceChild(
+      bgPage.deleteButton(
+          'Delete', key, callback,
+          'Are you sure you want to delete notes for this page? '),
+      e('delete'));
 }
 
 function updatePopUpForTab(currentTab) {
@@ -135,14 +116,18 @@ function updatePopUpForTab(currentTab) {
   };
   e('sitelevel_label').innerHTML = 'Apply to "' + tab.host() + '"';
   // Get notes for the current tab and display.
+  var key = '';
   if (bgPage.pageNotes.get(tab.url)) {
     e('notes').innerHTML = bgPage.pageNotes.get(tab.url);
+    key = tab.url;
   } else if (bgPage.pageNotes.get(tab.host())) {
     e('notes').innerHTML = bgPage.pageNotes.get(tab.host());
     e('sitelevel').checked = true;
+    key = tab.host();
   } else {
     enableEdit();
   }
+  fixDeleteButton(key);
 
   if (!localStorage.gFile) {
     document.getElementById("setup-sync").style.visibility = "";
