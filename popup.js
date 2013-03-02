@@ -133,6 +133,7 @@ function updatePopUpForTab(currentTab) {
   tab.host = function () {
     return bgPage.getHostFromUrl(tab.url);
   };
+  e('sitelevel_label').innerHTML = 'Apply to "' + tab.host() + '"';
   // Get notes for the current tab and display.
   if (bgPage.pageNotes.get(tab.url)) {
     e('notes').innerHTML = bgPage.pageNotes.get(tab.url);
