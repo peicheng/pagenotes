@@ -49,7 +49,9 @@ function initPage() {
     row.appendChild(cell1);
 
     var cell2 = document.createElement('td');
-    cell2.innerHTML = allPageNotes[keys[i]];
+    var notes_div = document.createElement('div');
+    notes_div.innerHTML = allPageNotes[keys[i]];
+    cell2.appendChild(notes_div);
     row.appendChild(cell2);
 
     var cell3 = document.createElement('td');
