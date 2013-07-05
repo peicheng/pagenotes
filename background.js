@@ -299,6 +299,19 @@ function deleteButton(name, key, callback, warningMessage) {
   return button;
 }
 
+function editButton(name, enableEdit, afterEdit, callback) {
+  var button = document.createElement('button');
+  button.innerHTML = name;
+  button.addEventListener('click', function () {
+      afterEdit();
+      callback();
+    } else if (this.innerHTML.trim() === 'Edit') {
+      enableEdit();
+    }
+  });
+  return button;
+}
+
 document.addEventListener('DOMContentLoaded', function () {
   window.setInterval(sync, SYNC_INTERVAL);
   init();

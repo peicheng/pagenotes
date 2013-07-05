@@ -2,7 +2,7 @@
 
 # This is to make sure that we don't archive unnecessary files.
 cat > .git/info/attributes << EOF
-*.sh export-ignore
+tools export-ignore
 *.svg export-ignore
 EOF
 
