@@ -104,9 +104,19 @@ TagIndex.prototype.updateTags = function(tags, value) {
     if (!(tags[i] in obj)) {
       obj[tags[i]] = [];
     }
-    if (obj[tags[i]].indexOf(value) == -1) {
+    if (obj[tags[i]].indexOf(value) === -1) {
       obj[tags[i]].push(value);
+    }
+  }
+  // Remove deleted tag
+  for (var key in obj) {
+    if (obj[key].indexOf(value) !== -1) {
+      if (tags.indexOf(key) === -1) {
+        obj[key].splice(tags.indexOf(key), 1);
+        if (obj[key].length === 0) delete obj[key];
+      }
     }
   }
   this.setSource(obj);
 };
+  

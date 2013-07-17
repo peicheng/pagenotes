@@ -23,6 +23,9 @@
 var bgPage = chrome.extension.getBackgroundPage();
 var pageNotes = new PageNotes();
 var tagIndex = new TagIndex().get();
+if ($.isEmptyObject(tagIndex)) {
+  pageNotes.buildTagIndex();
+}
 
 var reload = function() {
   location.reload();
@@ -98,7 +101,7 @@ function Edit(e) {
 }
 
 function Cancel(e) {
-  if(e.relatedTarget.className === 'saveB') return;
+  if(e.relatedTarget && e.relatedTarget.tagName === 'BUTTON') return;
   var par = $(this).parent().parent(); //tr
   var tdURL = par.children('td:nth-child(1)').children('a:nth-child(1)').html();
   var divNotes = par.children('td:nth-child(2)').children('div:nth-child(1)');
@@ -123,6 +126,7 @@ function Save(e) {
   // Change button text and behavior
   $(this).html('Edit');
   $(this).removeClass().addClass('editB');
+  location.reload();
 }
 
 function buildTagCloud() { 
