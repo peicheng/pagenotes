@@ -29,6 +29,8 @@ var reload = function() {
 };
 
 function initPage() {
+  buildTagCloud();
+  
   $('#all-notes').html('');
   var allNotesDiv = document.getElementById('all-notes');
   var table = document.createElement('table');
@@ -123,7 +125,7 @@ function Save(e) {
   $(this).removeClass().addClass('editB');
 }
 
-function BuildTagCloud() { 
+function buildTagCloud() { 
   var tags = [];
   for (var key in tagIndex) {
     tags.push({
@@ -137,11 +139,17 @@ function BuildTagCloud() {
     return 0;
   });
   
+  $('#tag-cloud').html('');
   $('#tag-cloud').html('<b>Tags: </b>')
   $('#tag-cloud').append('<a class="tag-link" href="">All</a>');
   for (var i = 0; i < tags.length; i++) {
-    $('#tag-cloud').append('<a class="tag-link" href="">' + tags[i].key + '(' + tags[i].value + ')' + '</a>');
+    if (window.location.hash === tags[i].key) {
+      $('#tag-cloud').append('<span class="selected-tag">' + tags[i].key + '(' + tags[i].value +')</span>');
+    } else {
+      $('#tag-cloud').append('<a class="tag-link" href="">' + tags[i].key + '(' + tags[i].value + ')' + '</a>');
+    }
   }
+  
   $('#tag-cloud').on('click', '.tag-link', function() {
     var tag = $(this).html().match(/(.*)\([0-9]+\)/)[1];
     window.location.hash = tag;
@@ -151,6 +159,5 @@ function BuildTagCloud() {
 }
 
 document.addEventListener('DOMContentLoaded', function() {
-  BuildTagCloud();
   initPage();
 });
