@@ -50,14 +50,17 @@ PageNotes.prototype.remove = function(key) {
   var obj = this.get();
   delete obj[key];
   this.setSource(obj);
+  this.buildTagIndex();
 };
 
 PageNotes.prototype.buildTagIndex = function() {
+  var tagIndex = new TagIndex();
+  tagIndex.setSource('{}');
   var obj = this.get();
   for (var key in obj) {
     var tags = extractTags(obj[key]);
     if (tags) {
-      new TagIndex().updateTags(tags, key);
+      tagIndex.updateTags(tags, key);
     }
   }
 };
@@ -106,15 +109,6 @@ TagIndex.prototype.updateTags = function(tags, value) {
     }
     if (obj[tags[i]].indexOf(value) === -1) {
       obj[tags[i]].push(value);
-    }
-  }
-  // Remove deleted tag
-  for (var key in obj) {
-    if (obj[key].indexOf(value) !== -1) {
-      if (tags.indexOf(key) === -1) {
-        obj[key].splice(tags.indexOf(key), 1);
-        if (obj[key].length === 0) delete obj[key];
-      }
     }
   }
   this.setSource(obj);
