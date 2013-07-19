@@ -96,6 +96,7 @@ function Edit(e) {
   divNotes.attr('contentEditable', true);
   divNotes.css('color', '#000');
   divNotes.focus();
+  setEndOfContenteditable(divNotes.get(0));
   // Change button text and behavior
   $(this).html('Save');
   $(this).removeClass().addClass('saveB');
@@ -166,6 +167,18 @@ function buildTagCloud() {
     initPage();
     return false;
   })
+}
+
+// Based on this response on stackoverflow:
+// http://stackoverflow.com/questions/1125292/how-to-move-cursor-to-end-of-contenteditable-entity/3866442#3866442
+function setEndOfContenteditable(contentEditableElement) {
+  var range, selection;
+  range = document.createRange(); //Create a range (a range is a like the selection but invisible)
+  range.selectNodeContents(contentEditableElement); //Select the entire contents of the element with the range
+  range.collapse(false); //collapse the range to the end point. false means collapse to end rather than the start
+  selection = window.getSelection(); //get the selection object (allows you to change selection)
+  selection.removeAllRanges(); //remove any selections already made
+  selection.addRange(range); //make the range you have just created the visible selection
 }
 
 document.addEventListener('DOMContentLoaded', function() {
