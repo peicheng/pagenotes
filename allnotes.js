@@ -85,23 +85,27 @@ function initPage() {
   allNotesDiv.appendChild(table);
   $('div#all-notes').on('click', 'button.editB', Edit);
   $('div#all-notes').on('click', 'button.saveB', Save);
-  $('div#all-notes').on('blur', 'div.notes-div', Cancel);
+  $('div#all-notes').on('click', 'button.cancelB', Cancel);
 }
 
 function Edit(e) {
   var par = $(this).parent().parent(); //tr
   // Open notes div for editing
   var divNotes = par.children('td:nth-child(2)').children('div:nth-child(1)');
+  var deleteButton = par.children('td:nth-child(3)').children('button:nth-child(2)');
   divNotes.attr('contentEditable', true);
   divNotes.css('color', '#000');
   divNotes.focus();
   // Change button text and behavior
   $(this).html('Save');
   $(this).removeClass().addClass('saveB');
+  var cancelB = document.createElement('button');
+  $(cancelB).html('Cancel');
+  $(cancelB).removeClass().addClass('cancelB');
+  deleteButton.replaceWith($(cancelB));
 }
 
-function Cancel(e) {
-  if(e.relatedTarget && e.relatedTarget.tagName === 'BUTTON') return;
+function Cancel() {
   var par = $(this).parent().parent(); //tr
   var tdURL = par.children('td:nth-child(1)').children('a:nth-child(1)').html();
   var divNotes = par.children('td:nth-child(2)').children('div:nth-child(1)');
@@ -112,6 +116,8 @@ function Cancel(e) {
   // Change button text and behavior
   editButton.html('Edit');
   editButton.removeClass().addClass('editB');
+  var deleteB = bgPage.deleteButton('Delete', tdURL, reload, 'Are you sure you want to delete these notes? ');
+  $(this).replaceWith($(deleteB));
 }
 
 function Save(e) {
