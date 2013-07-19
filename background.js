@@ -150,7 +150,7 @@ function syncData(gFile) {
   if (remoteLastModTime > localLastModTime) {
     debug.log('sync: Remote data is more recent.');
     // syncToLocal();
-    gFile.getData(pageNotes.setSource);
+    gFile.getData(pageNotes.setSource.bind(pageNotes));
     localStorage.lastModTime = gFile.getLastUpdateTime();
   } else {
     debug.log('sync: Local data is more recent.');
@@ -166,7 +166,7 @@ function mergeLocalAndRemoteData(gFile) {
   var localDataString = pageNotes.getSource();
   if (!localDataString) {
     // If there is no local data, just set local data to remote data.
-    gFile.getData(pageNotes.setSource);
+    gFile.getData(pageNotes.setSource.bind(pageNotes));
     localStorage.lastModTime = gFile.getLastUpdateTime();
     return;
   }
@@ -271,7 +271,7 @@ function deleteButton(name, key, callback, warningMessage) {
   var button = document.createElement('button');
   button.innerHTML = name;
 
-  button.addEventListener('click', function () {
+  button.addEventListener('click', function() {
     if (this.innerHTML === 'No') {
       callback();
       return;
@@ -279,7 +279,7 @@ function deleteButton(name, key, callback, warningMessage) {
     if (this.innerHTML !== 'Yes' && this.innerHTML !== 'No') {
       var deleteBlock = this.parentNode;
       while (deleteBlock.firstChild) {
-	deleteBlock.removeChild(deleteBlock.firstChild);
+        deleteBlock.removeChild(deleteBlock.firstChild);
       }
 
       deleteBlock.innerHTML = warningMessage;
