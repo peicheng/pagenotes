@@ -269,6 +269,7 @@ function handleFirstRun() {
 
 function deleteButton(name, key, callback, warningMessage) {
   var button = document.createElement('button');
+  button.className = 'deleteB';
   button.innerHTML = name;
 
   button.addEventListener('click', function() {

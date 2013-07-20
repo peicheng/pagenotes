@@ -91,41 +91,40 @@ function initPage() {
 function Edit(e) {
   var par = $(this).parent().parent(); //tr
   // Open notes div for editing
-  var divNotes = par.children('td:nth-child(2)').children('div:nth-child(1)');
-  var deleteButton = par.children('td:nth-child(3)').children('button:nth-child(2)');
-  divNotes.attr('contentEditable', true);
-  divNotes.css('color', '#000');
+  var divNotes = par.find('.notes-div');
+  divNotes.addClass('editable');
   divNotes.focus();
-  setEndOfContenteditable(divNotes.get(0));
+  moveCursorToTheEnd(divNotes.get(0));
   // Change button text and behavior
   $(this).html('Save');
   $(this).removeClass().addClass('saveB');
   var cancelB = document.createElement('button');
   $(cancelB).html('Cancel');
   $(cancelB).removeClass().addClass('cancelB');
-  deleteButton.replaceWith($(cancelB));
+  // Replace Delete button with Cancel button
+  par.find('.deleteB').replaceWith($(cancelB));
 }
 
 function Cancel() {
   var par = $(this).parent().parent(); //tr
   var tdURL = par.children('td:nth-child(1)').children('a:nth-child(1)').html();
-  var divNotes = par.children('td:nth-child(2)').children('div:nth-child(1)');
-  var editButton = par.children('td:nth-child(3)').children('button:nth-child(1)');
+  var divNotes = par.find('.notes-div');
+  var editSaveButton = par.find('.saveB');
   divNotes.html(pageNotes.get(tdURL));
-  divNotes.attr('contentEditable', false);
-  divNotes.css('color', '#111');
+  divNotes.removeClass('editable');
   // Change button text and behavior
-  editButton.html('Edit');
-  editButton.removeClass().addClass('editB');
+  editSaveButton.html('Edit');
+  editSaveButton.removeClass().addClass('editB');
+  // Replace Cancel button with Delete button
   var deleteB = bgPage.deleteButton('Delete', tdURL, reload, 'Are you sure you want to delete these notes? ');
   $(this).replaceWith($(deleteB));
-}
+  }
 
 function Save(e) {
   var par = $(this).parent().parent(); //tr
   var tdURL = par.children('td:nth-child(1)').children('a:nth-child(1)').html();
-  var divNotes = par.children('td:nth-child(2)').children('div:nth-child(1)');
-  divNotes.attr('contentEditable', false);
+  var divNotes = par.find('.notes-div');
+  divNotes.removeClass('editable');
   divNotes.css('color', '#111');
   // Update notes in the database
   pageNotes.set(tdURL, divNotes.html());
@@ -171,14 +170,13 @@ function buildTagCloud() {
 
 // Based on this response on stackoverflow:
 // http://stackoverflow.com/questions/1125292/how-to-move-cursor-to-end-of-contenteditable-entity/3866442#3866442
-function setEndOfContenteditable(contentEditableElement) {
-  var range, selection;
-  range = document.createRange(); //Create a range (a range is a like the selection but invisible)
-  range.selectNodeContents(contentEditableElement); //Select the entire contents of the element with the range
-  range.collapse(false); //collapse the range to the end point. false means collapse to end rather than the start
-  selection = window.getSelection(); //get the selection object (allows you to change selection)
-  selection.removeAllRanges(); //remove any selections already made
-  selection.addRange(range); //make the range you have just created the visible selection
+function moveCursorToTheEnd(element) {
+  var range = document.createRange(); // Create a range (a range is a like the selection but invisible)
+  range.selectNodeContents(element);  // Select the entire contents of the element with the range
+  range.collapse(false);              // collapse the range to the end point. false means collapse to end rather than the start
+  var sel = window.getSelection();    // get the selection object (allows you to change selection)
+  sel.removeAllRanges();              // remove any selections already made
+  sel.addRange(range);                // make the range you have just created the visible selection
 }
 
 document.addEventListener('DOMContentLoaded', function() {

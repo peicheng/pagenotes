@@ -30,19 +30,15 @@ function e(id) {
 }
 
 function enableEdit() {
-  e('notes').contentEditable = true;
-  e('notes').style.color = '#000';
-  e('notes').style.backgroundColor = '#FFFFFF';
-  e('notes').style.minHeight = '32px';
+  e('notes').className = 'editable'
   e('notes').focus();
+  moveCursorToTheEnd(e('notes'));
   e('edit').innerHTML = 'Save';
 }
 
 function afterEdit() {
-  e('notes').contentEditable = false;
-  e('notes').style.color = '#111';
-  e('notes').style.backgroundColor = '#EFEFEF';
-  e('notes').style.minHeight = '';
+  //e('notes').contentEditable = false;
+  e('notes').className = ''
   saveNotes();
   e('edit').innerHTML = 'Edit';
   window.close();
@@ -83,13 +79,6 @@ function handleSiteLevelToggle() {
 
 function setupEventHandlers() {
   e('edit').addEventListener('click', editButton);
-  document.addEventListener('keydown', function (event) {
-    if (event.which === 13 && !event.shiftKey) {
-      event.target.blur();
-      event.preventDefault();
-      afterEdit();
-    }
-  }, true);
   e('sitelevel').addEventListener('change', handleSiteLevelToggle);
 }
 
@@ -132,6 +121,17 @@ function updatePopUpForTab(currentTab) {
   if (!localStorage.gFile) {
     document.getElementById("setup-sync").style.visibility = "";
   }
+}
+
+// Based on this response on stackoverflow:
+// http://stackoverflow.com/questions/1125292/how-to-move-cursor-to-end-of-contenteditable-entity/3866442#3866442
+function moveCursorToTheEnd(element) {
+  var range = document.createRange(); // Create a range (a range is a like the selection but invisible)
+  range.selectNodeContents(element);  // Select the entire contents of the element with the range
+  range.collapse(false);              // collapse the range to the end point. false means collapse to end rather than the start
+  var sel = window.getSelection();    // get the selection object (allows you to change selection)
+  sel.removeAllRanges();              // remove any selections already made
+  sel.addRange(range);                // make the range you have just created the visible selection
 }
 
 window.setTimeout(function () { e('sitelevel').blur(); }, 100);
