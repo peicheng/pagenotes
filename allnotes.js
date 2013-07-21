@@ -55,6 +55,7 @@ function initPage() {
     var row = document.createElement('tr');
 
     var cell1 = document.createElement('td');
+    cell1.className = 'url';
     var link = document.createElement('a');
     link.href = keys[i];
     if (link.protocol == 'chrome-extension:') {
@@ -65,13 +66,26 @@ function initPage() {
     row.appendChild(cell1);
 
     var cell2 = document.createElement('td');
+    cell2.className = 'notes';
     var notes_div = document.createElement('div');
-    notes_div.innerHTML = pageNotes.get(keys[i]);
+    var notes = pageNotes.get(keys[i]);
+    var tags = notes.split(' ').filter(function(x) {
+      return x.match(/^#/);
+    });
+    $.each(tags, function(_, tag) {
+      var tagClass = 'tag-link';
+      if (tag === window.location.hash) {
+        tagClass += ' selected-tag';
+      }
+      notes = notes.replace(tag, '<a class="' + tagClass + '" href="">' + tag + '</a>');
+    });
+    notes_div.innerHTML = notes;
     $(notes_div).addClass('notes-div');
     cell2.appendChild(notes_div);
     row.appendChild(cell2);
 
     var cell3 = document.createElement('td');
+    cell3.className = 'button';
     var editB = document.createElement('button');
     editB.innerHTML = 'Edit';
     editB.className = 'editB';
@@ -90,8 +104,10 @@ function initPage() {
 
 function Edit(e) {
   var par = $(this).parent().parent(); //tr
+  var tdURL = par.children('td:nth-child(1)').children('a:nth-child(1)').html();
   // Open notes div for editing
   var divNotes = par.find('.notes-div');
+  divNotes.html(pageNotes.get(tdURL));
   divNotes.addClass('editable');
   divNotes.focus();
   moveCursorToTheEnd(divNotes.get(0));
@@ -151,22 +167,32 @@ function buildTagCloud() {
   
   $('#tag-cloud').html('');
   $('#tag-cloud').html('<b>Tags: </b>')
-  $('#tag-cloud').append('<a class="tag-link" href="">All</a>');
+  $('#tag-cloud').append('<a class="tag-link" href="">All</a>&nbsp;');
   for (var i = 0; i < tags.length; i++) {
     if (window.location.hash === tags[i].key) {
-      $('#tag-cloud').append('<span class="selected-tag">' + tags[i].key + '(' + tags[i].value +')</span>');
+      $('#tag-cloud').append('<a class="tag-link selected-tag" href="">' + tags[i].key + '(' + tags[i].value +')</a>&nbsp;');
     } else {
-      $('#tag-cloud').append('<a class="tag-link" href="">' + tags[i].key + '(' + tags[i].value + ')' + '</a>');
+      $('#tag-cloud').append('<a class="tag-link" href="">' + tags[i].key + '(' + tags[i].value + ')' + '</a>&nbsp;');
     }
   }
   
-  $('#tag-cloud').on('click', '.tag-link', function() {
-    var tag = $(this).html().match(/(.*)\([0-9]+\)/)[1];
-    window.location.hash = tag;
-    initPage();
-    return false;
-  })
+//  $('#tag-cloud').on('click', '.tag-link', onTagClick);
 }
+
+$(document).on('click', '.tag-link', function() {
+  var tag = $(this).html();
+  // Remove the count number from the tag
+  if (tag.match(/(.*)\([0-9]+\)/)) {
+    tag = tag.match(/(.*)\([0-9]+\)/)[1];
+  }
+  if($(this).attr('class').indexOf('selected-tag') == -1) {
+    window.location.hash = tag;
+  } else {
+    window.location.hash = '';
+  }
+  initPage();
+  return false;
+});
 
 // Based on this response on stackoverflow:
 // http://stackoverflow.com/questions/1125292/how-to-move-cursor-to-end-of-contenteditable-entity/3866442#3866442
