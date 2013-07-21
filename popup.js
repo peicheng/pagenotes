@@ -30,26 +30,19 @@ function e(id) {
 }
 
 function enableEdit() {
-  e('notes').className = 'editable'
+  e('notes').className = 'editable';
   e('notes').focus();
+  e('sitelevel-div').style.display = 'block';
   moveCursorToTheEnd(e('notes'));
   e('edit').innerHTML = 'Save';
+  // TODO(manugarg): May be replace Delete button with Cancel here.
 }
 
 function afterEdit() {
-  //e('notes').contentEditable = false;
-  e('notes').className = ''
+  e('notes').className = '';
   saveNotes();
   e('edit').innerHTML = 'Edit';
   window.close();
-}
-
-function editButton() {
-  if (e('edit').innerHTML.trim() === 'Save') {
-    afterEdit();
-  } else if (e('edit').innerHTML.trim() === 'Edit') {
-    enableEdit();
-  }
 }
 
 function saveNotes() {
@@ -64,22 +57,15 @@ function saveNotes() {
   localStorage.lastModTime = new Date().getTime();
 }
 
-function handleSiteLevelToggle() {
-  // Handle this toggle, only if we are not in edit mode already.
-  // This button reads 'Save' in edit mode.
-  if (e('edit').innerHTML.trim() === 'Edit') {
-    if (e('sitelevel').checked === false) {
-      bgPage.pageNotes.set(tab.url, bgPage.pageNotes.get(tab.host()));
-    } else {
-      bgPage.pageNotes.set(tab.host(), bgPage.pageNotes.get(tab.url));
-      bgPage.pageNotes.remove(tab.url);
+function setupEditButtonHandler() {
+  e('edit').addEventListener('click', function() {
+    if (e('edit').innerHTML.trim() === 'Save') {
+      afterEdit();
     }
-  }
-}
-
-function setupEventHandlers() {
-  e('edit').addEventListener('click', editButton);
-  e('sitelevel').addEventListener('change', handleSiteLevelToggle);
+    else if (e('edit').innerHTML.trim() === 'Edit') {
+      enableEdit();
+    }
+  });
 }
 
 function fixDeleteButton(key) {
@@ -87,7 +73,7 @@ function fixDeleteButton(key) {
     e('delete').disabled = true;
     return;
   }
-  callback = function () {
+  var callback = function () {
     bgPage.updateBadgeForTab(tab);
     window.close();
   };
@@ -103,7 +89,7 @@ function updatePopUpForTab(currentTab) {
   tab.host = function () {
     return bgPage.getHostFromUrl(tab.url);
   };
-  e('sitelevel_label').innerHTML = 'Apply to "' + tab.host() + '"';
+  e('sitelevel_label').innerHTML = 'Apply to all pages of "' + tab.host() + '"';
   // Get notes for the current tab and display.
   var key = '';
   if (bgPage.pageNotes.get(tab.url)) {
@@ -137,6 +123,6 @@ function moveCursorToTheEnd(element) {
 window.setTimeout(function () { e('sitelevel').blur(); }, 100);
 
 document.addEventListener('DOMContentLoaded', function () {
-  setupEventHandlers();
+  setupEditButtonHandler();
   chrome.tabs.getSelected(null, updatePopUpForTab);
 });
