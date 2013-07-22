@@ -21,10 +21,22 @@
 /*global document, location, localStorage, alert, chrome, confirm */
 
 var bgPage = chrome.extension.getBackgroundPage();
-var pageNotes = new PageNotes();
-var tagIndex = new TagIndex().get();
-if ($.isEmptyObject(tagIndex)) {
-  pageNotes.buildTagIndex();
+var pageNotes = {};
+var tagIndex = {};
+
+function extractTags(text) {
+  return text.split(' ').filter(function(x) { return x.match(/^#/); });
+}
+
+function markupTagsInNotes(notes) {
+  var tags = extractTags(notes);
+  for (var j = 0; j < tags.length; j++) {
+    var tag = tags[j];
+    var tagClass = 'tag-link';
+    if (tag === window.location.hash) tagClass += ' selected-tag';
+    notes = notes.replace(tag, '<a class="' + tagClass + '" href="">' + tag + '</a>');
+  }
+  return notes;
 }
 
 var reload = function() {
@@ -32,6 +44,7 @@ var reload = function() {
 };
 
 function initPage() {
+  pageNotes = new PageNotes().get();
   buildTagCloud();
   
   $('#all-notes').html('');
@@ -42,11 +55,10 @@ function initPage() {
   $(table).append('<tr><th>WebPage</th><th>Notes</th><th>Action</th></tr>');
   
   var keys = [];
-  $.each(pageNotes.get(), function(key, value) {
+  $.each(pageNotes, function(key, value) {
     if (window.location.hash === '') keys.push(key);
     else {
-      var tag = window.location.hash;
-      if (tagIndex[tag].indexOf(key) != -1) keys.push(key);
+      if (tagIndex[window.location.hash].indexOf(key) != -1) keys.push(key);
     }
   });
   keys.sort();
@@ -68,18 +80,8 @@ function initPage() {
     var cell2 = document.createElement('td');
     cell2.className = 'notes';
     var notes_div = document.createElement('div');
-    var notes = pageNotes.get(keys[i]);
-    var tags = notes.split(' ').filter(function(x) {
-      return x.match(/^#/);
-    });
-    $.each(tags, function(_, tag) {
-      var tagClass = 'tag-link';
-      if (tag === window.location.hash) {
-        tagClass += ' selected-tag';
-      }
-      notes = notes.replace(tag, '<a class="' + tagClass + '" href="">' + tag + '</a>');
-    });
-    notes_div.innerHTML = notes;
+    var notes = pageNotes[keys[i]];
+    notes_div.innerHTML = markupTagsInNotes(notes);
     $(notes_div).addClass('notes-div');
     cell2.appendChild(notes_div);
     row.appendChild(cell2);
@@ -107,7 +109,7 @@ function Edit(e) {
   var tdURL = par.children('td:nth-child(1)').children('a:nth-child(1)').html();
   // Open notes div for editing
   var divNotes = par.find('.notes-div');
-  divNotes.html(pageNotes.get(tdURL));
+  divNotes.html(pageNotes[tdURL]);
   divNotes.addClass('editable');
   divNotes.focus();
   moveCursorToTheEnd(divNotes.get(0));
@@ -126,7 +128,7 @@ function Cancel() {
   var tdURL = par.children('td:nth-child(1)').children('a:nth-child(1)').html();
   var divNotes = par.find('.notes-div');
   var editSaveButton = par.find('.saveB');
-  divNotes.html(pageNotes.get(tdURL));
+  divNotes.html(pageNotes[tdURL]);
   divNotes.removeClass('editable');
   // Change button text and behavior
   editSaveButton.html('Edit');
@@ -143,7 +145,7 @@ function Save(e) {
   divNotes.removeClass('editable');
   divNotes.css('color', '#111');
   // Update notes in the database
-  pageNotes.set(tdURL, divNotes.html());
+  new PageNotes().set(tdURL, divNotes.html());
   localStorage.lastModTime = new Date().getTime();
   // Change button text and behavior
   $(this).html('Edit');
@@ -151,7 +153,25 @@ function Save(e) {
   location.reload();
 }
 
-function buildTagCloud() { 
+function buildTagIndex() {
+  for (var key in pageNotes) {
+    var tags = extractTags(pageNotes[key]);
+    if (tags) {
+      for (var i = 0; i < tags.length; i++) {
+        if (!(tags[i] in tagIndex)) {
+          tagIndex[tags[i]] = [];
+        }
+        if (tagIndex[tags[i]].indexOf(key) === -1) {
+          tagIndex[tags[i]].push(key);
+        }
+      }
+    }
+  }
+}
+
+function buildTagCloud() {
+  // Build tagIndex first
+  buildTagIndex();
   var tags = [];
   for (var key in tagIndex) {
     tags.push({
@@ -175,8 +195,6 @@ function buildTagCloud() {
       $('#tag-cloud').append('<a class="tag-link" href="">' + tags[i].key + '(' + tags[i].value + ')' + '</a>&nbsp;');
     }
   }
-  
-//  $('#tag-cloud').on('click', '.tag-link', onTagClick);
 }
 
 $(document).on('click', '.tag-link', function() {
