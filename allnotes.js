@@ -25,7 +25,11 @@ var pageNotes = {};
 var tagIndex = {};
 
 function extractTags(text) {
-  return text.split(' ').filter(function(x) { return x.match(/^#/); });
+  // Hack to get a clean plain text string from HTML
+  var t = $.parseHTML(text).map(function(x) {
+    return $('<div>').html(x).text()
+  }).join(' ');
+  return t.replace(/(\n|\t)+/g, ' ').split(' ').filter(function(x) { return x.match(/^#/); });
 }
 
 function markupTagsInNotes(notes) {
