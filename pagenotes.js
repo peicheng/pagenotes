@@ -45,5 +45,4 @@ PageNotes.prototype.remove = function(key) {
   var obj = this.get();
   delete obj[key];
   this.setSource(obj);
-  this.buildTagIndex();
 };
