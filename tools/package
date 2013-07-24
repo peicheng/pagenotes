@@ -1,0 +1,73 @@
+#!/bin/bash -e
+
+USAGE="
+Usage: $0 [-n] [-v version]\n
+-n        : Create a new release. Tag the current repository revision as version\n
+-v version: Specify the version. If not specified, the latest git tag is used. \n
+            This option is required for a new release.\n
+"
+
+while getopts "nv:" flag
+do
+  if [ "$flag" = "n" ]; then
+    newrelease="yes"
+  elif [ "$flag" = "v" ]; then
+    ver=$OPTARG
+  elif [ "$flag" = "?" ]; then
+    echo -e $USAGE
+    exit 2
+  fi
+done
+
+if [ "$newrelease" = "yes" ]; then
+  if [ -z "$ver" ];then
+    echo "Version should be specified while creating a new release."
+    echo -e $USAGE
+    exit 2
+  else
+    echo -n "Are you sure you want to create a new release and tag the current "
+    echo -n "repository revision as $ver (y/n): "
+    read response
+    if [ $response != "y" ]; then
+      echo "You said no. Not moving ahead."
+      exit 0
+    fi
+    git tag release-$ver
+  fi
+fi
+
+if [ -z "$ver" ]; then
+  ver=$(git describe --always --tags --candidate=100 |\
+	  awk -F- 'NR == 1 {print $2}')
+fi
+
+cd $(dirname $0); tools_dir=$PWD; cd - > /dev/null
+
+pkgdir=$tools_dir/releases/cpn-$ver; rm -rf $pkgdir*; mkdir -p $pkgdir
+pkg=cpn-${ver}.zip
+
+mkdir -p $tools_dir/releases
+pushd $tools_dir/.. > /dev/null
+
+git_version=release-$ver
+if [ "$ver" == "HEAD" ]; then
+  git_version=$ver
+fi
+git archive --format=tar $git_version | (cd $pkgdir && tar xf - --exclude tools)
+
+
+pushd $pkgdir > /dev/null
+for file in *.js
+do
+  if [[ $file == jquery* ]]; then
+    continue
+  fi
+  java -jar $tools_dir/compiler.jar $file > tempcompiled
+  mv tempcompiled $file
+done
+# Create the zip file
+rm -f ../$(basename $pkg); zip -r ../$(basename $pkg) .
+# TODO(manugarg): Upload resulting package to code.google.com
+popd > /dev/null    # Come out of package directory
+
+popd > /dev/null
