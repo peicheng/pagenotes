@@ -40,22 +40,26 @@ td.button {
   padding-bottom: 5px;
 }
 
-.tag-link {
-  font-size: 95%;
-  color: #666;
-  font-weight: 500;
-  display: inline-block;
-  text-decoration: none;
-}
-
 li {
   display: inline;
   list-style-type: none;
   padding: 2px;
 }
 
-.tag-link:hover {
+a, .tag-link {
+  font-size: 95%;
+  color: #1873CC;
+}
+
+a:hover, .tag-link:hover {
   color: #1E90FF;
+  text-decoration: underline;
+}
+
+.tag-link {
+  font-weight: 500;
+  display: inline-block;
+  text-decoration: none;
 }
 
 .selected-tag {
