@@ -186,17 +186,19 @@ function buildTagCloud() {
   tags.sort(function(a, b) {
     if (a.value > b.value) return -1;
     if (a.value < b.value) return 1;
+    if (a.key > b.key ) return 1;
+    if (a.key < b.key ) return -1;
     return 0;
   });
   
   $('#tag-cloud').html('');
-  $('#tag-cloud').html('<b>Tags: </b>')
-  $('#tag-cloud').append('<a class="tag-link" href="">All</a>&nbsp;');
+  //$('#tag-cloud').html('<span>Filter By Tags: </span><br/>')
+  $('#tag-cloud').append('<li><a class="tag-link" href="">All</a></li>');
   for (var i = 0; i < tags.length; i++) {
     if (window.location.hash === tags[i].key) {
-      $('#tag-cloud').append('<a class="tag-link selected-tag" href="">' + tags[i].key + '(' + tags[i].value +')</a>&nbsp;');
+      $('#tag-cloud').append('<li><a class="tag-link selected-tag" href="">' + tags[i].key + '(' + tags[i].value +')</a></li>');
     } else {
-      $('#tag-cloud').append('<a class="tag-link" href="">' + tags[i].key + '(' + tags[i].value + ')' + '</a>&nbsp;');
+      $('#tag-cloud').append('<li><a class="tag-link" href="">' + tags[i].key + '(' + tags[i].value + ')' + '</a></li>');
     }
   }
 }

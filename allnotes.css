@@ -1,4 +1,4 @@
-table {
+table, #tag-cloud{
   min-width: 600px;
   max-width: 80%;
   table-layout: fixed;
@@ -35,11 +35,30 @@ td.button {
   text-align: center;
 }
 
+#tag-cloud {
+  line-height: 140%;
+  padding-bottom: 5px;
+}
+
 .tag-link {
-  font-size: 100%;
+  font-size: 95%;
+  color: #666;
+  font-weight: 500;
+  display: inline-block;
+  text-decoration: none;
+}
+
+li {
+  display: inline;
+  list-style-type: none;
+  padding: 2px;
+}
+
+.tag-link:hover {
+  color: #1E90FF;
 }
 
 .selected-tag {
-  font-size: 100%;
+  font-size: 95%;
   background-color: #F8FC83;
 }
