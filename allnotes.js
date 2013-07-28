@@ -192,7 +192,6 @@ function buildTagCloud() {
   });
   
   $('#tag-cloud').html('');
-  //$('#tag-cloud').html('<span>Filter By Tags: </span><br/>')
   $('#tag-cloud').append('<li><a class="tag-link" href="">All</a></li>');
   for (var i = 0; i < tags.length; i++) {
     if (window.location.hash === tags[i].key) {
