@@ -34,6 +34,9 @@ var pageNotes = new PageNotes();
 function setUpOauth() {
   oauth = new OAuth2({
     'client_id': '702868056438.apps.googleusercontent.com',
+    // We use installed applications OAuth2 flow so client_secret
+    // is not really a secret here.
+    // https://developers.google.com/accounts/docs/OAuth2#installed
     'client_secret': 'P-jAwCRjzcXEGZsWZVNQwvWE',
     'api_scope': DRIVE_SCOPE,
     'redirect_url': 'urn:ietf:wg:oauth:2.0:oob'
