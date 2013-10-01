@@ -89,7 +89,6 @@ function updatePopUpForTab(currentTab) {
   tab.host = function () {
     return bgPage.getHostFromUrl(tab.url);
   };
-  e('sitelevel_label').innerHTML = 'Apply to all pages of "' + tab.host() + '"';
   // Get notes for the current tab and display.
   var key = '';
   if (bgPage.pageNotes.get(tab.url)) {
