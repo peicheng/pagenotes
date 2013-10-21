@@ -92,7 +92,7 @@ GoogleFile.prototype.update = function (response) {
 };
 
 GoogleFile.prototype.getLastUpdateTime = function () {
-  return new Date(this.get('modifiedDate')).getTime();
+  return Date.parse(this.get('modifiedDate'));
 };
 
 /**
