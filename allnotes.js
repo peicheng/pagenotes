@@ -62,9 +62,14 @@ function initPage() {
   $('#all-notes').html('');
   var allNotesDiv = document.getElementById('all-notes');
   var table = document.createElement('table');
+  allNotesDiv.appendChild(table);
+  table.className = 'tablesorter';
+  table.id = 'notesTable';
 
   // Header row
-  $(table).append('<tr><th>WebPage</th><th>Last Modified</th><th>Notes</th><th>Action</th></tr>');
+  $(table).append('<thead><tr><th>WebPage</th><th width=160px;>Last Modified</th><th>Notes</th><th width=120px>&nbsp;</th></tr></thead>');
+  var tbody = document.createElement('tbody');
+  table.appendChild(tbody);
   
   var keys = [];
   $.each(pageNotes, function(key, value) {
@@ -77,6 +82,7 @@ function initPage() {
   
   for (var i = 0; i < keys.length; i++) {
     var row = document.createElement('tr');
+    tbody.appendChild(row);
 
     var cell1 = document.createElement('td');
     cell1.className = 'url';
@@ -92,7 +98,7 @@ function initPage() {
     var cell2 = document.createElement('td');
     cell2.className = 'date';
     var date_div = document.createElement('div');
-    var date = pageNotes[keys[i]][1];
+    var date = new Date(pageNotes[keys[i]][1]).toLocaleString();
     date_div.innerHTML = date;
     $(date_div).addClass('date-div');
     cell2.appendChild(date_div);
@@ -117,12 +123,19 @@ function initPage() {
     cell4.appendChild(editB);
     cell4.appendChild(deleteB);
     row.appendChild(cell4);
-    table.appendChild(row);
   }
-  allNotesDiv.appendChild(table);
   $('div#all-notes').on('click', 'button.editB', Edit);
   $('div#all-notes').on('click', 'button.saveB', Save);
   $('div#all-notes').on('click', 'button.cancelB', Cancel);
+  $('#notesTable').tablesorter({
+    theme: 'default',
+    headerTemplate: '{content}{icon}',
+    headers: {
+      // disable sorting of the first column (we start counting at zero)
+      3: { sorter: false }
+    },
+    sortList: [[0,0], [1,1]]
+  });
 }
 
 function Edit(e) {

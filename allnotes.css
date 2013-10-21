@@ -6,22 +6,6 @@ table, #tag-cloud{
   word-break: break-all;
 }
 
-table,td,th {
-  border: 1px solid gray;
-  border-collapse: collapse;
-  padding: 5px;
-}
-
-th {
-  background: #333;
-  color: white;
-  font-weight: bold;
-}
-
-tr:nth-of-type(odd) {
-  background: #eee;
-}
-
 td.url {
   width: 300px;
 }
