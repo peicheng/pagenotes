@@ -245,18 +245,23 @@ function init() {
 }
 
 function handleMajorUpdate() {
-  if (localStorage.gDoc) {
-    // If it's a major update (1->2), clear old data.
-    var item;
-    for (item in localStorage) {
-      if (localStorage.hasOwnProperty(item)) {
-        if (item !== "pagenotes") {
-          localStorage.removeItem(item);
-        }
-      }
+  var conversionRequired= false;
+  for (var i in pageNotes) {
+    if (typeof pageNotes[i] == "string") {
+      // this is before 2.3.x
+      // Add date field to page notes
+      conversionRequired = true;
+      break;
     }
-    localStorage.majorUpdate = true;
-    chrome.tabs.create({'url': chrome.extension.getURL('options.html')});
+    break;
+  }
+  if (conversionRequired) {
+    var today = new Date();
+    for (var j in pageNotes) {
+      pageNotes[j] = [pageNotes[j], today];
+    }
+    pageNotes.set();
+    localStorage.localLastModTime = new Date();
   }
 }
 

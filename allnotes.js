@@ -64,7 +64,7 @@ function initPage() {
   var table = document.createElement('table');
 
   // Header row
-  $(table).append('<tr><th>WebPage</th><th>Notes</th><th>Action</th></tr>');
+  $(table).append('<tr><th>WebPage</th><th>Last Modified</th><th>Notes</th><th>Action</th></tr>');
   
   var keys = [];
   $.each(pageNotes, function(key, value) {
@@ -90,24 +90,33 @@ function initPage() {
     row.appendChild(cell1);
 
     var cell2 = document.createElement('td');
-    cell2.className = 'notes';
+    cell2.className = 'date';
+    var date_div = document.createElement('div');
+    var date = pageNotes[keys[i]][1];
+    date_div.innerHTML = date;
+    $(date_div).addClass('date-div');
+    cell2.appendChild(date_div);
+    row.appendChild(cell2);
+    
+    var cell3 = document.createElement('td');
+    cell3.className = 'notes';
     var notes_div = document.createElement('div');
-    var notes = pageNotes[keys[i]];
+    var notes = pageNotes[keys[i]][0];
     notes_div.innerHTML = markupTagsInNotes(notes);
     $(notes_div).addClass('notes-div');
-    cell2.appendChild(notes_div);
-    row.appendChild(cell2);
+    cell3.appendChild(notes_div);
+    row.appendChild(cell3);
 
-    var cell3 = document.createElement('td');
-    cell3.className = 'button';
+
+    var cell4 = document.createElement('td');
+    cell4.className = 'button';
     var editB = document.createElement('button');
     editB.innerHTML = 'Edit';
     editB.className = 'editB';
     var deleteB = bgPage.deleteButton('Delete', keys[i], reload, 'Are you sure you want to delete these notes? ');
-    cell3.appendChild(editB);
-    cell3.appendChild(deleteB);
-    row.appendChild(cell3);
-
+    cell4.appendChild(editB);
+    cell4.appendChild(deleteB);
+    row.appendChild(cell4);
     table.appendChild(row);
   }
   allNotesDiv.appendChild(table);
@@ -121,7 +130,7 @@ function Edit(e) {
   var tdURL = par.children('td:nth-child(1)').children('a:nth-child(1)').html();
   // Open notes div for editing
   var divNotes = par.find('.notes-div');
-  divNotes.html(pageNotes[tdURL]);
+  divNotes.html(pageNotes[tdURL][0]);
   divNotes.addClass('editable');
   divNotes.focus();
   moveCursorToTheEnd(divNotes.get(0));
@@ -140,7 +149,7 @@ function Cancel() {
   var tdURL = par.children('td:nth-child(1)').children('a:nth-child(1)').html();
   var divNotes = par.find('.notes-div');
   var editSaveButton = par.find('.saveB');
-  divNotes.html(pageNotes[tdURL]);
+  divNotes.html(pageNotes[tdURL][0]);
   divNotes.removeClass('editable');
   // Change button text and behavior
   editSaveButton.html('Edit');
@@ -167,7 +176,7 @@ function Save(e) {
 
 function buildTagIndex() {
   for (var key in pageNotes) {
-    var tags = extractTags(pageNotes[key]);
+    var tags = extractTags(pageNotes[key][0]);
     if (tags) {
       for (var i = 0; i < tags.length; i++) {
         if (!(tags[i] in tagIndex)) {
