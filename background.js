@@ -155,6 +155,9 @@ function syncData(gFile) {
     // syncToLocal();
     gFile.getData(pageNotes.setSource.bind(pageNotes));
     localStorage.lastModTime = gFile.getLastUpdateTime();
+    // Convert if remote pagenotes were in old format.
+    // TODO(manugarg): Remove after upgrade to > 2.2.2 is complete
+    convertPageNotes();
   } else {
     debug.log('sync: Local data is more recent.');
     // syncToRemote();
@@ -171,6 +174,8 @@ function mergeLocalAndRemoteData(gFile) {
     // If there is no local data, just set local data to remote data.
     gFile.getData(pageNotes.setSource.bind(pageNotes));
     localStorage.lastModTime = gFile.getLastUpdateTime();
+    // convert page notes if required
+    convertPageNotes();
     return;
   }
 
@@ -213,6 +218,9 @@ function mergeLocalAndRemoteData(gFile) {
     }
     mergedDataString = JSON.stringify(mergedData);
   });
+  // Convert merged data string if required
+  // TODO(manugarg): Remove after upgrade to > 2.2.2 is complete
+  mergedDataString = convertPageNotesString(mergedDataString);
   pageNotes.setSource(mergedDataString);
   gFile.setData(mergedDataString);
   localStorage.lastModTime = gFile.getLastUpdateTime();
@@ -238,32 +246,34 @@ function getSyncFailCount() {
 }
 
 function init() {
-  handleMajorUpdate();
+  convertPageNotes();
   handleFirstRun();
   chrome.tabs.getSelected(null, updateBadgeForTab);
   sync();
 }
 
-function handleMajorUpdate() {
-  var conversionRequired= false;
-  var obj = JSON.parse(localStorage.pagenotes);
+// TODO(manugarg): Remove after upgrade to > 2.2.2 is complete
+function convertPageNotes() {
+  var pageNotesString = convertPageNotesString(pageNotes.getSource());
+  if (pageNotesString !== pageNotes.getSource()) {
+    pageNotes.setSource(pageNotesString);
+    localStorage.localLastModTime = new Date();
+    sync();
+  }
+}
+
+// TODO(manugarg): Remove after upgrade to > 2.2.2 is complete
+function convertPageNotesString(pageNotesString) {
+  var obj = JSON.parse(pageNotesString);
+  var today = new Date();
   for (var i in obj) {
     if (typeof obj[i] == "string") {
       // this is before 2.3.x
       // Add date field to page notes
-      conversionRequired = true;
-      break;
+      obj[i] = [obj[i], today];
     }
-    break;
   }
-  if (conversionRequired) {
-    var today = new Date();
-    for (var j in obj) {
-      obj[j] = [obj[j], today];
-    }
-    new PageNotes().setSource(obj);
-    localStorage.localLastModTime = new Date();
-  }
+  return JSON.stringify(obj);
 }
 
 function handleFirstRun() {
