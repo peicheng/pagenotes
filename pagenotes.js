@@ -23,14 +23,38 @@ PageNotes.prototype.getSource = function() {
 };
 
 PageNotes.prototype.get = function(key) {
-  var src = this.getSource();
-  var obj = src ? JSON.parse(src) : {};
-  return key ? obj[key] : obj;
+  var obj = this.getAll();
+  // obj is not defined
+  if (!obj) return undefined;
+  if (obj[key] && typeof obj[key] !== 'string') {
+    // new pageNotes format
+    return obj[key][0];
+  }
+  return obj[key];
 };
 
+PageNotes.prototype.getAll = function() {
+  var src = this.getSource();
+  return src ? JSON.parse(src) : {};
+}
+
 PageNotes.prototype.set = function(key, value) {
-  var obj = this.get();
+  var src = this.getSource();
+  var obj = src ? JSON.parse(src) : {};
+  var newFormat = false;
+  for (var i in obj) {
+    if(typeof obj[i] !== 'string') {
+      newFormat = true;
+      break;
+    }
+    else {
+      break;
+    }
+  }
   obj[key] = value;
+  if (newFormat) {
+    obj[key] = [value, new Date()];
+  }
   this.setSource(obj);
 };
 
@@ -46,3 +70,5 @@ PageNotes.prototype.remove = function(key) {
   delete obj[key];
   this.setSource(obj);
 };
+
+function pageNotesNewToOld() {}
