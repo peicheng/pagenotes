@@ -246,8 +246,9 @@ function init() {
 
 function handleMajorUpdate() {
   var conversionRequired= false;
-  for (var i in pageNotes) {
-    if (typeof pageNotes[i] == "string") {
+  var obj = JSON.parse(localStorage.pagenotes);
+  for (var i in obj) {
+    if (typeof obj[i] == "string") {
       // this is before 2.3.x
       // Add date field to page notes
       conversionRequired = true;
@@ -257,10 +258,10 @@ function handleMajorUpdate() {
   }
   if (conversionRequired) {
     var today = new Date();
-    for (var j in pageNotes) {
-      pageNotes[j] = [pageNotes[j], today];
+    for (var j in obj) {
+      obj[j] = [obj[j], today];
     }
-    pageNotes.set();
+    new PageNotes().setSource(obj);
     localStorage.localLastModTime = new Date();
   }
 }
