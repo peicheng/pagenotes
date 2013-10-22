@@ -14,15 +14,24 @@
     <script src="allnotes.js"></script>
   </head>
   
-  <body>
-    <h1>
-      <img src="icons/icon32.png" width=32px>Page Notes</img>
-    </h1>
-    <h2>All Page Notes</h2>
-    <span style="font-size: 85%; font-weight: 600;">TAGS</span>
-    <div id="tag-cloud"></div>
-    <br/>
-    <div id="all-notes"></div>
-  </body>
-
-</html>
+<body>
+  <h1>
+    <img src="icons/icon32.png" width=32px>Page Notes</img>
+  </h1>
+  <h2>All Page Notes</h2>
+  <span style="font-size: 85%; font-weight: 600;">TAGS</span>
+  <div id="tag-cloud"></div>
+  <br/>
+  <table class="tablesorter" id="notesTable">
+    <thead>
+      <tr>
+        <th width=300px>WebPage</th>
+        <th width=160px>Last Modified</th>
+        <th>Notes</th>
+        <th class="buttons">&nbsp;</th>
+      </tr>
+    </thead>
+    <tbody id="all-notes"></tbody>
+  </table>
+</body>
+  </html>

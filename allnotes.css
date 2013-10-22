@@ -6,16 +6,13 @@ table, #tag-cloud{
   word-break: break-all;
 }
 
-td.url {
-  width: 300px;
+/* Don't collpase multiple whitespace into one for date div. */
+.date-div {
+  white-space: pre;  
 }
 
-td.notes {
-  min-width: 300px;
-}
-
-td.button {
-  min-width: 120px;
+.buttons {
+  width: 150px;
   text-align: center;
 }
 

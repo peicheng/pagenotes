@@ -51,18 +51,6 @@ function initPage() {
   pageNotes = new PageNotes().getAll();
   buildTagCloud();
   
-  $('#all-notes').html('');
-  var allNotesDiv = document.getElementById('all-notes');
-  var table = document.createElement('table');
-  allNotesDiv.appendChild(table);
-  table.className = 'tablesorter';
-  table.id = 'notesTable';
-
-  // Header row
-  $(table).append('<thead><tr><th>WebPage</th><th width=160px;>Last Modified</th><th>Notes</th><th width=120px>&nbsp;</th></tr></thead>');
-  var tbody = document.createElement('tbody');
-  table.appendChild(tbody);
-  
   var keys = [];
   $.each(pageNotes, function(key, value) {
     if (window.location.hash === '') keys.push(key);
@@ -72,52 +60,38 @@ function initPage() {
   });
   keys.sort();
   
+  var allNotes = $('#all-notes').html('');
   for (var i = 0; i < keys.length; i++) {
-    var row = document.createElement('tr');
-    tbody.appendChild(row);
+    var row = $('<tr/>').appendTo(allNotes);
 
-    var cell1 = document.createElement('td');
-    cell1.className = 'url';
-    var link = document.createElement('a');
-    link.href = keys[i];
-    if (link.protocol == 'chrome-extension:') {
-      link.href = 'http://' + keys[i];
+    // First cell
+    var link = $('<a/>').attr('href', keys[i]).html(keys[i])
+      .appendTo($('<td/>').appendTo(row));
+    if (link.prop('protocol') == 'chrome-extension:') {
+      link.attr('href', 'http://' + keys[i]);
     }
-    link.innerHTML = keys[i];
-    cell1.appendChild(link);
-    row.appendChild(cell1);
 
-    var cell2 = document.createElement('td');
-    cell2.className = 'date';
-    var date_div = document.createElement('div');
+    // Second cell
     var date = new Date(pageNotes[keys[i]][1]).toLocaleString();
-    date_div.innerHTML = date;
-    $(date_div).addClass('date-div');
-    cell2.appendChild(date_div);
-    row.appendChild(cell2);
+    // If hour is in single digit, add an extra in the front for better alignment.
+    date = date.replace(/ (\d:\d\d:\d\d)+/, "  $1");
+    $('<div/>').addClass('date-div').html(date)
+      .appendTo($('<td/>').appendTo(row));
     
-    var cell3 = document.createElement('td');
-    cell3.className = 'notes';
-    var notes_div = document.createElement('div');
-    var notes = pageNotes[keys[i]][0];
-    notes_div.innerHTML = markupTagsInNotes(notes);
-    $(notes_div).addClass('notes-div');
-    cell3.appendChild(notes_div);
-    row.appendChild(cell3);
-
-    var cell4 = document.createElement('td');
-    cell4.className = 'button';
-    var editB = document.createElement('button');
-    editB.innerHTML = 'Edit';
-    editB.className = 'editB';
+    // Third cell
+    var notes = markupTagsInNotes(pageNotes[keys[i]][0]);
+    $('<div/>').addClass('notes-div').html(notes)
+      .appendTo($('<td/>').appendTo(row));
+    
+    // Fourth cell
+    var buttonCell = $('<td/>').appendTo(row);
+    $('<button/>').addClass('editB').html('Edit').appendTo(buttonCell);
     var deleteB = bgPage.deleteButton('Delete', keys[i], reload, 'Are you sure you want to delete these notes? ');
-    cell4.appendChild(editB);
-    cell4.appendChild(deleteB);
-    row.appendChild(cell4);
+    $(deleteB).appendTo(buttonCell);
   }
-  $('div#all-notes').on('click', 'button.editB', Edit);
-  $('div#all-notes').on('click', 'button.saveB', Save);
-  $('div#all-notes').on('click', 'button.cancelB', Cancel);
+  allNotes.on('click', 'button.editB', Edit);
+  allNotes.on('click', 'button.saveB', Save);
+  allNotes.on('click', 'button.cancelB', Cancel);
   $('#notesTable').tablesorter({
     theme: 'default',
     headerTemplate: '{content}{icon}',
@@ -125,7 +99,7 @@ function initPage() {
       // disable sorting of the first column (we start counting at zero)
       3: { sorter: false }
     },
-    sortList: [[0,0], [1,1]]
+    sortList: [[0,0]]
   });
 }
 
