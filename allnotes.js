@@ -49,14 +49,6 @@ var reload = function() {
 
 function initPage() {
   pageNotes = new PageNotes().getAll();
-  for (var i in pageNotes) {
-    if (typeof pageNotes[i] === "string") { // old format
-      break;
-    }
-    else {                                  // new format
-      pageNotes[i] = pageNotes[i][0];
-    }
-  }
   buildTagCloud();
   
   $('#all-notes').html('');

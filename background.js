@@ -257,7 +257,7 @@ function convertPageNotes() {
   var pageNotesString = convertPageNotesString(pageNotes.getSource());
   if (pageNotesString !== pageNotes.getSource()) {
     pageNotes.setSource(pageNotesString);
-    localStorage.localLastModTime = new Date();
+    localStorage.lastModTime = new Date().getTime();
     sync();
   }
 }
