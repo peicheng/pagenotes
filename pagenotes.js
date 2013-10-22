@@ -66,9 +66,8 @@ PageNotes.prototype.setSource = function(src) {
 };
 
 PageNotes.prototype.remove = function(key) {
-  var obj = this.get();
+  var src = this.getSource();
+  var obj = src ? JSON.parse(src) : {};
   delete obj[key];
   this.setSource(obj);
 };
-
-function pageNotesNewToOld() {}
