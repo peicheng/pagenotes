@@ -113,7 +113,6 @@ function initPage() {
     cell3.appendChild(notes_div);
     row.appendChild(cell3);
 
-
     var cell4 = document.createElement('td');
     cell4.className = 'button';
     var editB = document.createElement('button');

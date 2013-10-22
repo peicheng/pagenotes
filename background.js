@@ -156,7 +156,7 @@ function syncData(gFile) {
     gFile.getData(pageNotes.setSource.bind(pageNotes));
     localStorage.lastModTime = gFile.getLastUpdateTime();
     // Convert if remote pagenotes were in old format.
-    // TODO(manugarg): Remove after upgrade to > 2.2.2 is complete
+    // TODO(manugarg): Remove after upgrade to > 2.2.3 is complete
     convertPageNotes();
   } else {
     debug.log('sync: Local data is more recent.');
@@ -219,7 +219,7 @@ function mergeLocalAndRemoteData(gFile) {
     mergedDataString = JSON.stringify(mergedData);
   });
   // Convert merged data string if required
-  // TODO(manugarg): Remove after upgrade to > 2.2.2 is complete
+  // TODO(manugarg): Remove after upgrade to > 2.2.3 is complete
   mergedDataString = convertPageNotesString(mergedDataString);
   pageNotes.setSource(mergedDataString);
   gFile.setData(mergedDataString);
@@ -252,7 +252,7 @@ function init() {
   sync();
 }
 
-// TODO(manugarg): Remove after upgrade to > 2.2.2 is complete
+// TODO(manugarg): Remove after upgrade to > 2.2.3 is complete
 function convertPageNotes() {
   var pageNotesString = convertPageNotesString(pageNotes.getSource());
   if (pageNotesString !== pageNotes.getSource()) {
@@ -262,7 +262,7 @@ function convertPageNotes() {
   }
 }
 
-// TODO(manugarg): Remove after upgrade to > 2.2.2 is complete
+// TODO(manugarg): Remove after upgrade to > 2.2.3 is complete
 function convertPageNotesString(pageNotesString) {
   var obj = JSON.parse(pageNotesString);
   var today = new Date();
