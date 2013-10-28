@@ -92,15 +92,7 @@ function initPage() {
   allNotes.on('click', 'button.editB', Edit);
   allNotes.on('click', 'button.saveB', Save);
   allNotes.on('click', 'button.cancelB', Cancel);
-  $('#notesTable').tablesorter({
-    theme: 'default',
-    headerTemplate: '{content}{icon}',
-    headers: {
-      // disable sorting of the first column (we start counting at zero)
-      3: { sorter: false }
-    },
-    sortList: [[0,0]]
-  });
+  $('#notesTable').trigger('update', [true]);
 }
 
 function Edit(e) {
@@ -207,6 +199,8 @@ $(document).on('click', '.tag-link', function() {
     window.location.hash = tag;
   } else {
     window.location.hash = '';
+    var url = window.location;
+    window.location.href = window.location.href.replace(/#$/, '');
   }
   initPage();
   return false;
@@ -225,4 +219,13 @@ function moveCursorToTheEnd(element) {
 
 document.addEventListener('DOMContentLoaded', function() {
   initPage();
+  $('#notesTable').tablesorter({
+    theme: 'default',
+    headerTemplate: '{content}{icon}',
+    headers: {
+      // disable sorting of the first column (we start counting at zero)
+      3: { sorter: false }
+    },
+    sortList: [[0,0]]
+  });
 });
