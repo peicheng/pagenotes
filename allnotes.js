@@ -18,7 +18,7 @@
  * Directive for JSLint, so that it doesn't complain about these names not being
  * defined.
  */
-/*global document, location, localStorage, alert, chrome, confirm */
+/*global document, location, localStorage, PageNotes, alert, chrome, confirm */
 
 var bgPage = chrome.extension.getBackgroundPage();
 var pageNotes = {};
@@ -27,7 +27,7 @@ var tagIndex = {};
 function extractTags(text) {
   // Hack to get a clean plain text string from HTML
   var t = $.parseHTML(text).map(function(x) {
-    return $('<div>').html(x).text()
+    return $('<div>').html(x).text();
   }).join(' ');
   return t.replace(/(\n|\t)+/g, ' ').split(' ').filter(function(x) { return x.match(/^#/); });
 }
@@ -50,11 +50,14 @@ var reload = function() {
 function initPage() {
   pageNotes = new PageNotes().getAll();
   buildTagCloud();
-  
+
+  // Build array of keys (URLs) that we need to show
   var keys = [];
   $.each(pageNotes, function(key, value) {
+    // key is URL, value is page notes structure
     if (window.location.hash === '') keys.push(key);
     else {
+      // If tag is already in taxIndex
       if (tagIndex[window.location.hash].indexOf(key) != -1) keys.push(key);
     }
   });
@@ -72,9 +75,9 @@ function initPage() {
     }
 
     // Second cell
-    var date = new Date(pageNotes[keys[i]][1]).toLocaleString();
+    var date = formatDate(pageNotes[keys[i]][1]);
     // If hour is in single digit, add an extra in the front for better alignment.
-    date = date.replace(/ (\d:\d\d:\d\d)+/, "  $1");
+    // date = date.replace(/ (\d:\d\d:\d\d)+/, "  $1");
     $('<div/>').addClass('date-div').html(date)
       .appendTo($('<td/>').appendTo(row));
     
@@ -93,6 +96,11 @@ function initPage() {
   allNotes.on('click', 'button.saveB', Save);
   allNotes.on('click', 'button.cancelB', Cancel);
   $('#notesTable').trigger('update', [true]);
+}
+
+function formatDate(date) {
+  var d = new Date(date);
+  return d.toDateString().replace(/^[^ ]+ /, '') + ' ' +  d.toTimeString().replace(/ GMT.*$/,'');  
 }
 
 function Edit(e) {
@@ -189,6 +197,7 @@ function buildTagCloud() {
   }
 }
 
+// When you click on a tag
 $(document).on('click', '.tag-link', function() {
   var tag = $(this).html();
   // Remove the count number from the tag
@@ -199,7 +208,6 @@ $(document).on('click', '.tag-link', function() {
     window.location.hash = tag;
   } else {
     window.location.hash = '';
-    var url = window.location;
     window.location.href = window.location.href.replace(/#$/, '');
   }
   initPage();
@@ -217,7 +225,21 @@ function moveCursorToTheEnd(element) {
   sel.addRange(range);                // make the range you have just created the visible selection
 }
 
+function exportToCsv() {
+  var content = [];
+  var colDelimiter = '","';
+  content.push(['URL', 'Date', 'Notes'].join(colDelimiter));
+  $.each(new PageNotes().getAll(), function(url, note) {
+    content.push([url, formatDate(note[1]), note[0]].map(function(item) {
+      return item.replace(/"/g, '""');  // Escape double quotes
+    }).join(colDelimiter));
+  });
+  var csv = '"' + content.join('"\r\n"') + '"';
+  $('.exportAnchor').attr('href', 'data:text/csv,' + encodeURIComponent(csv));
+}
+
 document.addEventListener('DOMContentLoaded', function() {
+  $('.exportButton').click(exportToCsv);
   initPage();
   $('#notesTable').tablesorter({
     theme: 'default',
