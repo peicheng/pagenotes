@@ -1,6 +1,4 @@
-Chrome Page Notes Extension
-
-###Lets you take notes for web pages and sync them automatically to your Google Drive.
+###Lets you take notes for web pages and syncs them automatically to your Google Drive.
 
 Ever needed to note down something about a webpage e.g. login id, frequent flyer number, membership number, tracking id etc. Something that you want to remember when you visit that page again.
 
