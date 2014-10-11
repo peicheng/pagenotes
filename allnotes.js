@@ -25,7 +25,11 @@ var pageNotes = {};
 var tagIndex = {};
 
 function extractTags(text) {
-  // Hack to get a clean plain text string from HTML
+  if (!text) { return []; }
+  // Hack to get a clean plain text string from HTML:
+  // Parse text string into an array of DOM elements using parseHTML, then
+  // for each DOM element, put it into a new <div> element and get the text
+  // from it. It gives a clean text string.
   var t = $.parseHTML(text).map(function(x) {
     return $('<div>').html(x).text();
   }).join(' ');
