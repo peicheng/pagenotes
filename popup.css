@@ -10,18 +10,24 @@
   padding: 1px;
 }
 
-#sitelevel-div {
+#checkbox-div {
   display: none;
   margin-bottom: 8px;
   margin-top:8px;
+  padding: 2px;
 }
 
 #control-div {
   padding-left: 1px;
 }
 
+#warning {
+	color: red;
+	font-size: small;
+}
 label {
   padding-left: 1px;
+  padding-right: 1px;
   text-indent: -15px;
   font-size: 90%;
 }

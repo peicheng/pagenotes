@@ -33,6 +33,12 @@ PageNotes.prototype.get = function(key) {
   return obj[key];
 };
 
+PageNotes.prototype.getNotesObj = function(key) {
+  var obj = this.getAll();
+  if (!obj) return undefined;
+  return obj[key];
+};
+
 PageNotes.prototype.getAll = function() {
   var src = this.getSource();
   return src ? JSON.parse(src) : {};
@@ -55,6 +61,13 @@ PageNotes.prototype.set = function(key, value) {
   if (newFormat) {
     obj[key] = [value, new Date()];
   }
+  this.setSource(obj);
+};
+
+PageNotes.prototype.setNotesObj = function(key, objValue) {
+  var src = this.getSource();
+  var obj = src ? JSON.parse(src) : {};
+  obj[key] = objValue;
   this.setSource(obj);
 };
 

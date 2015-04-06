@@ -2,3 +2,4 @@
 .settings
 tools/packages
 tools/releases
+.DS_Store
