@@ -24,8 +24,12 @@
 
 var bgPage = chrome.extension.getBackgroundPage();
 
+function e(id) {
+  return document.getElementById(id);
+}
+
 function notify(msg) {
-    document.getElementById('error').innerHTML = msg;
+    e('error').innerHTML = msg;
 }
 
 function setupSync() {
@@ -64,7 +68,7 @@ function setupSync() {
 }
 
 function handleSyncButton() {
-  var syncButton = document.getElementById('setup_sync');
+  var syncButton = e('setup_sync');
   if (syncButton.name === 'cancel_sync') {
     if (confirm('Are you sure you want to clear the sync setup?')) {
       localStorage.removeItem('gFile');
@@ -84,17 +88,35 @@ function clearLocalData() {
   }
 }
 
+function updateFeatureButtons()  {
+  var options_keys = [];
+  var els = document.getElementsByClassName('feature_option');
+  for (var i=0; i < els.length; i++) {
+    options_keys.push(els[i].id);
+  }
+  options_keys.forEach(function(key) {
+    var stored_value = bgPage.options.get(key);
+    if (typeof stored_value != 'undefined') {
+      e(key).checked = stored_value;
+    }
+    e(key).addEventListener('change', function() {
+      bgPage.options.set(key, e(key).checked);
+    });
+  });
+}
+
 function initUI() {
+  updateFeatureButtons();
   if (localStorage.majorUpdate) {
     notify('Note: Your sync has been disabled after the last major update. ' +
            'Unfortunately, you will have to set it up again (click on ' +
            '"Setup Sync"). Your existing data will not be lost.');
     localStorage.removeItem('majorUpdate');
   }
-  var syncButton = document.getElementById('setup_sync');
-  var authButton = document.getElementById('auth_button');
-  var syncStatus = document.getElementById('sync_status');
-  var syncNowButton = document.getElementById('sync_now');
+  var syncButton = e('setup_sync');
+  var authButton = e('auth_button');
+  var syncStatus = e('sync_status');
+  var syncNowButton = e('sync_now');
   if (localStorage.gFile) {
     var gFile = bgPage.getRemoteFile();
     if (gFile && gFile.get('alternateLink')) {
@@ -112,7 +134,7 @@ function initUI() {
     bgPage.lastSyncStatus = '';
   }
   if (!bgPage.pageNotes.getSource()) {
-    document.getElementById('clear_local').disabled = true;
+    e('clear_local').disabled = true;
   }
   if (bgPage.lastSyncStatus === 'good') {
     var lastSyncTime = new Date(localStorage.lastSyncTime);
@@ -132,14 +154,14 @@ function initUI() {
 }
 
 function showHideDebugInfo() {
-  var showDebugAnchor = document.getElementById('showdebug');
+  var showDebugAnchor = e('showdebug');
   if (showDebugAnchor.name === 'show') {
     var debugInfo = 'Messages from last sync: \n' + bgPage.debug.msg;
-    document.getElementById('debug').innerHTML = debugInfo;
+    e('debug').innerHTML = debugInfo;
     showDebugAnchor.innerHTML = 'Hide debug info';
     showDebugAnchor.name = 'hide';
   } else {
-    document.getElementById('debug').innerHTML = '';
+    e('debug').innerHTML = '';
     showDebugAnchor.innerHTML = 'Show debug info';
     showDebugAnchor.name = 'show';
   }
@@ -152,8 +174,8 @@ function syncNow() {
 
 document.addEventListener('DOMContentLoaded', function () {
   initUI();
-  document.getElementById('setup_sync').addEventListener('click', handleSyncButton);
-  document.getElementById('sync_now').addEventListener('click', syncNow);
-  document.getElementById('showdebug').addEventListener('click', showHideDebugInfo);
-  document.getElementById('clear_local').addEventListener('click', clearLocalData);
+  e('setup_sync').addEventListener('click', handleSyncButton);
+  e('sync_now').addEventListener('click', syncNow);
+  e('showdebug').addEventListener('click', showHideDebugInfo);
+  e('clear_local').addEventListener('click', clearLocalData);
 });

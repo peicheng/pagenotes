@@ -30,6 +30,7 @@ var GREEN_COLOR = {'color': [42, 115, 109, 255]};
 
 var oauth = null;
 var pageNotes = new PageNotes();
+var options = new Options();
 
 function setUpOauth() {
   oauth = new OAuth2({
@@ -49,7 +50,8 @@ var debug = {
 };
 
 var lastSyncStatus;
-chrome.browserAction.setBadgeText({'text': 'pn'});
+
+// chrome.browserAction.setBadgeText({'text': 'pn'});
 
 // Update badge text on tab change.
 chrome.tabs.onSelectionChanged.addListener(function (tabId) {
@@ -61,10 +63,25 @@ chrome.tabs.onUpdated.addListener(function (tabId, changeinfo, tab) {
   updateBadgeForTab(tab);
 });
 
+
 function getHostFromUrl(url) {
   var a_element = document.createElement("a");
   a_element.href = url;
   return a_element.hostname;
+}
+
+function setIcon(tab, suffix, badgeText) {
+  chrome.browserAction.setIcon({
+    path: {
+      19: 'icons/icon' + suffix + '19.png',
+      38: 'icons/icon' + suffix + '38.png',
+    },
+    tabId: tab.id
+  });
+  chrome.browserAction.setBadgeText({
+    'text': badgeText,
+    'tabId': tab.id
+  });
 }
 
 function updateBadgeForTab(tab) {
@@ -72,9 +89,17 @@ function updateBadgeForTab(tab) {
   var tabHost = getHostFromUrl(tabUrl);
   var pn = pageNotes.get(tabUrl) || pageNotes.get(tabHost);
   if (pn) {
-    chrome.browserAction.setBadgeText({'text': 'pn', 'tabId': tab.id});
+    if (bgPage.options.get('old_icons')) {
+      setIcon(tab, '-old', 'pn');
+    } else {
+      setIcon(tab, '-filled', '');
+    }
   } else {
-    chrome.browserAction.setBadgeText({'text': '0', 'tabId': tab.id});
+    if (bgPage.options.get('old_icons')) {
+      setIcon(tab, '-old', '0');
+    } else {
+      setIcon(tab, '', '');
+    }
   }
 }
 
@@ -89,11 +114,14 @@ function getRemoteFile() {
 function setVisualCues() {
   if (getSyncFailCount() >= 2) {
     chrome.browserAction.setBadgeBackgroundColor(RED_COLOR);
-    chrome.browserAction.setTitle({'title': 'Page Notes - Sync is not ' +
-                                            'happening.'});
+    chrome.browserAction.setTitle({
+      'title': 'Page Notes - Sync is not ' + 'happening.'
+    });
   } else {
     chrome.browserAction.setBadgeBackgroundColor(GREEN_COLOR);
-    chrome.browserAction.setTitle({'title': 'Page Notes'});
+    chrome.browserAction.setTitle({
+      'title': 'Page Notes'
+    });
   }
 }
 
@@ -248,7 +276,7 @@ function getSyncFailCount() {
 function init() {
   convertPageNotes();
   handleFirstRun();
-  chrome.tabs.getSelected(null, updateBadgeForTab);
+  //chrome.tabs.getSelected(null, updateBadgeForTab);
   sync();
 }
 
