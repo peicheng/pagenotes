@@ -73,8 +73,8 @@ function getHostFromUrl(url) {
 function setIcon(tab, suffix, badgeText) {
   chrome.browserAction.setIcon({
     path: {
-      19: 'icons/icon' + suffix + '19.png',
-      38: 'icons/icon' + suffix + '38.png',
+      19: 'icons/icon' + suffix + '_19.png',
+      38: 'icons/icon' + suffix + '_38.png',
     },
     tabId: tab.id
   });
@@ -90,13 +90,13 @@ function updateBadgeForTab(tab) {
   var pn = pageNotes.get(tabUrl) || pageNotes.get(tabHost);
   if (pn) {
     if (bgPage.options.get('old_icons')) {
-      setIcon(tab, '-old', 'pn');
+      setIcon(tab, '_old', 'pn');
     } else {
-      setIcon(tab, '-filled', '');
+      setIcon(tab, '_filled', '');
     }
   } else {
     if (bgPage.options.get('old_icons')) {
-      setIcon(tab, '-old', '0');
+      setIcon(tab, '_old', '0');
     } else {
       setIcon(tab, '', '');
     }
