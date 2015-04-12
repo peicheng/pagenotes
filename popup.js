@@ -42,8 +42,8 @@ function enableEdit() {
 function afterEdit() {
   e('notes').className = '';
   if (saveNotes()) {
-	e('edit').innerHTML = 'Edit';
-	window.close();
+    e('edit').innerHTML = 'Edit';
+    window.close();
   }
 }
 
@@ -118,6 +118,10 @@ function setupEditButtonHandler() {
     else if (e('edit').innerHTML.trim() === 'Edit') {
       // Edit has been clicked.
       enableEdit();
+      var enable_enc = bgPage.options.get('enable_encryption');
+      if ((typeof enable_enc === 'undefined' || !enable_enc) && e('encrypt').checked === false) {
+        e('encryption-option').style.display = 'none';
+      }
     }
 		else if (e('edit').innerHTML.trim() === 'Decrypt') {
 			handleDecrypt();
