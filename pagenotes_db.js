@@ -31,7 +31,7 @@ PageNotes.prototype.getNotesObj = function(key) {
 PageNotes.prototype.getAll = function() {
   var src = this.getSource();
   return src ? JSON.parse(src) : {};
-}
+};
 
 PageNotes.prototype.set = function(key, value) {
   var src = this.getSource();

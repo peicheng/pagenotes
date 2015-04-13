@@ -17,7 +17,7 @@ Options.prototype.get = function(key) {
 Options.prototype.getAll = function() {
   var src = this.getSource();
   return src ? JSON.parse(src) : {};
-}
+};
 
 Options.prototype.set = function(key, value) {
   var src = this.getSource();
