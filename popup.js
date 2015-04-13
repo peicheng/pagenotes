@@ -17,12 +17,25 @@ function e(id) {
   return document.getElementById(id);
 }
 
+function handleEncOptionsVisibility() {
+  var disable_enc = bgPage.options.get('disable_encryption');
+  if (e('encrypt').checked) {
+    e('encryption-option').style.display = 'block';
+    e('encrypt-passphrase-div').style.display = 'block';
+    return;
+  }
+  if (disable_enc) {
+    e('encryption-option').style.display = 'none';
+  }
+}
+
 function enableEdit() {
   e('notes').className = 'editable';
   e('notes').focus();
   e('checkbox-div').style.display = 'block';
   moveCursorToTheEnd(e('notes'));
   e('edit').innerHTML = 'Save';
+  handleEncOptionsVisibility();
   // TODO(manugarg): May be replace Delete button with Cancel here.
 }
 
@@ -81,17 +94,17 @@ function handleDecrypt() {
     e('warning').innerHTML = 'Decrypt passphrase cannot be empty.';
     return;
   }
-  //	var data = e('notes').innerHTML.trim();
   var decrypted = bgPage.CryptoJS.AES.decrypt(notes[0], pp).toString(bgPage.CryptoJS.enc.Utf8);
   if (decrypted === '') {
     e('warning').innerHTML = 'Wrong passphrase.';
     return;
   }
+  
+  // Show decrypted notes and do rest of the setup.
   e('notes').innerHTML = decrypted;
   e('decrypt-passphrase-div').style.display = 'none';
   e('edit').innerHTML = 'Edit';
   e('encrypt').checked = true;
-  e('encrypt-passphrase-div').style.display = 'block';
   e('encrypt-passphrase').value = pp;
   e('verify-passphrase').value = pp;
 }
@@ -104,10 +117,6 @@ function setupEditButtonHandler() {
     } else if (e('edit').innerHTML.trim() === 'Edit') {
       // Edit has been clicked.
       enableEdit();
-      var enable_enc = bgPage.options.get('enable_encryption');
-      if ((typeof enable_enc === 'undefined' || !enable_enc) && e('encrypt').checked === false) {
-        e('encryption-option').style.display = 'none';
-      }
     } else if (e('edit').innerHTML.trim() === 'Decrypt') {
       handleDecrypt();
     }
@@ -188,5 +197,6 @@ window.setTimeout(function() {
 
 document.addEventListener('DOMContentLoaded', function() {
   setupEditButtonHandler();
+  handleEncOptionsVisibility();
   chrome.tabs.getSelected(null, updatePopUpForTab);
 });
