@@ -1,6 +1,8 @@
 /*
  * Copyright 2012 Manu Garg.
  * @author manugarg@google.com (Manu Garg)
+ * 
+ * Interface to page notes database in localStorage.
  */
 
 var PageNotes = function() {};
