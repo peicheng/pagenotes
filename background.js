@@ -261,6 +261,7 @@ function getSyncFailCount() {
 }
 
 function init() {
+  versionTracking();
   convertPageNotes();
   handleFirstRun();
   //chrome.tabs.getSelected(null, updateBadgeForTab);
@@ -289,6 +290,14 @@ function convertPageNotesString(pageNotesString) {
     }
   }
   return JSON.stringify(obj);
+}
+
+function versionTracking() {
+  var manifest = chrome.runtime.getManifest();
+  if (!localStorage.currentVersion || localStorage.currentVersion !== manifest.version) {
+    localStorage.lastVersion = localStorage.currentVersion;
+    localStorage.currentVersion = manifest.version;
+  }
 }
 
 function handleFirstRun() {
