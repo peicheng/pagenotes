@@ -1,7 +1,7 @@
 /*
  * Copyright 2012 Manu Garg.
  * @author manugarg@google.com (Manu Garg)
-
+ 
  * Directive for JSLint, so that it doesn't complain about these names not being
  * defined.
  */
@@ -16,7 +16,7 @@ function e(id) {
 }
 
 function notify(msg) {
-    e('error').innerHTML = msg;
+  e('error').innerHTML = msg;
 }
 
 function setupSync() {
@@ -25,14 +25,16 @@ function setupSync() {
   try {
     if (!bgPage.oauth || !bgPage.oauth.hasAccessToken()) {
       if (!confirm('You\'ll be redirected to Google website to set ' +
-                  'up authentication.')) {
+        'up authentication.')) {
         return;
       }
       localStorage.nextAction = 'setup_sync';
       if (!bgPage.oauth) {
         bgPage.setUpOauth();
       }
-      bgPage.oauth.authorize(function () { location.reload(); });
+      bgPage.oauth.authorize(function() {
+        location.reload();
+      });
       return;
     }
     if (!localStorage.gFile) {
@@ -44,8 +46,8 @@ function setupSync() {
       }
     }
   } catch (e) {
-    notify('There was an error in setting up sync. Click on "Show debug info" ' +
-           'for more information.');
+    notify('There was an error in setting up sync. Click on "Debug info" ' +
+      'for more information.');
     bgPage.debug.log(e);
     return;
   }
@@ -68,17 +70,10 @@ function handleSyncButton() {
   }
 }
 
-function clearLocalData() {
-  if (confirm('Are you sure you want to delete all local data?')) {
-    localStorage.removeItem('pagenotes');
-    location.reload();
-  }
-}
-
-function updateFeatureButtons()  {
+function updateFeatureButtons() {
   var options_keys = [];
   var els = document.getElementsByClassName('feature_option');
-  for (var i=0; i < els.length; i++) {
+  for (var i = 0; i < els.length; i++) {
     options_keys.push(els[i].id);
   }
   options_keys.forEach(function(key) {
@@ -92,14 +87,7 @@ function updateFeatureButtons()  {
   });
 }
 
-function initUI() {
-  updateFeatureButtons();
-  if (localStorage.majorUpdate) {
-    notify('Note: Your sync has been disabled after the last major update. ' +
-           'Unfortunately, you will have to set it up again (click on ' +
-           '"Setup Sync"). Your existing data will not be lost.');
-    localStorage.removeItem('majorUpdate');
-  }
+function syncStatus() {
   var syncButton = e('setup_sync');
   var authButton = e('auth_button');
   var syncStatus = e('sync_status');
@@ -108,7 +96,7 @@ function initUI() {
     var gFile = bgPage.getRemoteFile();
     if (gFile && gFile.get('alternateLink')) {
       syncStatus.innerHTML = 'Syncing to <a href="' +
-                             gFile.get('alternateLink') + '">this file</a>. ';
+        gFile.get('alternateLink') + '">this file</a>. ';
     }
     syncButton.innerHTML = 'Stop Syncing';
     syncButton.name = 'cancel_sync';
@@ -120,49 +108,70 @@ function initUI() {
     syncNowButton.disabled = true;
     bgPage.lastSyncStatus = '';
   }
-  if (!bgPage.pageNotes.getSource()) {
-    e('clear_local').disabled = true;
-  }
   if (bgPage.lastSyncStatus === 'good') {
     var lastSyncTime = new Date(localStorage.lastSyncTime);
     var syncLast = Math.floor((new Date() - lastSyncTime) / 60000);
     syncStatus.innerHTML += 'Synced ' + (syncLast === 0 ?
-        'less than a minute ago.' : syncLast + ' min ago.');
+      'less than a minute ago.' : syncLast + ' min ago.');
   } else {
     if (bgPage.lastSyncStatus) {
-      notify('There was an error during sync. Click on "Show debug info" for ' + 
-             'more information.');
+      notify('There was an error during sync. Click on "Show debug info" for ' +
+        'more information.');
     }
   }
+}
+
+function initUI() {
+  if (localStorage.majorUpdate) {
+    notify('Note: Your sync has been disabled after the last major update. ' +
+      'Unfortunately, you will have to set it up again (click on ' +
+      '"Setup Sync"). Your existing data will not be lost.');
+    localStorage.removeItem('majorUpdate');
+  }
+  e('debug').innerHTML = 'Messages from last sync: \n' + bgPage.debug.msg;
+  updateFeatureButtons();
+  syncStatus();
+  if (!bgPage.pageNotes.getSource()) {
+    e('clear_local').disabled = true;
+  }
+  // Following is part of the setup sync workflow.
   if (localStorage.hasOwnProperty('nextAction') && localStorage.nextAction === 'setup_sync') {
     localStorage.nextAction = '';
     setupSync();
   }
 }
 
-function showHideDebugInfo() {
-  var showDebugAnchor = e('showdebug');
-  if (showDebugAnchor.name === 'show') {
-    var debugInfo = 'Messages from last sync: \n' + bgPage.debug.msg;
-    e('debug').innerHTML = debugInfo;
-    showDebugAnchor.innerHTML = 'Hide debug info';
-    showDebugAnchor.name = 'hide';
-  } else {
-    e('debug').innerHTML = '';
-    showDebugAnchor.innerHTML = 'Show debug info';
-    showDebugAnchor.name = 'show';
+
+function setupShowHideElements() {
+  var els = document.getElementsByClassName('show_hide');
+  for (var i = 0; i < els.length; i++) {
+    els[i].addEventListener('click', function() {
+      var e_id = this.id.replace('show_', '');
+      if (e(e_id).style.display === 'none') {
+        e(e_id).style.display = 'block';
+      } else {
+        e(e_id).style.display = 'none';
+      }
+    });
   }
 }
 
-function syncNow() {
-  bgPage.sync();
-  location.reload();
+function setupHandlers() {
+  setupShowHideElements();
+  e('setup_sync').addEventListener('click', handleSyncButton);
+  e('sync_now').addEventListener('click', function() {
+    bgPage.sync();
+    location.reload();
+  });
+  e('clear_local').addEventListener('click', function() {
+    if (confirm('Are you sure you want to delete all local data?')) {
+      localStorage.removeItem('pagenotes');
+      location.reload();
+    }
+  });
 }
 
-document.addEventListener('DOMContentLoaded', function () {
+document.addEventListener('DOMContentLoaded', function() {
   initUI();
-  e('setup_sync').addEventListener('click', handleSyncButton);
-  e('sync_now').addEventListener('click', syncNow);
-  e('showdebug').addEventListener('click', showHideDebugInfo);
-  e('clear_local').addEventListener('click', clearLocalData);
+  setupHandlers();
 });

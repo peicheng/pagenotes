@@ -1,0 +1,23 @@
+label {
+  width: 300px;
+  padding-top: 6px;
+}
+
+input[type=checkbox] {
+  float: right;
+}
+
+.tooltip {
+  width: 400px;
+  font-size: 95%;
+  color: #111;
+  line-height: 140%;
+  background-color: lightyellow;
+}
+
+.show_hide {
+  color: blue;
+  font-size: 90%;
+  text-decoration: underline;
+  cursor: pointer;
+}

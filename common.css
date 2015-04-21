@@ -41,3 +41,19 @@ button {
 a {
   font-size: 90%;
 }
+
+label {
+  display: inline-block;
+  vertical-align: top;
+  padding-top: 2px;
+}
+
+input[type=checkbox] {
+    vertical-align: middle;
+    position: relative;
+    bottom: 1px;
+}
+
+input {
+  display: inline-block;
+}

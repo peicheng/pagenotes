@@ -28,20 +28,10 @@
 
 label {
   font-size: 90%;
-  display: inline-block;
-  vertical-align: top;
-  padding-top: 2px;
   width: 256px;
-}
-
-input[type=checkbox] {
-    vertical-align: middle;
-    position: relative;
-    bottom: 1px;
 }
 
 input {
   font-size: 90%;
-  display: inline-block;
 }
 
