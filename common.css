@@ -1,7 +1,11 @@
-body {
+body, ul {
   font-family: "Roboto", Arial, sans-serif;
-  font-size: 14px;
+  font-size: 13px;
   color: #111;
+}
+
+li {
+  margin: 6px 0;
 }
 
 h1 { font-size: 156% }

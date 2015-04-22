@@ -21,3 +21,10 @@ input[type=checkbox] {
   text-decoration: underline;
   cursor: pointer;
 }
+
+h2.relnotes {
+  border-top: 0;
+  background-color: transparent;
+  padding: 3px 5px;
+  font-size: 100%
+}
