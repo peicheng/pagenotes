@@ -264,6 +264,7 @@ function init() {
   versionTracking();
   convertPageNotes();
   handleFirstRun();
+  handleIconsUpdate();
   //chrome.tabs.getSelected(null, updateBadgeForTab);
   sync();
 }
@@ -297,6 +298,12 @@ function versionTracking() {
   if (!localStorage.currentVersion || localStorage.currentVersion !== manifest.version) {
     localStorage.lastVersion = localStorage.currentVersion;
     localStorage.currentVersion = manifest.version;
+  }
+}
+
+function handleIconsUpdate() {
+  if (!localStorage.warnedAboutIcons) {
+    chrome.tabs.create({'url': chrome.extension.getURL('options.html')});
   }
 }
 

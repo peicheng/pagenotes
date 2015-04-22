@@ -15,7 +15,12 @@ function e(id) {
   return document.getElementById(id);
 }
 
-function notify(msg) {
+function notify(msg, type) {
+  if (type === 'info') {
+    e('error').style.backgroundColor = 'moccasin';
+  } else if (type === 'warn') {
+    e('error').style.backgroundColor = 'gold';
+  }
   e('error').innerHTML = msg;
 }
 
@@ -46,8 +51,9 @@ function setupSync() {
       }
     }
   } catch (e) {
-    notify('There was an error in setting up sync. Click on "Debug info" ' +
-      'for more information.');
+    notify(
+      'There was an error in setting up sync. Click on "Debug info" for more' +
+      'information.', 'warn');
     bgPage.debug.log(e);
     return;
   }
@@ -115,32 +121,12 @@ function syncStatus() {
       'less than a minute ago.' : syncLast + ' min ago.');
   } else {
     if (bgPage.lastSyncStatus) {
-      notify('There was an error during sync. Click on "Show debug info" for ' +
-        'more information.');
+      notify(
+        'There was an error during sync. Click on "Show debug info" for more' +
+        'information.', warn);
     }
   }
 }
-
-function initUI() {
-  if (localStorage.majorUpdate) {
-    notify('Note: Your sync has been disabled after the last major update. ' +
-      'Unfortunately, you will have to set it up again (click on ' +
-      '"Setup Sync"). Your existing data will not be lost.');
-    localStorage.removeItem('majorUpdate');
-  }
-  e('debug').innerHTML = 'Messages from last sync: \n' + bgPage.debug.msg;
-  updateFeatureButtons();
-  syncStatus();
-  if (!bgPage.pageNotes.getSource()) {
-    e('clear_local').disabled = true;
-  }
-  // Following is part of the setup sync workflow.
-  if (localStorage.hasOwnProperty('nextAction') && localStorage.nextAction === 'setup_sync') {
-    localStorage.nextAction = '';
-    setupSync();
-  }
-}
-
 
 function setupShowHideElements() {
   var els = document.getElementsByClassName('show_hide');
@@ -171,7 +157,37 @@ function setupHandlers() {
   });
 }
 
-document.addEventListener('DOMContentLoaded', function() {
-  initUI();
+function checkAndNotify() {
+  var curMajorVersion = localStorage.currentVersion.replace(/(\d+\.\d+)\.\d+/, '$1');
+  if (localStorage.lastVersion) {
+    var lastMajorVersion = localStorage.lastVersion.replace(/(\d+\.\d+)\.\d+/, '$1');
+  }
+  lastMajorVersion = '2.3';
+  if (lastMajorVersion === '2.3' && !localStorage.warnedAboutIcons) {
+    notify(
+      'Page notes icons have changed significantly. Please accustom ' +
+      'yourself with the new icons. If you\'d rather keep using old icons, ' +
+      'you can do so by selecting \'Use old browser icons\' on the ' +
+      '\'Options\' page.', 'info');
+    localStorage.warnedAboutIcons = true;
+  }
+}
+
+function init() {
+  checkAndNotify();
+  e('debug').innerHTML = 'Messages from last sync: \n' + bgPage.debug.msg;
+  syncStatus();
+  updateFeatureButtons();
   setupHandlers();
-});
+  // Disable clear local data button if there is not data.
+  if (!bgPage.pageNotes.getSource()) {
+    e('clear_local').disabled = true;
+  }
+  // Following is part of the setup sync workflow.
+  if (localStorage.hasOwnProperty('nextAction') && localStorage.nextAction === 'setup_sync') {
+    localStorage.nextAction = '';
+    setupSync();
+  }
+}
+
+document.addEventListener('DOMContentLoaded', init);
