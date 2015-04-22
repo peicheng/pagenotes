@@ -61,7 +61,7 @@ function setIcon(tab, suffix, badgeText) {
   chrome.browserAction.setIcon({
     path: {
       19: 'icons/icon' + suffix + '_19.png',
-      38: 'icons/icon' + suffix + '_38.png',
+      38: 'icons/icon' + suffix + '_38.png'
     },
     tabId: tab.id
   });
