@@ -50,6 +50,11 @@ function afterEdit() {
 function saveNotes() {
   e('warning').innerHTML = '';
   var data = e('notes').innerHTML.replace(/&nbsp;/gi, ' ').trim();
+  if (!data) {
+    e('warning').innerHTML = 'Notes cannot be empty.';
+    enableEdit();
+    return 0;
+  }
   // If encrypt is checked.
   var encrypted = false;
   if (e('encrypt').checked === true) {
