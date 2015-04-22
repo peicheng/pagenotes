@@ -271,6 +271,9 @@ function init() {
 
 // TODO(manugarg): Remove after upgrade to > 2.2.3 is complete
 function convertPageNotes() {
+  if (!pageNotes.getSource()) {
+    return;
+  }
   var pageNotesString = convertPageNotesString(pageNotes.getSource());
   if (pageNotesString !== pageNotes.getSource()) {
     pageNotes.setSource(pageNotesString);

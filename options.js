@@ -162,12 +162,13 @@ function checkAndNotify() {
   if (localStorage.lastVersion) {
     var lastMajorVersion = localStorage.lastVersion.replace(/(\d+\.\d+)\.\d+/, '$1');
   }
-  lastMajorVersion = '2.3';
+  // If you were using a version with old icons and haven't been warned about
+  // icons change.
   if (lastMajorVersion === '2.3' && !localStorage.warnedAboutIcons) {
     notify(
-      'Page notes icons have changed significantly. Please accustom ' +
-      'yourself with the new icons. If you\'d rather keep using old icons, ' +
-      'you can do so by selecting \'Use old browser icons\' on the ' +
+      'Important: Page notes icons have changed significantly. Please ' + 
+      'accustom yourself with the new icons. If you\'d rather keep using old' +
+      ' icons, you can do so by selecting \'Use old browser icons\' on the ' +
       '\'Options\' page.', 'info');
     localStorage.warnedAboutIcons = true;
   }
