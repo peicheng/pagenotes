@@ -65,21 +65,30 @@ function initPage() {
       link.attr('href', 'http://' + keys[i]);
     }
 
+    // Check if notes are encrypted
+    var notes = pageNotes[keys[i]];
+    if (notes.length >= 3 && notes[2]) {
+      var notesText = '***************';
+      var editButtonText = 'Decrypt';
+    } else {
+      notesText = markupTagsInNotes(notes[0]);
+      editButtonText = 'Edit';
+    }
+
     // Second cell
-    var date = formatDate(pageNotes[keys[i]][1]);
+    var date = formatDate(notes[1]);
     // If hour is in single digit, add an extra in the front for better alignment.
     // date = date.replace(/ (\d:\d\d:\d\d)+/, "  $1");
     $('<div/>').addClass('date-div').html(date)
       .appendTo($('<td/>').appendTo(row));
     
     // Third cell
-    var notes = markupTagsInNotes(pageNotes[keys[i]][0]);
-    $('<div/>').addClass('notes-div').html(notes)
+    $('<div/>').addClass('notes-div').html(notesText)
       .appendTo($('<td/>').appendTo(row));
     
     // Fourth cell
     var buttonCell = $('<td/>').appendTo(row);
-    $('<button/>').addClass('editB').html('Edit').appendTo(buttonCell);
+    $('<button/>').addClass('editB').html(editButtonText).appendTo(buttonCell);
     var deleteB = bgPage.deleteButton('Delete', keys[i], reload, 'Are you sure you want to delete these notes? ');
     $(deleteB).appendTo(buttonCell);
   }
@@ -94,11 +103,55 @@ function formatDate(date) {
   return d.toDateString().replace(/^[^ ]+ /, '') + ' ' +  d.toTimeString().replace(/ GMT.*$/,'');  
 }
 
+function warning(par, text) {
+  var warningDiv = par.find('.warning');
+  if (warningDiv.length == 0) {
+    warningDiv = $('<div/>').addClass('warning').appendTo(par);
+  }
+  warningDiv.html(text);
+}
+
+function handleDecrypt(row, url, editButton) {
+  var tdControl = row.children('td:nth-child(4)');
+  var ppLabel = row.find('.passphrase-label');
+  if (ppLabel.length == 0) {
+    var ppLabel = $('<label/>').css('margin-bottom', '5px').addClass('passphrase-label').html('Passphrase: ').prependTo(tdControl);
+    $('<input/>').prop('type', 'password').addClass('passphrase-input').appendTo(ppLabel);
+    return;
+  }
+  var pp = row.find('.passphrase-input')[0].value;
+  if (pp === '') {
+    warning(tdControl, 'Passphrase cannot be empty.');
+    return;
+  }
+  var decrypted = bgPage.CryptoJS.AES.decrypt(pageNotes[url][0], pp).toString(bgPage.CryptoJS.enc.Utf8);
+  if (decrypted === '') {
+    warning(tdControl, 'Wrong passphrase.');
+    return;
+  }
+  var divNotes = row.find('.notes-div');
+  divNotes.html(decrypted);
+  editButton.html('Hide');
+  ppLabel.remove();
+}
+
 function Edit(e) {
   var par = $(this).parent().parent(); //tr
+  // Clear warning field.
+  warning(par, '');
   var tdURL = par.children('td:nth-child(1)').children('a:nth-child(1)').html();
-  // Open notes div for editing
+  // If we are decrypting
+  if ($(this).html() === 'Decrypt') {
+    handleDecrypt(par, tdURL, $(this));
+    return;
+  }
   var divNotes = par.find('.notes-div');
+  if ($(this).html() === 'Hide') {
+    $(this).html('Decrypt');
+    divNotes.html('**********');
+    return;
+  }
+  // Open notes div for editing
   divNotes.html(pageNotes[tdURL][0]);
   divNotes.addClass('editable');
   divNotes.focus();
