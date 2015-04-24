@@ -1,4 +1,7 @@
 var relnotes = {
+  "2.4.1": [
+    "Affects only encrypted page notes: add a facility to <a href='/allnotes.html'>all notes</a> page to decrypt and see encrypted page notes after providing the passphrase."
+  ],
   "2.4.0": [
     "New icons. Browser icon now changes color if there are notes available for a page. There is an option to continue using older icons if you prefer so.",
     "Add an option to encrypt page notes with a user provided passphrase. Passphrase is not stored anywhere; if you forget the passphrase for any reason, encrypted notes will become irrecoverable."

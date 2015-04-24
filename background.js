@@ -38,8 +38,6 @@ var debug = {
 
 var lastSyncStatus;
 
-// chrome.browserAction.setBadgeText({'text': 'pn'});
-
 // Update badge text on tab change.
 chrome.tabs.onSelectionChanged.addListener(function (tabId) {
   chrome.tabs.get(tabId, updateBadgeForTab);
