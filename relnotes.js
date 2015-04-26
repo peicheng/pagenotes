@@ -1,4 +1,7 @@
 var relnotes = {
+  "2.4.3": [
+    "Fix a table cell width issue on the all notes page."
+  ],
   "2.4.2": [
     "For encrypted notes, show passphrase prompt by default in the popup.",
     "To make the popup less crowded, use a delete icon for the delete button and don't show it if there are no notes.",
