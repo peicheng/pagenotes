@@ -86,7 +86,7 @@ function initPage() {
     
     // Third cell
     $('<div/>').addClass('notes-div').html(notesText)
-      .appendTo($('<td/>').appendTo(row));
+      .appendTo($('<td/>').addClass('notesTD').appendTo(row));
     
     // Fourth cell
     var buttonCell = $('<td/>').addClass('buttons').appendTo(row);
