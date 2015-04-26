@@ -1,4 +1,10 @@
 var relnotes = {
+  "2.4.2": [
+    "For encrypted notes, show passphrase prompt by default in the popup.",
+    "To make the popup less crowded, use a delete icon for the delete button and don't show it if there are no notes.",
+    "Improve buttons appearance on 'all notes' page. Fix the width and the spacing between them.",
+    "Use green color text for the Decrypt/Hide button on 'all notes' page to make them stand out."
+  ],
   "2.4.1": [
     "Affects only encrypted page notes: add a facility to <a href='/allnotes.html'>all notes</a> page to decrypt and see encrypted page notes after providing the passphrase."
   ],
