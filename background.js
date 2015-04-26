@@ -318,37 +318,33 @@ function handleFirstRun() {
   }
 }
 
-function deleteButton(name, key, callback, warningMessage) {
-  var button = document.createElement('button');
-  button.className = 'deleteB';
-  button.innerHTML = name;
-
-  button.addEventListener('click', function() {
-    if (this.innerHTML === 'No') {
-      callback();
-      return;
-    }
-    if (this.innerHTML !== 'Yes' && this.innerHTML !== 'No') {
-      var deleteBlock = this.parentNode;
-      while (deleteBlock.firstChild) {
-        deleteBlock.removeChild(deleteBlock.firstChild);
-      }
-
-      deleteBlock.innerHTML = warningMessage;
-
-      var noButton = deleteButton('No', key, callback, '');
-      deleteBlock.appendChild(noButton);
-
-      var yesButton = deleteButton('Yes', key, callback, '');
-      deleteBlock.appendChild(yesButton);
-      return;
-    }
-    pageNotes.remove(key);
-    localStorage.lastModTime = new Date().getTime();
+function deleteButtonHandler(elem, key, callback, warningMessage) {
+  if (elem.innerHTML === 'No') {
     callback();
-  });
+    return;
+  }
+  if (elem.innerHTML !== 'Yes' && elem.innerHTML !== 'No') {
+    var deleteBlock = elem.parentNode;
+    // Clear parent div.
+    while (deleteBlock.firstChild) {
+      deleteBlock.removeChild(deleteBlock.firstChild);
+    }
+    deleteBlock.innerHTML = warningMessage;
 
-  return button;
+    var confirmButtons = ['Yes', 'No'];
+    for (var i = 0; i < confirmButtons.length; i++) {
+      var button = document.createElement('button');
+      button.innerHTML = confirmButtons[i];
+      button.addEventListener('click', function() {
+        deleteButtonHandler(this, key, callback, '');
+      }); 
+      deleteBlock.appendChild(button);
+    }
+    return;
+  }
+  pageNotes.remove(key);
+  localStorage.lastModTime = new Date().getTime();
+  callback();
 }
 
 document.addEventListener('DOMContentLoaded', function () {

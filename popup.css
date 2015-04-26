@@ -15,8 +15,11 @@
   margin-top:8px;
 }
 
+#encrypt-passphrase-div {
+  padding-top: 3px;  
+}
+
 #control-div {
-  padding-left: 1px;
   margin-top: 8px;
 }
 
@@ -31,5 +34,13 @@ input {
 
 a {
   font-size: 90%;
+  padding-left: 2px;
+  vertical-align: bottom;
+}
+
+#delete {
+  float: right;
+  height: 14px;
+  padding-top: 2px;
 }
 

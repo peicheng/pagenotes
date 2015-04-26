@@ -70,9 +70,11 @@ function initPage() {
     if (notes.length >= 3 && notes[2]) {
       var notesText = '***************';
       var editButtonText = 'Decrypt';
+      var editButtonClass = 'decryptB';
     } else {
       notesText = markupTagsInNotes(notes[0]);
       editButtonText = 'Edit';
+      var editButtonClass = 'editB';
     }
 
     // Second cell
@@ -87,12 +89,16 @@ function initPage() {
       .appendTo($('<td/>').appendTo(row));
     
     // Fourth cell
-    var buttonCell = $('<td/>').appendTo(row);
-    $('<button/>').addClass('editB').html(editButtonText).appendTo(buttonCell);
-    var deleteB = bgPage.deleteButton('Delete', keys[i], reload, 'Are you sure you want to delete these notes? ');
-    $(deleteB).appendTo(buttonCell);
+    var buttonCell = $('<td/>').addClass('buttons').appendTo(row);
+    $('<button/>').addClass(editButtonClass).html(editButtonText).appendTo(buttonCell);
+    var deleteB = $('<button/>').addClass('deleteB').html('Delete').appendTo(buttonCell);
+    key = keys[i];
+    deleteB.click(function() {
+      bgPage.deleteButtonHandler(this, key, reload, 'Are you sure you want to delete these notes? ');
+    });
   }
   allNotes.on('click', 'button.editB', Edit);
+  allNotes.on('click', 'button.decryptB', Edit);
   allNotes.on('click', 'button.saveB', Save);
   allNotes.on('click', 'button.cancelB', Cancel);
   $('#notesTable').trigger('update', [true]);

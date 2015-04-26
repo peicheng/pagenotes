@@ -130,20 +130,20 @@ function setupEditButtonHandler() {
   }, true);
 }
 
-function fixDeleteButton(key) {
-  if (key === '') {
-    e('delete').disabled = true;
+function fixDeleteButton(key, disabled) {
+  if (key === '' || disabled) {
+    e('delete').remove();
     return;
   }
   var callback = function() {
     bgPage.updateBadgeForTab(tab);
     window.close();
   };
-  e('control-div').replaceChild(
-    bgPage.deleteButton(
-      'Delete', key, callback,
-      'Are you sure you want to delete notes for this page? '),
-    e('delete'));
+  e('delete').addEventListener('click', function() {
+     bgPage.deleteButtonHandler(
+         this, key, callback,
+         'Are you sure you want to delete notes for this page? '); 
+  });
 }
 
 function updatePopUpForTab(currentTab) {
@@ -174,7 +174,7 @@ function updatePopUpForTab(currentTab) {
     }
   }
 
-  fixDeleteButton(key);
+  fixDeleteButton(key, !notes);
   if (!localStorage.gFile) {
     document.getElementById("setup-sync").style.visibility = "";
   }

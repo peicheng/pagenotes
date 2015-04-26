@@ -12,8 +12,18 @@ table, #tag-cloud{
 }
 
 .buttons {
-  width: 180px;
-  text-align: center;
+  width: 200px;
+  word-wrap: normal;
+  word-break: normal;
+}
+
+button.editB, button.deleteB, button.decryptB {
+  margin-right: 5px;
+  width: 60px;
+}
+
+button.decryptB {
+  color: green;
 }
 
 #tag-cloud {
