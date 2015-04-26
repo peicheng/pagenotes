@@ -91,11 +91,6 @@ function handleDecrypt() {
   e('warning').innerHTML = '';
   var pp = e('decrypt-passphrase').value;
   if (pp === '') {
-    // Prompt for decrypt passphrase if not prompted already
-    if (e('decrypt-passphrase-div').style.display === 'none') {
-      e('decrypt-passphrase-div').style.display = 'block';
-      return;
-    }
     e('warning').innerHTML = 'Decrypt passphrase cannot be empty.';
     return;
   }
@@ -172,6 +167,7 @@ function updatePopUpForTab(currentTab) {
   } else {
     if (notes.length >= 3 && notes[2]) {
       e('notes').innerHTML = '***************';
+      e('decrypt-passphrase-div').style.display = 'block';
       e('edit').innerHTML = 'Decrypt';
     } else {
       e('notes').innerHTML = notes[0];
