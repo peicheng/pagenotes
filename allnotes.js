@@ -1,7 +1,7 @@
 /*
  * Copyright 2012 Manu Garg
  * @author manugarg@google.com (Manu Garg)
-
+ 
  * Directive for JSLint, so that it doesn't complain about these names not being
  * defined.
  */
@@ -12,7 +12,9 @@ var pageNotes = {};
 var tagIndex = {};
 
 function extractTags(text) {
-  if (!text) { return []; }
+  if (!text) {
+    return [];
+  }
   // Hack to get a clean plain text string from HTML:
   // Parse text string into an array of DOM elements using parseHTML, then
   // for each DOM element, put it into a new <div> element and get the text
@@ -20,7 +22,9 @@ function extractTags(text) {
   var t = $.parseHTML(text).map(function(x) {
     return $('<div>').html(x).text();
   }).join(' ');
-  return t.replace(/(\n|\t)+/g, ' ').split(' ').filter(function(x) { return x.match(/^#/); });
+  return t.replace(/(\n|\t)+/g, ' ').split(' ').filter(function(x) {
+    return x.match(/^#/);
+  });
 }
 
 function markupTagsInNotes(notes) {
@@ -53,7 +57,7 @@ function initPage() {
     }
   });
   keys.sort();
-  
+
   var allNotes = $('#all-notes').html('');
   for (var i = 0; i < keys.length; i++) {
     var row = $('<tr/>').appendTo(allNotes);
@@ -83,16 +87,18 @@ function initPage() {
     // date = date.replace(/ (\d:\d\d:\d\d)+/, "  $1");
     $('<div/>').addClass('date-div').html(date)
       .appendTo($('<td/>').appendTo(row));
-    
+
     // Third cell
     $('<div/>').addClass('notes-div').html(notesText)
       .appendTo($('<td/>').addClass('notesTD').appendTo(row));
-    
+
     // Fourth cell
     var buttonCell = $('<td/>').addClass('buttons').appendTo(row);
     $('<button/>').addClass(editButtonClass).html(editButtonText).appendTo(buttonCell);
     var deleteB = $('<button/>').addClass('deleteB').html('Delete').appendTo(buttonCell);
-    deleteB.click({key: keys[i]}, function(event) {
+    deleteB.click({
+      key: keys[i]
+    }, function(event) {
       bgPage.deleteButtonHandler(this, event.data.key, reload, 'Are you sure you want to delete these notes? ');
     });
   }
@@ -105,7 +111,7 @@ function initPage() {
 
 function formatDate(date) {
   var d = new Date(date);
-  return d.toDateString().replace(/^[^ ]+ /, '') + ' ' +  d.toTimeString().replace(/ GMT.*$/,'');  
+  return d.toDateString().replace(/^[^ ]+ /, '') + ' ' + d.toTimeString().replace(/ GMT.*$/, '');
 }
 
 function warning(par, text) {
@@ -184,7 +190,7 @@ function Cancel() {
   // Replace Cancel button with Delete button
   var deleteB = bgPage.deleteButton('Delete', tdURL, reload, 'Are you sure you want to delete these notes? ');
   $(this).replaceWith($(deleteB));
-  }
+}
 
 function Save(e) {
   var par = $(this).parent().parent(); //tr
@@ -230,16 +236,16 @@ function buildTagCloud() {
   tags.sort(function(a, b) {
     if (a.value > b.value) return -1;
     if (a.value < b.value) return 1;
-    if (a.key > b.key ) return 1;
-    if (a.key < b.key ) return -1;
+    if (a.key > b.key) return 1;
+    if (a.key < b.key) return -1;
     return 0;
   });
-  
+
   $('#tag-cloud').html('');
   $('#tag-cloud').append('<li><a class="tag-link" href="">All</a></li>');
   for (var i = 0; i < tags.length; i++) {
     if (window.location.hash === tags[i].key) {
-      $('#tag-cloud').append('<li><a class="tag-link selected-tag" href="">' + tags[i].key + '(' + tags[i].value +')</a></li>');
+      $('#tag-cloud').append('<li><a class="tag-link selected-tag" href="">' + tags[i].key + '(' + tags[i].value + ')</a></li>');
     } else {
       $('#tag-cloud').append('<li><a class="tag-link" href="">' + tags[i].key + '(' + tags[i].value + ')' + '</a></li>');
     }
@@ -253,7 +259,7 @@ $(document).on('click', '.tag-link', function() {
   if (tag.match(/(.*)\([0-9]+\)/)) {
     tag = tag.match(/(.*)\([0-9]+\)/)[1];
   }
-  if($(this).attr('class').indexOf('selected-tag') == -1) {
+  if ($(this).attr('class').indexOf('selected-tag') == -1) {
     window.location.hash = tag;
   } else {
     window.location.hash = '';
@@ -265,13 +271,14 @@ $(document).on('click', '.tag-link', function() {
 
 // Based on this response on stackoverflow:
 // http://stackoverflow.com/questions/1125292/how-to-move-cursor-to-end-of-contenteditable-entity/3866442#3866442
+
 function moveCursorToTheEnd(element) {
   var range = document.createRange(); // Create a range (a range is a like the selection but invisible)
-  range.selectNodeContents(element);  // Select the entire contents of the element with the range
-  range.collapse(false);              // collapse the range to the end point. false means collapse to end rather than the start
-  var sel = window.getSelection();    // get the selection object (allows you to change selection)
-  sel.removeAllRanges();              // remove any selections already made
-  sel.addRange(range);                // make the range you have just created the visible selection
+  range.selectNodeContents(element); // Select the entire contents of the element with the range
+  range.collapse(false); // collapse the range to the end point. false means collapse to end rather than the start
+  var sel = window.getSelection(); // get the selection object (allows you to change selection)
+  sel.removeAllRanges(); // remove any selections already made
+  sel.addRange(range); // make the range you have just created the visible selection
 }
 
 function exportToCsv() {
@@ -280,7 +287,7 @@ function exportToCsv() {
   content.push(['URL', 'Date', 'Notes'].join(colDelimiter));
   $.each(new PageNotes().getAll(), function(url, note) {
     content.push([url, formatDate(note[1]), note[0]].map(function(item) {
-      return item.replace(/"/g, '""');  // Escape double quotes
+      return item.replace(/"/g, '""'); // Escape double quotes
     }).join(colDelimiter));
   });
   var csv = '"' + content.join('"\r\n"') + '"';
@@ -295,8 +302,12 @@ document.addEventListener('DOMContentLoaded', function() {
     headerTemplate: '{content}{icon}',
     headers: {
       // disable sorting of the first column (we start counting at zero)
-      3: { sorter: false }
+      3: {
+        sorter: false
+      }
     },
-    sortList: [[0,0]]
+    sortList: [
+      [0, 0]
+    ]
   });
 });

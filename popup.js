@@ -99,7 +99,7 @@ function handleDecrypt() {
     e('warning').innerHTML = 'Wrong passphrase.';
     return;
   }
-  
+
   // Show decrypted notes and do rest of the setup.
   e('notes').innerHTML = decrypted;
   e('decrypt-passphrase-div').style.display = 'none';
@@ -140,9 +140,9 @@ function fixDeleteButton(key, disabled) {
     window.close();
   };
   e('delete').addEventListener('click', function() {
-     bgPage.deleteButtonHandler(
-         this, key, callback,
-         'Are you sure you want to delete notes for this page? '); 
+    bgPage.deleteButtonHandler(
+      this, key, callback,
+      'Are you sure you want to delete notes for this page? ');
   });
 }
 
