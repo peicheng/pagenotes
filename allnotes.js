@@ -92,9 +92,8 @@ function initPage() {
     var buttonCell = $('<td/>').addClass('buttons').appendTo(row);
     $('<button/>').addClass(editButtonClass).html(editButtonText).appendTo(buttonCell);
     var deleteB = $('<button/>').addClass('deleteB').html('Delete').appendTo(buttonCell);
-    key = keys[i];
-    deleteB.click(function() {
-      bgPage.deleteButtonHandler(this, key, reload, 'Are you sure you want to delete these notes? ');
+    deleteB.click({key: keys[i]}, function(event) {
+      bgPage.deleteButtonHandler(this, event.data.key, reload, 'Are you sure you want to delete these notes? ');
     });
   }
   allNotes.on('click', 'button.editB', Edit);
