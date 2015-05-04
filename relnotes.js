@@ -1,4 +1,10 @@
 var relnotes = {
+  "2.4.5": [
+    "Fix a bug where page notes will keep opening options page for new installs everytime browser re-starts."
+  ],
+  "2.4.4": [
+    "Fix a bug in all notes page, where key will get tied to the wrong notes."
+  ],
   "2.4.3": [
     "Fix a table cell width issue on the all notes page."
   ],
