@@ -303,7 +303,13 @@ function versionTracking() {
 }
 
 function handleIconsUpdate() {
-  if (!localStorage.warnedAboutIcons) {
+  var lastMajorVersion = "";
+  if (localStorage.lastVersion) {
+    lastMajorVersion = localStorage.lastVersion.replace(/(\d+\.\d+)\.\d+/, '$1');
+  }
+  // If you were using a version with old icons and haven't been warned about
+  // icons change.
+  if (lastMajorVersion === '2.3' && !localStorage.warnedAboutIcons) {
     chrome.tabs.create({'url': chrome.extension.getURL('options.html')});
   }
 }
