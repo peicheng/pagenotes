@@ -4,7 +4,7 @@ _Chrome extension that makes web easy and more powerful. For screenshots and to 
 
 **Take notes for the web pages and sync them automatically to your Google Drive.**
 
-Ever needed to note down something about a webpage e.g. login id, password/password hints, frequent flyer number, membership number, tracking id etc. Something that you want to remember when you visit that page again. Add page notes to chrome and remember nothing; not even where and how to look for the information :) Page notes does all the remembering for you.
+Ever needed to note down something about a webpage e.g. login id, password/password hints, frequent flyer number, membership number, tracking id etc. Something that you want to remember when you visit that page again. Add page notes to chrome and remember nothing, not even where and how to look for the information. Page notes does all the remembering for you.
 
 You can take and access notes with a single click. Extension lets you know when there are notes for a webpage by changing its color. Your notes can live in the cloud allowing you to be free of the device. It's secure: data stays in your browser and in your Google drive; you can encrypt your notes if you want that extra level of security. There's more. See below for full features list.
 
