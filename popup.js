@@ -12,6 +12,7 @@ var bgPage = chrome.extension.getBackgroundPage();
 // Global variable for selected tab.
 var tab;
 var notes;
+var disableSaveOnClose = false;
 
 function e(id) {
   return document.getElementById(id);
@@ -137,6 +138,7 @@ function fixDeleteButton(key, disabled) {
   }
   var callback = function() {
     bgPage.updateBadgeForTab(tab);
+    disableSaveOnClose = true;
     window.close();
   };
   e('delete').addEventListener('click', function() {
@@ -192,6 +194,14 @@ function moveCursorToTheEnd(element) {
   sel.addRange(range); // make the range you have just created the visible selection
 }
 
+function setupUnloadEvent() {
+  addEventListener("unload", function (event) {
+    if (!disableSaveOnClose) {
+      saveNotes();
+    }
+  }, true);  
+}
+
 window.setTimeout(function() {
   e('sitelevel').blur();
 }, 100);
@@ -200,4 +210,5 @@ document.addEventListener('DOMContentLoaded', function() {
   setupEditButtonHandler();
   handleEncOptionsVisibility();
   chrome.tabs.getSelected(null, updatePopUpForTab);
+  setupUnloadEvent();
 });
