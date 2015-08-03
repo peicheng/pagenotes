@@ -196,7 +196,7 @@ function moveCursorToTheEnd(element) {
 
 function setupUnloadEvent() {
   addEventListener("unload", function (event) {
-    if (!disableSaveOnClose) {
+    if (!disableSaveOnClose && (e('edit').innerHTML.trim() === 'Save')) {
       saveNotes();
     }
   }, true);  
