@@ -1,4 +1,7 @@
 var relnotes = {
+  "2.4.7": [
+    "Add Save-On-Close feature. If you accidentally close the notes before saving them, notes will be automatically saved."
+  ],
   "2.4.5": [
     "Fix a bug where page notes will keep opening options page for new installs everytime browser re-starts."
   ],
