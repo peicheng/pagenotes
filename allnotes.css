@@ -8,7 +8,7 @@ table, #tag-cloud{
 }
 
 td.urlTD {
-  min-width: 200px;
+  min-width: 100px;
 }
 
 td.notesTD {
