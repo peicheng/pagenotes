@@ -28,7 +28,7 @@ h2 {
 
 .notes-div {
   color: #111;
-  white-space: pre;
+  white-space: pre-line;
 }
 
 .not-editable {

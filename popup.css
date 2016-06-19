@@ -4,7 +4,7 @@
 }
 
 #notes {
-  white-space: pre;
+  white-space: pre-line;
   border-radius: 3px;
   margin-bottom: 9px;
   padding: 1px;

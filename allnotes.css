@@ -7,6 +7,10 @@ table, #tag-cloud{
   word-break: break-all;
 }
 
+td.urlTD {
+  min-width: 200px;
+}
+
 td.notesTD {
   min-width: 200px;
 }

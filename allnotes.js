@@ -64,7 +64,7 @@ function initPage() {
 
     // First cell
     var link = $('<a/>').attr('href', keys[i]).html(keys[i])
-      .appendTo($('<td/>').appendTo(row));
+      .appendTo($('<td/>').addClass('urlTD').appendTo(row));
     if (link.prop('protocol') == 'chrome-extension:') {
       link.attr('href', 'http://' + keys[i]);
     }
