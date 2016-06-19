@@ -1,4 +1,7 @@
 var relnotes = {
+  "2.4.8": [
+    "Preserve whitespace while showing up notes."
+  ],
   "2.4.7": [
     "Add Save-On-Close feature. If you accidentally close the notes before saving them, notes will be automatically saved."
   ],
