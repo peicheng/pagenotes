@@ -1,5 +1,5 @@
 var relnotes = {
-  "2.4.8-9": [
+  "2.4.8-10": [
     "Preserve whitespace while showing up notes."
   ],
   "2.4.7": [
