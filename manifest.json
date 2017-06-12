@@ -1,6 +1,6 @@
 {
   "name": "Page Notes",
-  "version": "2.4.8",
+  "version": "2.4.11",
   "manifest_version": 2,
   "description": "Take notes for web pages and access them with a single click whenever you visit those web pages again. (Syncs to Google Drive)",
   "background": {
